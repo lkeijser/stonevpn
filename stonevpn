@@ -1,0 +1,514 @@
+#!/usr/bin/env python
+"""
+ stonevpn - OpenVPN Certificate Management
+
+ by L.S. Keijser, <keijser@stone-it.com>
+
+ create OpenVPN certificates using Python and OpenSSL
+ with optional configuration files (using templates) for
+ *nix or Windows OS, and zipfile-packaging
+
+
+ depends on: python2.4 python-configobj python-ipy and a customized python-pyopenssl (due to the CRL patch)
+ 
+ Only runs on Linux
+
+ disclaimer: VNOCI (verynonoptimalcodeincluded)
+
+ TODO:  - printing crl.pem
+        - clean up script
+        - passwords
+"""
+
+import os, sys, shutil
+from OpenSSL import SSL, crypto
+from optparse import OptionParser
+from configobj import ConfigObj
+
+stonevpnver = '0.3.3'
+stonevpnconf = '/etc/stonevpn.conf'
+
+# must..have..root..
+def gotRoot():
+    import commands
+    myId = commands.getstatusoutput('id -u')[1]
+    if not myId == '0':
+        print "Sorry, "+color('red')+"root"+color('0')+" privileges required for this action."
+        sys.exit(0)
+
+# Read main configuration from stonevpn.conf
+def readMainConf():
+    config = ConfigObj(stonevpnconf)
+    sectionname = 'stonevpn conf'
+    section=config[sectionname]
+    # here come the global variables (can be called from anywhere in the program)
+    global cacertfile, cakeyfile, openvpnconf, ccddir, working, opensslconf, pushrouter, ciphermethodi, prefix, crlfile
+    crlfile = section['crlfile']
+    prefix = section['prefix']
+    pushrouter = section['pushrouter']
+    cacertfile = section['cacertfile']
+    cakeyfile = section['cakeyfile']
+    openvpnconf = section['openvpnconf']
+    ccddir = section['ccddir']
+    working = section['working']
+    opensslconf = section['opensslconf']
+    ciphermethod = section['cipher']
+
+
+# Make things pretty with colors
+def color(code):
+    if code == 'red': return '\033[1;31m'
+    if code == 'green': return '\033[1;32'
+    if code == 'yellow': return '\033[1;33'
+    if code == 'blue': return '\033[1;34'
+    if code == '0': return '\033[0m'
+
+# Read certain vars from OpenSSL config file
+def readOpenSSLConf():
+    config = ConfigObj(opensslconf)
+    sectionname = 'req_distinguished_name'
+    section=config[sectionname]
+    # make these variables also global
+    global countryName, stateOrProvinceName, localityName, organizationName, organizationalUnitName, defaultDays, prefixdir, indexdb, serialfile
+    try:
+        countryName = section['countryName_default']
+        stateOrProvinceName = section['stateOrProvinceName_default']
+        localityName = section['localityName_default']
+        organizationName = section['0.organizationName_default']
+        organizationalUnitName = section['organizationalUnitName_default']
+    except KeyError:
+        print "KeyError: did you adjust " + opensslconf + " according to the Stone OpenVPN SOS?"
+        sys.exit()
+    sectionname = 'CA_default'
+    section=config[sectionname]
+    defaultDays = section['default_days']
+    prefixdir = section['dir']
+    indexdb = section['database'].replace('$dir', prefixdir)
+    serialfile = section['serial'].replace('$dir', prefixdir)
+
+if os.path.exists(stonevpnconf):
+    readMainConf()
+else:
+    print "File " + stonevpnconf + " does not exist!"
+    sys.exit()
+
+if os.path.exists(opensslconf):
+    readOpenSSLConf()
+else:
+    print "File " + opensslconf + " does not exist!"
+    sys.exit()
+
+# command line options
+parser = OptionParser(usage="%prog -f <filename> -n <commonname> [ -o unix|windows | -z | -h | -i | -r <serial> | -l |-a ]",version="%prog " + stonevpnver)
+
+# how to add more options:
+# syntax: parser.add_options("-option", "--longoption",
+#             action="store", type="string", dest="<variable>", default="<default for var>", help="<help text>")
+# use action="store_true" if the option doesn't require an argument
+parser.add_option("-n", "--name",
+    action="store", type="string", dest="cname", help="Common Name, use quotes: \"CNAME\"")
+parser.add_option("-f", "--file",
+    dest="fname", help="write to file FNAME (no extension!)")
+parser.add_option("-o", "--config",
+    action="store", dest="confs", default="unix", help="create config files for [windows|unix]")
+parser.add_option("-e", "--prefix",
+    action="store", dest="prefix", default=prefix, help="prefix (almost all) generated files. Default = " + str(prefix))
+parser.add_option("-z", "--zip",
+    action="store_true", dest="zip", help="create ZIP-file and delete the rest")
+parser.add_option("-i", "--free-ip",
+    action="store_true", dest="freeip", help="locate and assign free ip (EXPERIMENTAL)")
+parser.add_option("-p", "--password",
+    action="store_true", dest="password", help="prompt for password when generating private key (EXPERIMENTAL)")
+parser.add_option("-r", "--revoke",
+    action="store", dest="serial", help="revoke certificate with serial SERIAL")
+parser.add_option("-l", "--listrevoked",
+    action="store_true", dest="listrevoked", help="list revoked certificates")
+parser.add_option("-a", "--listall",
+    action="store_true", dest="listall", help="list all certificates")
+parser.add_option("-s", "--showserial",
+    action="store_true", dest="showserial", help="Display current SSL serial number from " + serialfile )
+parser.add_option("-c", "--printcrl",
+    action="store_true", dest="printcrl", help="Prints CRL file " + crlfile )
+parser.add_option("-d", "--printindex",
+    action="store_true", dest="printindex", help="Prints index file " + indexdb )
+parser.add_option("-t", "--test",
+    action="store_true", dest="test", help="Danger, Will Robinson, Danger! test parameter - can do anything! Review source before executing!")
+
+# parse cmd line options
+(options, args) = parser.parse_args()
+
+def checkFileOption():
+    if not options.fname:
+        print color('red')+"Error"+color('0')+": no filename specified! Try " + sys.argv[0] + " --help"
+        sys.exit()
+
+# define some crypto stuff
+TYPE_RSA = crypto.TYPE_RSA
+TYPE_DSA = crypto.TYPE_DSA
+FILETYPE = crypto.FILETYPE_PEM
+
+# check if working dir exists, create it if it doesn't
+if not os.path.exists(working):
+    print "Working dir didn't exist, making ..."
+    os.mkdir(working)
+
+# Create key
+def createKeyPair(type, bits):
+    pkey = crypto.PKey()
+    pkey.generate_key(type, bits)
+    return pkey
+
+# Create request
+def createCertRequest(pkey, digest="md5", **name):
+    req = crypto.X509Req()
+    subj = req.get_subject()
+    for (key,value) in name.items():
+        setattr(subj, key, value)
+    req.set_pubkey(pkey)
+    req.sign(pkey, 'md5')
+    return req
+
+# decimal 2 hexidecimal and vice versa
+def dec2hex(n):
+    return "%X" % n
+
+def hex2dec(s):
+    return int(s, 16)
+
+def printIndexDB():
+    f=open(indexdb, 'r')
+    for line in f:
+	print line
+    f.close()
+
+def readSerial():
+    f=open(serialfile, 'r')
+    serial = f.readline()
+    f.close()
+    return serial
+
+def writeSerial(serial):
+    f=open(serialfile, 'w')
+    f.write(serial)
+    f.close()
+
+def writeIndex(index):
+    f=open(indexdb, 'a')
+    f.write(index)
+    f.close()
+
+def printCRL():
+    print "Function not implemented yet."
+
+# Create certificate
+def createCertificate(req, (issuerCert, issuerKey), serial, (notBefore, notAfter), digest="md5"):
+    extensions = []
+    extensions.append(crypto.X509Extension('basicConstraints',1, 'CA:FALSE'))
+    extensions.append(crypto.X509Extension('nsComment',0, 'Created with stonevpn ' + str(stonevpnver)))
+    cert = crypto.X509()
+    cert.set_version ( 2 )
+    cert.add_extensions(extensions)
+    from string import atoi
+    goodserial = atoi(str(serial), 16)
+    cert.set_serial_number(goodserial)
+    cert.gmtime_adj_notBefore(notBefore)
+    cert.gmtime_adj_notAfter(notAfter)
+    cert.set_issuer(issuerCert.get_subject())
+    cert.set_subject(req.get_subject())
+    cert.set_pubkey(req.get_pubkey())
+    cert.sign(issuerKey, digest)
+    return cert
+
+# Password
+def getPass():
+    import getpass
+    return getpass.getpass('Enter password: ')
+
+# Simple routines to load/save files using crypto lib
+def save_key ( fn, key ):
+    fp = open ( fn, 'w' )
+    if options.password:
+        fp.write ( crypto.dump_privatekey ( FILETYPE, key, ciphermethod, getPass() ) )
+    else:
+        fp.write ( crypto.dump_privatekey ( FILETYPE, key ) )
+    fp.close ()
+
+def save_cert ( fn, cert ):
+    fp = open ( fn, 'w' )
+    fp.write ( crypto.dump_certificate ( FILETYPE, cert ) )
+    fp.close ()
+
+def load_key ( fn ):
+    fp = open ( fn, 'r' )
+    ret = crypto.load_privatekey ( FILETYPE, fp.read() )
+    fp.close ()
+    return ret
+
+def load_cert ( fn ):
+    fp = open ( fn, 'r' )
+    ret = crypto.load_certificate ( FILETYPE, fp.read() )
+    fp.close ()
+    return ret
+
+# Generate keyfile and certificate
+def makeCert(fname, cname):
+    pkey = createKeyPair(TYPE_RSA, 1024)
+    req = createCertRequest(pkey, CN=cname, C=countryName, ST=stateOrProvinceName, O=organizationName, OU=organizationalUnitName)
+    try:
+        cacert = load_cert( cacertfile )
+    except:
+        print "Error opening CA cert file"
+        sys.exit()
+    try:
+        cakey = load_key( cakeyfile )
+    except:
+        print "Error opening CA key file"
+        sys.exit()
+    curSerial = readSerial()
+    newSerial = hex2dec(curSerial) + 1
+    newSerialDec = newSerial
+    newSerial = dec2hex(newSerial)
+    cert = createCertificate(req, (cacert, cakey), newSerialDec, (0, 24 * 60 * 60 * int(defaultDays)))
+    save_key ( working + '/' + prefix + fname + '.key', pkey )
+    save_cert ( working + '/' + prefix + fname + '.crt', cert )
+    writeSerial(newSerial)
+    # copy CA certificate to working dir
+    shutil.copy(cacertfile, working)
+    # create the configuration files (default 'unix' unless specified with option -c)
+    makeConfs(options.confs, fname)
+    # write index to file
+    from time import strftime
+    curYear = str(strftime("%y"))
+    newYear = int(curYear) + 1
+    expDate = str(newYear) + str(strftime("%m%d%H%M%S"))
+    # OpenSSL only accepts serials of 2 digits, so check for the length and prepend a 0 if necessary
+    if len(str(newSerial)) == 1:
+        serialNumber = '0' + str(newSerial)
+    else:
+        serialNumber = newSerial
+    index = 'V\t' + str(expDate) + 'Z\t' + str(serialNumber) + '\tunknown\t' + '/C=' + str(countryName) + '/ST=' + str(stateOrProvinceName) + '/O=' + str(organizationName) + '/OU=' + str(organizationalUnitName) + '/CN=' + str(cname) + '\tUser/emailAddress=' + str(fname) + '@local\n'
+    writeIndex(index)
+
+# Make config files for OpenVPN
+def makeConfs(sname, fname):
+    import string
+    config = ConfigObj(stonevpnconf)
+    if sname == 'unix':
+        sectionname = 'unix conf'
+        print "Generating UNIX configuration file"
+        f=open(working + '/' + prefix + fname + '.conf', 'w')
+    elif sname == 'windows':
+        sectionname = 'windows conf'
+        print "Generating Windows configuration file"
+        f=open(working + '/' + prefix + fname + '.ovpn', 'w')
+    section=config[sectionname]
+    for var in section:
+        if var == 'ca':
+            cacertfilenopath = cacertfile.split('/')[int(len(cacertfile.split('/')) - 1)]
+            f.write(section[var].replace('cacertfile', cacertfilenopath) + '\n')
+        elif var == 'cert':
+            f.write(section[var].replace('clientcertfile', prefix + fname + '.crt') + '\n')
+        elif var == 'key':
+            f.write(section[var].replace('clientkeyfile', prefix + fname + '.key') + '\n')
+        else:
+            f.write(section[var] + '\n')
+    f.close()
+
+# Make certificates
+if options.cname: 
+    checkFileOption()
+    print "Creating " + options.fname + ".key and " + options.fname + ".crt for " + options.cname
+    makeCert( options.fname, options.cname )
+
+# Make nice zipfile from all the generated files
+# :: called only when option '-z' is used ::
+if options.zip:
+    checkFileOption()
+    import zipfile
+    import glob
+    print "Adding all files to " + prefix + options.fname + ".zip"
+    z = zipfile.ZipFile(working + "/" + prefix + options.fname + ".zip", "w")
+    for name in glob.glob(working + "/" + prefix + options.fname + ".*"):
+        # only add the files that begin with the name specified with the -f option, don't add the zipfile itself (duh)
+        if not name == working + "/" + prefix + options.fname + ".zip": z.write(name, os.path.basename(name), zipfile.ZIP_DEFLATED)
+    # and add the CA certificate file
+    z.write(cacertfile, os.path.basename(cacertfile), zipfile.ZIP_DEFLATED)
+    z.close()
+    # delete all the files generated, except the ZIP-file
+    for file in glob.glob(working + "/" + prefix + options.fname + ".*"):
+        if not file == working + "/" + prefix + options.fname + ".zip": os.remove(file)
+
+# Find free IP-address by parsing config files (usually in /etc/openvpn/ccd/*)
+# :: called only when option '-i' is used ::
+if options.freeip:
+    checkFileOption()
+    print "Searching for free IP-address:"
+    # since we're writing to the ccd dir, check if we have root privileges
+    gotRoot()
+    import glob, fileinput, string
+    # parse config file in search for ifconfig-pool
+    for line in fileinput.input(openvpnconf):
+        if line.split()[0] == 'ifconfig-pool':
+            pool_from = line.split()[1]
+            pool_to = line.split()[2]
+            print "Pool runs from " + pool_from + " to " + pool_to
+    import IPy
+    IPy.check_addr_prefixlen = False    # set so that IP-addresses other than x.x.x.0/x can be handled
+    from IPy import IP
+    range = IP(pool_from + '-' + pool_to)
+    # define list of IP-addresses
+    ipList = []
+    for x in range:
+        ipList.append(x)
+    # go through the individual config files to find IP-addresses
+    for file in glob.glob(ccddir+"/*"):
+        print "Parsing file: " + file
+        for line in fileinput.input(file):
+            # search for line that starts with 'ifconfig-push'
+            if line.split()[0] == 'ifconfig-push':
+                # the client IP is the 2nd argument ([2] is 0,1,2nd object on the line)
+                clientip = line.split()[2]
+                # remove IP from range if it exists in the list
+                if IP(clientip) in ipList:
+                    ipList.remove(IP(clientip)) 
+                # the server IP is the 1st argument
+                servip = line.split()[1]
+                # remove IP from range if it exists in the list
+                if IP(servip) in ipList:
+                    ipList.remove(IP(servip))
+    # sort list
+    ipList.sort()
+    # we now have a list of usable IP addresses :)
+    # find 2 free IP-addresses:
+    firstFree = ipList[0]
+    secondFree = ipList[1]
+    print "First free address: " + str(firstFree)
+    print "Second free address: " + str(secondFree)
+    # And create the configuration file for these addresses
+    f=open(ccddir + '/' + options.fname, 'w')
+    f.write('ifconfig-push ' + str(firstFree) + ' ' + str(secondFree) + '\n')
+    f.write('push "route ' + pushrouter + ' 255.255.255.255"\n')
+    f.close()
+    print "CCD file written to: " + ccddir + '/' + options.fname
+
+# Revoke certificate
+def revokeCert(serial):
+    from time import strftime
+    crl = crypto.CRL()
+    # we can't replace stuff in the original index file, so we have to create
+    # a new one and in the end rename the original one and move the temp file
+    # to the final location (usually /etc/ssl/index.txt)
+    t=open(working + '/index.tmp', 'w')
+    # read SSL dbase from the index file
+    # this file has 5 columns: Status, Expiry date, Revocation date, Serial nr, file?, Distinguished Name (DN)
+    print "Reading SSL database: " + indexdb
+    input = open(indexdb, 'r')
+    f=open(working + '/revoked.crl', 'w')
+    crlTime = str(strftime("%y%m%d%H%M%S")) + 'Z'
+    for line in input:
+        # first check if the line contains a revoked cert:
+        if line.split()[0] == 'R':
+            # then check if the revoked cert has the same serial nr as the one we're trying to revoke
+            # if so, exit immediately since we can't revoke twice (duh)
+            if line.split()[3] == serial:
+                print "Certificate already revoked!"
+                os.remove(working + '/index.tmp')
+                os.remove(working + '/revoked.crl')
+                sys.exit()
+            else:
+                revSerial = str(line.split()[3])
+                revDate = str(line.split()[2])
+                crl.make_revoked(revDate, revSerial)
+                print "Adding to CRL with date " + revDate + " and serial " + revSerial
+                t.write(line)
+        # the line contains a valid certificate. Check if the serial is the same as the
+        # one we're trying to revoke
+        else:
+            if line.split()[2] == serial:
+                # we have a match! do not write this line again to the new index file
+                # instead, change it to the revoked-format
+                t.write('R\t' + str(line.split()[1]) + '\t' + crlTime + '\t' + serial + '\tunknown\t' + str(line.split()[4]) + '\n')
+            else:
+		# this is not the match we're looking for, so just write the line again
+		# to the index file
+                t.write(line)
+    # crlTime = str(strftime("%y%m%d%H%M%S")) + 'Z'
+    print "adding new revoked certificate to CRL with date " + crlTime + " and serial " + serial
+    crl.make_revoked(crlTime, serial)
+    cacert = load_cert( cacertfile )
+    cakey = load_key( cakeyfile )
+    newCRL = crypto.dump_crl(crl, cacert, cakey)
+    f.write(newCRL)
+    f.close()
+    shutil.move(indexdb,indexdb + '.old')
+    shutil.move(working + '/index.tmp',indexdb)
+    shutil.move(crlfile,crlfile + '.old')
+    shutil.move(working + '/revoked.crl',crlfile)
+    print "New CRL written to: " + crlfile
+    print "Old CRL renamed to: " + crlfile + '.old'
+    print "New index written to: " + indexdb
+    print "Old index renamed to: " + indexdb + '.old'
+
+def listRevokedCerts():
+    crl = crypto.CRL()
+    # read SSL dbase (usually index.txt)
+    # this file has 5 columns: Status, Expiry date, Revocation date, Serial nr, file?, Distinguished Name (DN)
+    print "Reading SSL database: " + indexdb
+    input = open(indexdb, 'r')
+    revCerts = []
+    print "Finding revoked certificates..."
+    for line in input:
+        if line.split()[0] == 'R':
+            revCerts.append(line)
+    count = 0
+    while count < len(revCerts):
+        print "Revoked certificate:\t" + str(revCerts[count].split()[5].split('/CN=')[1])
+        print "Status:\t\t\t" + str(revCerts[count].split()[0])
+        print "Expiry date:\t\t" + str(revCerts[count].split()[1])
+        print "Revocation date:\t" + str(revCerts[count].split()[2])
+        print "Serial:\t\t\t" + str(revCerts[count].split()[3])
+        print "DN:\t\t\t" + str(revCerts[count].split()[5])
+        print "\n"
+        count = count + 1
+
+def listAllCerts():
+    crl = crypto.CRL()
+    # read SSL dbase (usually index.txt)
+    # this file has 5 columns: Status, Expiry date, Revocation date, Serial nr, file?, Distinguished Name (DN)
+    print "Reading SSL database: " + indexdb
+    input = open(indexdb, 'r')
+    print "Listing all issued certificates..."
+    for line in input:
+        if line.split()[0] == 'R':
+            print "Certificate:\t\t" + str(line.split()[5].split('/CN=')[1])
+            print "Status:\t\t\tRevoked"
+            print "Expiry date:\t\t" + str(line.split()[1])
+            print "Revocation date:\t" + str(line.split()[2])
+            print "Serial:\t\t\t" + str(line.split()[3])
+            print "DN:\t\t\t" + str(line.split()[5])
+        else:
+            print "Certificate:\t\t" + str(line.split()[4].split('/CN=')[1])
+            print "Status:\t\t\tValid"
+            print "Expiry date:\t\t" + str(line.split()[1])
+            print "Serial:\t\t\t" + str(line.split()[2])
+            print "DN:\t\t\t" + str(line.split()[4])
+        print "\n"
+
+if options.listall:
+    listAllCerts()
+
+if options.listrevoked:
+    listRevokedCerts()
+
+if options.serial:
+    revokeCert(str(options.serial))
+
+if options.showserial:
+    print "Current SSL serial number (in hex): " + readSerial()
+
+if options.printindex:
+    print "Current index file (" + indexdb + "):"
+    printIndexDB()
+
+if options.printcrl:
+    printCRL()
