@@ -127,8 +127,8 @@ parser.add_option("-a", "--listall",
     action="store_true", dest="listall", help="list all certificates")
 parser.add_option("-s", "--showserial",
     action="store_true", dest="showserial", help="Display current SSL serial number from " + serialfile )
-parser.add_option("-c", "--printcrl",
-    action="store_true", dest="printcrl", help="Prints CRL file " + crlfile )
+parser.add_option("-c", "--printcert",
+    action="store", dest="printcert", help="Prints information about a certficiate file")
 parser.add_option("-d", "--printindex",
     action="store_true", dest="printindex", help="Prints index file " + indexdb )
 parser.add_option("-t", "--test",
@@ -197,9 +197,6 @@ def writeIndex(index):
     f.write(index)
     f.close()
 
-def printCRL():
-    print "Function not implemented yet."
-
 # Create certificate
 def createCertificate(req, (issuerCert, issuerKey), serial, (notBefore, notAfter), digest="md5"):
     extensions = []
@@ -249,6 +246,36 @@ def load_cert ( fn ):
     ret = crypto.load_certificate ( FILETYPE, fp.read() )
     fp.close ()
     return ret
+
+def print_cert ( cert ):
+    try:
+        certfile = load_cert( cert )
+    except:
+        print "Error opening certificate file"
+        sys.exit()
+    certIssuerArray = str(certfile.get_issuer()).replace('<X509Name object \'', '').replace('\'>','').split('/')
+    certIssuer = certIssuerArray[1] + ', ' + certIssuerArray[2] + ', ' + certIssuerArray[3] + ', ' + certIssuerArray[4]
+    print "Issuer:\t\t" + str(certIssuer)
+    certSubjectArray = str(certfile.get_subject()).replace('<X509Name object \'', '').replace('\'>','').split('/')
+    certSubject = certSubjectArray[1] + ', ' + certSubjectArray[2] + ', ' + certSubjectArray[3] + ', ' + certSubjectArray[4]
+    print "Subject:\t" + str(certSubject)
+    print "Version:\t" + str(certfile.get_version())
+    print "Serial number:\t" + str(certfile.get_serial_number())
+    validFromYear = str(certfile.get_notBefore())[:4]
+    validFromMonth = str(certfile.get_notBefore())[4:6]
+    validFromDay = str(certfile.get_notBefore())[6:8]
+    validFromTime = str(certfile.get_notBefore())[8:10] + ':' + str(certfile.get_notBefore())[10:12] + ':' + str(certfile.get_notBefore())[12:14]
+    print "Valid from:\t" + validFromYear + '-' + validFromMonth + '-' + validFromDay + ' ' + validFromTime
+    validUntilYear = str(certfile.get_notAfter())[:4]
+    validUntilMonth = str(certfile.get_notAfter())[4:6]
+    validUntilDay = str(certfile.get_notAfter())[6:8]
+    validUntilTime = str(certfile.get_notAfter())[8:10] + ':' + str(certfile.get_notAfter())[10:12] + ':' + str(certfile.get_notAfter())[12:14]
+    print "Valid until:\t" + validUntilYear + '-' + validUntilMonth + '-' + validUntilDay + ' ' + validUntilTime
+    if str(certfile.has_expired()) == '1':
+        print "Expired:\tyes"
+    else:
+        print "Expired:\tno"
+
 
 # Generate keyfile and certificate
 def makeCert(fname, cname):
@@ -510,5 +537,5 @@ if options.printindex:
     print "Current index file (" + indexdb + "):"
     printIndexDB()
 
-if options.printcrl:
-    printCRL()
+if options.printcert:
+    print_cert ( options.printcert )
