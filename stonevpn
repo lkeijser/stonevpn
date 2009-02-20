@@ -72,12 +72,28 @@ def readOpenSSLConf():
     global countryName, stateOrProvinceName, localityName, organizationName, organizationalUnitName, defaultDays, prefixdir, indexdb, serialfile
     try:
         countryName = section['countryName_default']
+    except KeyError:
+        print "KeyError: missing section 'countryName_default' in " + opensslconf
+        sys.exit()
+    try:
         stateOrProvinceName = section['stateOrProvinceName_default']
+    except KeyError:
+        print "KeyError: missing section 'stateOrProvinceName_default' in " + opensslconf
+        sys.exit()
+    try:
         localityName = section['localityName_default']
+    except KeyError:
+        print "KeyError: missing section 'localityName_default' in " + opensslconf
+        sys.exit()
+    try:
         organizationName = section['0.organizationName_default']
+    except KeyError:
+        print "KeyError: missing section '0.organizationName_default' in " + opensslconf
+        sys.exit()
+    try:
         organizationalUnitName = section['organizationalUnitName_default']
     except KeyError:
-        print "KeyError: did you adjust " + opensslconf + " according to the Stone OpenVPN SOS?"
+        print "KeyError: missing section 'organizationalUnitName_default' in " + opensslconf
         sys.exit()
     sectionname = 'CA_default'
     section=config[sectionname]
