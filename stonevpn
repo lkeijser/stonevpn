@@ -70,6 +70,7 @@ def readOpenSSLConf():
     section=config[sectionname]
     # make these variables also global
     global countryName, stateOrProvinceName, localityName, organizationName, organizationalUnitName, defaultDays, prefixdir, indexdb, serialfile
+    # Check if certain sections in OpenSSL configfile are present, report if they're not
     try:
         countryName = section['countryName_default']
     except KeyError:
@@ -216,11 +217,15 @@ def writeIndex(index):
 # Create certificate
 def createCertificate(req, (issuerCert, issuerKey), serial, (notBefore, notAfter), digest="md5"):
     extensions = []
+    # Create the X509 Extensions
     extensions.append(crypto.X509Extension('basicConstraints',1, 'CA:FALSE'))
     extensions.append(crypto.X509Extension('nsComment',0, 'Created with stonevpn ' + str(stonevpnver)))
+    # We're creating a X509 certificate version 2
     cert = crypto.X509()
     cert.set_version ( 2 )
+    # Add the Extension to the certificate
     cert.add_extensions(extensions)
+    # Create a valid hexidecimal serial number
     from string import atoi
     goodserial = atoi(str(serial), 16)
     cert.set_serial_number(goodserial)
@@ -238,37 +243,44 @@ def getPass():
     return getpass.getpass('Enter password: ')
 
 # Simple routines to load/save files using crypto lib
+# Save private key to file
 def save_key ( fn, key ):
     fp = open ( fn, 'w' )
+    # Experimental: adding password to private key
     if options.password:
         fp.write ( crypto.dump_privatekey ( FILETYPE, key, ciphermethod, getPass() ) )
     else:
         fp.write ( crypto.dump_privatekey ( FILETYPE, key ) )
     fp.close ()
 
+# Save certificate to file
 def save_cert ( fn, cert ):
     fp = open ( fn, 'w' )
     fp.write ( crypto.dump_certificate ( FILETYPE, cert ) )
     fp.close ()
 
+# Load private key from file
 def load_key ( fn ):
     fp = open ( fn, 'r' )
     ret = crypto.load_privatekey ( FILETYPE, fp.read() )
     fp.close ()
     return ret
 
+# Load certificate from file
 def load_cert ( fn ):
     fp = open ( fn, 'r' )
     ret = crypto.load_certificate ( FILETYPE, fp.read() )
     fp.close ()
     return ret
 
+# Print information retreived from a certificate file
 def print_cert ( cert ):
     try:
         certfile = load_cert( cert )
     except:
         print "Error opening certificate file"
         sys.exit()
+    # Some objects are 'X509Name objects' so we have to fiddle a bit to output to a human-readable format
     certIssuerArray = str(certfile.get_issuer()).replace('<X509Name object \'', '').replace('\'>','').split('/')
     certIssuer = certIssuerArray[1] + ', ' + certIssuerArray[2] + ', ' + certIssuerArray[3] + ', ' + certIssuerArray[4]
     print "Issuer:\t\t" + str(certIssuer)
@@ -308,12 +320,15 @@ def makeCert(fname, cname):
         print "Error opening CA key file"
         sys.exit()
     curSerial = readSerial()
+    # We can't work with hex integers. Convert them to dec first
     newSerial = hex2dec(curSerial) + 1
     newSerialDec = newSerial
+    # Now convert dec back to hex 
     newSerial = dec2hex(newSerial)
     cert = createCertificate(req, (cacert, cakey), newSerialDec, (0, 24 * 60 * 60 * int(defaultDays)))
     save_key ( working + '/' + prefix + fname + '.key', pkey )
     save_cert ( working + '/' + prefix + fname + '.crt', cert )
+    # Write serial (hex) to serial file
     writeSerial(newSerial)
     # copy CA certificate to working dir
     shutil.copy(cacertfile, working)
@@ -329,6 +344,7 @@ def makeCert(fname, cname):
         serialNumber = '0' + str(newSerial)
     else:
         serialNumber = newSerial
+    # Format index line and write to OpenSSL index file
     index = 'V\t' + str(expDate) + 'Z\t' + str(serialNumber) + '\tunknown\t' + '/C=' + str(countryName) + '/ST=' + str(stateOrProvinceName) + '/O=' + str(organizationName) + '/OU=' + str(organizationalUnitName) + '/CN=' + str(cname) + '\tUser/emailAddress=' + str(fname) + '@local\n'
     writeIndex(index)
 
@@ -336,6 +352,7 @@ def makeCert(fname, cname):
 def makeConfs(sname, fname):
     import string
     config = ConfigObj(stonevpnconf)
+    # Generate appropriate (according to specified OS) configuration for OpenVPN
     if sname == 'unix':
         sectionname = 'unix conf'
         print "Generating UNIX configuration file"
@@ -345,7 +362,9 @@ def makeConfs(sname, fname):
         print "Generating Windows configuration file"
         f=open(working + '/' + prefix + fname + '.ovpn', 'w')
     section=config[sectionname]
+    # Go over each entry (variable) and write it to the OpenVPN configuration file
     for var in section:
+        # Fill in correct path to generated cert/key/cacert files
         if var == 'ca':
             cacertfilenopath = cacertfile.split('/')[int(len(cacertfile.split('/')) - 1)]
             f.write(section[var].replace('cacertfile', cacertfilenopath) + '\n')
