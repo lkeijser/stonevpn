@@ -41,7 +41,7 @@ def readMainConf():
     config = ConfigObj(stonevpnconf)
     sectionname = 'stonevpn conf'
     section=config[sectionname]
-    # here come the global variables (can be called from anywhere in the program)
+    # Define global variables (can be called from anywhere in the program)
     global cacertfile, cakeyfile, openvpnconf, ccddir, working, opensslconf, pushrouter, ciphermethodi, prefix, crlfile
     crlfile = section['crlfile']
     prefix = section['prefix']
