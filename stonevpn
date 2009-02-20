@@ -25,7 +25,7 @@ from OpenSSL import SSL, crypto
 from optparse import OptionParser
 from configobj import ConfigObj
 
-stonevpnver = '0.3.3'
+stonevpnver = '0.3.4'
 stonevpnconf = '/etc/stonevpn.conf'
 
 # must..have..root..
