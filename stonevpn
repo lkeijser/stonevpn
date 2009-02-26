@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 """
+TEST TEST TEST
+
  stonevpn - OpenVPN Certificate Management
 
  by L.S. Keijser, <keijser@stone-it.com>
@@ -11,7 +13,7 @@
 
  depends on: python2.4 python-configobj python-ipy and a customized python-pyopenssl (due to the CRL patch)
  
- Only runs on Linux
+ Only runs on Linux and must be ran as root
 
  disclaimer: VNOCI (verynonoptimalcodeincluded)
 
@@ -117,12 +119,12 @@ else:
 
 # Check for presence of OpenSSL index file
 if not os.path.exists(indexdb):
-    print "Error: indexfile not found at: " + indexdb + "! Please check your OpenSSL configuration."
+    print "Error: indexfile not found at: " + indexdb + " or permission denied.\nPlease check your OpenSSL configuration."
     sys.exit()
 
 # Check for presence of OpenSSL serial file
 if not os.path.exists(serialfile):
-    print "Error: serialfile not found at: " + serialfile + "! Please check your OpenSSL configuration."
+    print "Error: serialfile not found at: " + serialfile + " or permission denied.\nPlease check your OpenSSL configuration."
     sys.exit()
 
 # command line options
