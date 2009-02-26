@@ -115,6 +115,16 @@ else:
     print "File " + opensslconf + " does not exist!"
     sys.exit()
 
+# Check for presence of OpenSSL index file
+if not os.path.exists(indexdb):
+    print "Error: indexfile not found at: " + indexdb + "! Please check your OpenSSL configuration."
+    sys.exit()
+
+# Check for presence of OpenSSL serial file
+if not os.path.exists(serialfile):
+    print "Error: serialfile not found at: " + serialfile + "! Please check your OpenSSL configuration."
+    sys.exit()
+
 # command line options
 parser = OptionParser(usage="%prog -f <filename> -n <commonname> [ -o unix|windows | -z | -h | -i | -r <serial> | -l |-a ]",version="%prog " + stonevpnver)
 
