@@ -15,9 +15,7 @@
 
  disclaimer: VNOCI (verynonoptimalcodeincluded)
 
- TODO:  - printing crl.pem
-        - clean up script
-        - passwords
+ TODO:  - make stonepvn class so it can be used as a module
 """
 
 import os, sys, shutil
@@ -25,7 +23,7 @@ from OpenSSL import SSL, crypto
 from optparse import OptionParser
 from configobj import ConfigObj
 
-stonevpnver = '0.3.4'
+stonevpnver = '0.3.5'
 stonevpnconf = '/etc/stonevpn.conf'
 
 # must..have..root..
@@ -42,7 +40,7 @@ def readMainConf():
     sectionname = 'stonevpn conf'
     section=config[sectionname]
     # Define global variables (can be called from anywhere in the program)
-    global cacertfile, cakeyfile, openvpnconf, ccddir, working, opensslconf, pushrouter, ciphermethodi, prefix, crlfile
+    global cacertfile, cakeyfile, openvpnconf, ccddir, working, opensslconf, pushrouter, ciphermethod, prefix, crlfile
     crlfile = section['crlfile']
     prefix = section['prefix']
     pushrouter = section['pushrouter']
@@ -117,12 +115,12 @@ else:
 
 # Check for presence of OpenSSL index file
 if not os.path.exists(indexdb):
-    print "Error: indexfile not found at: " + indexdb + "! Please check your OpenSSL configuration."
+    print "Error: indexfile not found at: " + indexdb + " or insufficient rights. Please check your OpenSSL configuration."
     sys.exit()
 
 # Check for presence of OpenSSL serial file
 if not os.path.exists(serialfile):
-    print "Error: serialfile not found at: " + serialfile + "! Please check your OpenSSL configuration."
+    print "Error: serialfile not found at: " + serialfile + " or insufficient rights. Please check your OpenSSL configuration."
     sys.exit()
 
 # command line options
@@ -145,7 +143,7 @@ parser.add_option("-z", "--zip",
 parser.add_option("-i", "--free-ip",
     action="store_true", dest="freeip", help="locate and assign free ip (EXPERIMENTAL)")
 parser.add_option("-p", "--password",
-    action="store_true", dest="password", help="prompt for password when generating private key (EXPERIMENTAL)")
+    action="store_true", dest="password", help="prompt for password when generating private key")
 parser.add_option("-r", "--revoke",
     action="store", dest="serial", help="revoke certificate with serial SERIAL")
 parser.add_option("-l", "--listrevoked",
