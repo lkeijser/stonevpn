@@ -1,8 +1,11 @@
 version		Date			Changes
 
+0.3.5		2009-02-27		Made --password parameter work
+					correctly
+
 0.3.4		2009-02-20		Made KeyError messages a bit more specific when
-							checking for required sections in OpenSSL
-							configuration file.
+					checking for required sections in OpenSSL 
+					configuration file.
 
 0.3.4		2009-02-20		Added option to print info about certificate
 
