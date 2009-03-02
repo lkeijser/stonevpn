@@ -115,12 +115,12 @@ else:
 
 # Check for presence of OpenSSL index file
 if not os.path.exists(indexdb):
-    print "Error: indexfile not found at: " + indexdb + " or insufficient rights. Please check your OpenSSL configuration."
+    print "Error: indexfile not found at: " + indexdb + " or insufficient rights."
     sys.exit()
 
 # Check for presence of OpenSSL serial file
 if not os.path.exists(serialfile):
-    print "Error: serialfile not found at: " + serialfile + " or insufficient rights. Please check your OpenSSL configuration."
+    print "Error: serialfile not found at: " + serialfile + " or insufficient rights."
     sys.exit()
 
 # command line options
@@ -542,10 +542,11 @@ def listRevokedCerts():
         count = count + 1
 
 def listAllCerts():
-    crl = crypto.CRL()
+    # commented out next line .. not sure if we really gonna need it
+    # crl = crypto.CRL()
+    print "Reading SSL database: " + indexdb
     # read SSL dbase (usually index.txt)
     # this file has 5 columns: Status, Expiry date, Revocation date, Serial nr, file?, Distinguished Name (DN)
-    print "Reading SSL database: " + indexdb
     input = open(indexdb, 'r')
     print "Listing all issued certificates..."
     for line in input:
