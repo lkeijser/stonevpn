@@ -352,8 +352,10 @@ def makeCert(fname, cname):
         serialNumber = '0' + str(newSerial)
     else:
         serialNumber = newSerial
+    # convert cname: spaces to underscores for inclusion in indexdb
+    nospaces_cname =  cname.replace(' ', '_')
     # Format index line and write to OpenSSL index file
-    index = 'V\t' + str(expDate) + 'Z\t' + str(serialNumber) + '\tunknown\t' + '/C=' + str(countryName) + '/ST=' + str(stateOrProvinceName) + '/O=' + str(organizationName) + '/OU=' + str(organizationalUnitName) + '/CN=' + str(cname) + '\tUser/emailAddress=' + str(fname) + '@local\n'
+    index = 'V\t' + str(expDate) + 'Z\t' + str(serialNumber) + '\tunknown\t' + '/C=' + str(countryName) + '/ST=' + str(stateOrProvinceName) + '/O=' + str(organizationName) + '/OU=' + str(organizationalUnitName) + '/CN=' + str(nospaces_cname) + '\tUser/emailAddress=' + str(fname) + '@local\n'
     writeIndex(index)
 
 # Make config files for OpenVPN
@@ -562,7 +564,7 @@ def listAllCerts():
             print "Status:\t\t\tValid"
             print "Expiry date:\t\t" + str(line.split()[1])
             print "Serial:\t\t\t" + str(line.split()[2])
-            print "DN:\t\t\t" + str(line.split()[4])
+	    print "DN:\t\t\t" + str(line.split()[4])
         print "\n"
 
 if options.listall:
