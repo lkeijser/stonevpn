@@ -1,5 +1,8 @@
 version		Date			Changes
 
+0.3.6?		2009-03-02		Removed crypto CRL function from listAllCerts
+					routine since we're not gonna use it anyway.
+
 0.3.5		2009-02-27		Made --password parameter work
 					correctly
 
