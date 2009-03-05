@@ -1,5 +1,7 @@
 version		Date			Changes
 
+0.3.7		2009-03-05		Fixed: file prefix when set manually.
+
 0.3.6		2009-03-02		Removed crypto CRL function from listAllCerts
 					routine since we're not gonna use it anyway.
 					When writing to indexdb, convert
