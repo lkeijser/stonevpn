@@ -23,7 +23,7 @@ from OpenSSL import SSL, crypto
 from optparse import OptionParser
 from configobj import ConfigObj
 
-stonevpnver = '0.3.6'
+stonevpnver = '0.3.7'
 stonevpnconf = '/etc/stonevpn.conf'
 
 # must..have..root..
@@ -137,7 +137,7 @@ parser.add_option("-f", "--file",
 parser.add_option("-o", "--config",
     action="store", dest="confs", default="unix", help="create config files for [windows|unix]")
 parser.add_option("-e", "--prefix",
-    action="store", dest="prefix", default=prefix, help="prefix (almost all) generated files. Default = " + str(prefix))
+    action="store", dest="fprefix", default=prefix, help="prefix (almost all) generated files. Default = " + str(prefix))
 parser.add_option("-z", "--zip",
     action="store_true", dest="zip", help="create ZIP-file and delete the rest")
 parser.add_option("-i", "--free-ip",
@@ -166,6 +166,10 @@ def checkFileOption():
     if not options.fname:
         print color('red')+"Error"+color('0')+": no filename specified! Try " + sys.argv[0] + " --help"
         sys.exit()
+
+# Make sure FPREFIX ends with a dash
+if not options.fprefix[-1] == '-':
+	options.fprefix = str(options.fprefix) + '-'
 
 # define some crypto stuff
 TYPE_RSA = crypto.TYPE_RSA
@@ -334,8 +338,8 @@ def makeCert(fname, cname):
     # Now convert dec back to hex 
     newSerial = dec2hex(newSerial)
     cert = createCertificate(req, (cacert, cakey), newSerialDec, (0, 24 * 60 * 60 * int(defaultDays)))
-    save_key ( working + '/' + prefix + fname + '.key', pkey )
-    save_cert ( working + '/' + prefix + fname + '.crt', cert )
+    save_key ( working + '/' + options.fprefix + fname + '.key', pkey )
+    save_cert ( working + '/' + options.fprefix + fname + '.crt', cert )
     # Write serial (hex) to serial file
     writeSerial(newSerial)
     # copy CA certificate to working dir
@@ -366,11 +370,11 @@ def makeConfs(sname, fname):
     if sname == 'unix':
         sectionname = 'unix conf'
         print "Generating UNIX configuration file"
-        f=open(working + '/' + prefix + fname + '.conf', 'w')
+        f=open(working + '/' + options.fprefix + fname + '.conf', 'w')
     elif sname == 'windows':
         sectionname = 'windows conf'
         print "Generating Windows configuration file"
-        f=open(working + '/' + prefix + fname + '.ovpn', 'w')
+        f=open(working + '/' + options.fprefix + fname + '.ovpn', 'w')
     section=config[sectionname]
     # Go over each entry (variable) and write it to the OpenVPN configuration file
     for var in section:
@@ -379,9 +383,9 @@ def makeConfs(sname, fname):
             cacertfilenopath = cacertfile.split('/')[int(len(cacertfile.split('/')) - 1)]
             f.write(section[var].replace('cacertfile', cacertfilenopath) + '\n')
         elif var == 'cert':
-            f.write(section[var].replace('clientcertfile', prefix + fname + '.crt') + '\n')
+            f.write(section[var].replace('clientcertfile', options.fprefix + fname + '.crt') + '\n')
         elif var == 'key':
-            f.write(section[var].replace('clientkeyfile', prefix + fname + '.key') + '\n')
+            f.write(section[var].replace('clientkeyfile', options.fprefix + fname + '.key') + '\n')
         else:
             f.write(section[var] + '\n')
     f.close()
@@ -398,17 +402,17 @@ if options.zip:
     checkFileOption()
     import zipfile
     import glob
-    print "Adding all files to " + prefix + options.fname + ".zip"
-    z = zipfile.ZipFile(working + "/" + prefix + options.fname + ".zip", "w")
-    for name in glob.glob(working + "/" + prefix + options.fname + ".*"):
+    print "Adding all files to " + options.fprefix + options.fname + ".zip"
+    z = zipfile.ZipFile(working + "/" + options.fprefix + options.fname + ".zip", "w")
+    for name in glob.glob(working + "/" + options.fprefix + options.fname + ".*"):
         # only add the files that begin with the name specified with the -f option, don't add the zipfile itself (duh)
-        if not name == working + "/" + prefix + options.fname + ".zip": z.write(name, os.path.basename(name), zipfile.ZIP_DEFLATED)
+        if not name == working + "/" + options.fprefix + options.fname + ".zip": z.write(name, os.path.basename(name), zipfile.ZIP_DEFLATED)
     # and add the CA certificate file
     z.write(cacertfile, os.path.basename(cacertfile), zipfile.ZIP_DEFLATED)
     z.close()
     # delete all the files generated, except the ZIP-file
-    for file in glob.glob(working + "/" + prefix + options.fname + ".*"):
-        if not file == working + "/" + prefix + options.fname + ".zip": os.remove(file)
+    for file in glob.glob(working + "/" + options.fprefix + options.fname + ".*"):
+        if not file == working + "/" + options.fprefix + options.fname + ".zip": os.remove(file)
 
 # Find free IP-address by parsing config files (usually in /etc/openvpn/ccd/*)
 # :: called only when option '-i' is used ::
