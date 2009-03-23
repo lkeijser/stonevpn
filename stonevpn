@@ -1,21 +1,22 @@
 #!/usr/bin/env python
 """
- stonevpn - OpenVPN Certificate Management
+ StoneVPN - Easy OpenVPN certificate and configuration management
 
  by L.S. Keijser, <keijser@stone-it.com>
 
- create OpenVPN certificates using Python and OpenSSL
- with optional configuration files (using templates) for
- *nix or Windows OS, and zipfile-packaging
+ Create OpenVPN certificates using Python and OpenSSL  with optional
+ configuration files (using templates) for *nix or Windows OS, zipfile-
+ packaging and the option to e-mail the generated files.
 
-
- depends on: python2.4 python-configobj python-ipy and a customized python-pyopenssl (due to the CRL patch)
+ depends on: python2.4 python-configobj python-ipy and a customized pyOpenSSL (due to the CRL patch)
  
  Only runs on Linux
 
  disclaimer: VNOCI (verynonoptimalcodeincluded)
 
- TODO:  - make stonepvn class so it can be used as a module
+ TODO:  
+    - make stonepvn class so it can be used as a module
+    - option to PGP encrypt e-mail
 """
 
 import os, sys, shutil
@@ -23,7 +24,7 @@ from OpenSSL import SSL, crypto
 from optparse import OptionParser
 from configobj import ConfigObj
 
-stonevpnver = '0.3.7'
+stonevpnver = '0.4'
 stonevpnconf = '/etc/stonevpn.conf'
 
 # must..have..root..
@@ -40,7 +41,7 @@ def readMainConf():
     sectionname = 'stonevpn conf'
     section=config[sectionname]
     # Define global variables (can be called from anywhere in the program)
-    global cacertfile, cakeyfile, openvpnconf, ccddir, working, opensslconf, pushrouter, ciphermethod, prefix, crlfile
+    global cacertfile, cakeyfile, openvpnconf, ccddir, working, opensslconf, pushrouter, ciphermethod, prefix, crlfile, mail_server, mail_cc, mail_msg, mail_from
     crlfile = section['crlfile']
     prefix = section['prefix']
     pushrouter = section['pushrouter']
@@ -51,6 +52,10 @@ def readMainConf():
     working = section['working']
     opensslconf = section['opensslconf']
     ciphermethod = section['cipher']
+    mail_server = section['mail_server']
+    mail_cc = section['mail_cc']
+    mail_msg = section['mail_msg']
+    mail_from = section['mail_from']
 
 
 # Make things pretty with colors
@@ -140,6 +145,8 @@ parser.add_option("-e", "--prefix",
     action="store", dest="fprefix", default=prefix, help="prefix (almost all) generated files. Default = " + str(prefix))
 parser.add_option("-z", "--zip",
     action="store_true", dest="zip", help="create ZIP-file and delete the rest")
+parser.add_option("-m", "--mail",
+    action="store", type="string", dest="emailaddress", help="Send all generated files to EMAILADDRESS")
 parser.add_option("-i", "--free-ip",
     action="store_true", dest="freeip", help="locate and assign free ip (EXPERIMENTAL)")
 parser.add_option("-p", "--password",
@@ -589,3 +596,57 @@ if options.printindex:
 
 if options.printcert:
     print_cert ( options.printcert )
+
+def send_mail(send_from, send_to, subject, text, attachment=[]):
+    import smtplib
+    import os
+    from email.MIMEMultipart import MIMEMultipart
+    from email.MIMEBase import MIMEBase
+    from email.MIMEText import MIMEText
+    from email.Utils import formatdate
+    from email import Encoders
+    print "Generating e-mail"
+    msg = MIMEMultipart()
+    msg['From'] = send_from
+    msg['To'] = send_to
+    msg['CC'] = mail_cc
+    msg['Date'] = formatdate(localtime=True)
+    msg['Subject'] = subject
+    text = text.replace('EMAILRECIPIENT', options.cname)
+    msg.attach( MIMEText(text, 'html') )
+    # Attachment(s)
+    if type(attachment) == 'string':
+        part = MIMEBase('application', "octet-stream")
+        part.set_payload( open(attachment,"rb").read() )
+        Encoders.encode_base64(part)
+        part.add_header('Content-Disposition', 'attachment; filename="%s"' % os.path.basename(attachment))
+        msg.attach(part)
+    else:
+        for f in attachment:
+            print "Attaching file %s" % f
+            part = MIMEBase('application', "octet-stream")
+            part.set_payload( open(f,"rb").read() )
+            Encoders.encode_base64(part)
+            part.add_header('Content-Disposition', 'attachment; filename="%s"' % os.path.basename(f))
+            msg.attach(part)
+    # Now to send the entire message
+    print 'Sending e-mail with attachment(s) to %s' % options.emailaddress
+    smtp = smtplib.SMTP(mail_server)
+    smtp.sendmail(send_from, send_to, msg.as_string())
+    smtp.close()
+
+if options.emailaddress:
+    mail_attachment = []
+    mail_to = options.emailaddress
+    # First check if we've generated a ZIP file (include just one attachment) or not (include all generated files)
+    if options.zip:
+        mail_attachment.append(working + '/' + options.fprefix + options.fname + '.zip')
+        send_mail(mail_from, mail_to, 'StoneVPN: generated files for ' + str(options.cname), mail_msg, mail_attachment)
+    else:
+        # Generate a list of filenames to include as attachments
+        import glob
+        for name in glob.glob(working + "/" + options.fprefix + options.fname + ".*"):
+            mail_attachment.append(name)
+        # Also include the CA certificate
+        mail_attachment.append(cacertfile)
+        send_mail(mail_from, mail_to, 'StoneVPN: generated files for ' + str(options.cname), mail_msg, mail_attachment)
