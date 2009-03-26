@@ -1,0 +1,4 @@
+- make stonepvn class so it can be used as a module
+- option to PGP encrypt e-mail
+- have CRL patches be included in upstream :)
+

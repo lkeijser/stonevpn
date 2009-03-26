@@ -1,22 +1,24 @@
 #!/usr/bin/env python
 """
+
  StoneVPN - Easy OpenVPN certificate and configuration management
 
- by L.S. Keijser, <keijser@stone-it.com>
+ (C) 2009 by L.S. Keijser, <keijser@stone-it.com>
 
- Create OpenVPN certificates using Python and OpenSSL  with optional
- configuration files (using templates) for *nix or Windows OS, zipfile-
- packaging and the option to e-mail the generated files.
-
- depends on: python2.4 python-configobj python-ipy and a customized pyOpenSSL (due to the CRL patch)
+ This program is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 2 of the License, or
+ (at your option) any later version.
  
- Only runs on Linux
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
 
- disclaimer: VNOCI (verynonoptimalcodeincluded)
+ You should have received a copy of the GNU General Public License
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
- TODO:  
-    - make stonepvn class so it can be used as a module
-    - option to PGP encrypt e-mail
 """
 
 import os, sys, shutil

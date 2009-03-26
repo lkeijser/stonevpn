@@ -1,21 +1,39 @@
-version		Date			Changes
+2009-03-26	Léon Keijser	<keijser@stone-it.com>
 
-0.4			2009-03-23		Added e-mail support
+	* Added: copyright stuff
+	* Added: modified pyOpenSSL-0.8-crl.patch
+	* Added: README file
+	* Added: TODO file
 
-0.3.7		2009-03-05		Fixed: file prefix when set manually.
+2009-03-23	Léon Keijser	<keijser@stone-it.com>
 
-0.3.6		2009-03-02		Removed crypto CRL function from listAllCerts
-					routine since we're not gonna use it anyway.
-					When writing to indexdb, convert
-					spaces to underscores in CNAME
+	* Added: e-mail support
 
-0.3.5		2009-02-27		Made --password parameter work
-					correctly
+2009-03-05	Léon Keijser	<keijser@stone-it.com>
 
-0.3.4		2009-02-20		Made KeyError messages a bit more specific when
-					checking for required sections in OpenSSL 
-					configuration file.
+	* Fixed: file prefix when set manually.
 
-0.3.4		2009-02-20		Added option to print info about certificate
+2009-03-02	Léon Keijser	<keijser@stone-it.com>
 
-0.3.3		2009-02-19		Initial commit.
+	* Fixed: removed crypto CRL function from listAllCerts
+	routine since we're not gonna use it anyway.
+
+	* Fixed: when writing to indexdb, convert spaces to underscores
+	in CNAME
+
+2009-02-27	Léon Keijser	<keijser@stone-it.com>
+
+	* Fixed: made '--password' parameter work correctly
+
+2009-02-20	Léon Keijser	<keijser@stone-it.com>
+
+	* Fixed: made KeyError messages a bit more specific when checking
+	for required sections in OpenSSL configuration file.
+
+2009-02-20	Léon Keijser	<keijser@stone-it.com>
+
+	* Added: option to print info about certificate
+
+2009-02-19	Léon Keijser	<keijser@stone-it.com>
+
+	* Added: initial commit (version 0.3.3)
