@@ -7,7 +7,7 @@ Group:		Applications/Internet
 License:	GPLv2
 URL:		http://github.com/lkeijser/stonevpn/tree/master
 Source0:	stonevpn.tar.gz
-BuildRoot:	%(mktemp -ud %{_tmppath}/%{name}-%{version}-%{release}-XXXXXX)
+BuildRoot:	%(mktemp -ud %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildArch:	noarch
 Requires:	python-configobj
 Requires:	python-IPy
