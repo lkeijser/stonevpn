@@ -1,4 +1,5 @@
 - make stonepvn class so it can be used as a module
 - option to PGP encrypt e-mail
+- option to create encrypted zipfile (using 7zip?)
 - have CRL patches be included in upstream :)
 
