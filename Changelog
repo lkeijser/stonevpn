@@ -1,3 +1,8 @@
+2009-03-27	Léon Keijser	<keijser@stone-it.com>
+
+	* Added: stonevpn.spec SPEC file
+	* Updated: README file with instructions to build an RPM
+
 2009-03-26	Léon Keijser	<keijser@stone-it.com>
 
 	* Added: copyright stuff
