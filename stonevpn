@@ -151,8 +151,8 @@ parser.add_option("-m", "--mail",
     action="store", type="string", dest="emailaddress", help="Send all generated files to EMAILADDRESS")
 parser.add_option("-i", "--free-ip",
     action="store_true", dest="freeip", help="locate and assign free ip (EXPERIMENTAL)")
-parser.add_option("-p", "--password",
-    action="store_true", dest="password", help="prompt for password when generating private key")
+parser.add_option("-p", "--passphrase",
+    action="store_true", dest="passphrase", help="prompt for passphrase when generating private key")
 parser.add_option("-r", "--revoke",
     action="store", dest="serial", help="revoke certificate with serial SERIAL")
 parser.add_option("-l", "--listrevoked",
@@ -258,17 +258,17 @@ def createCertificate(req, (issuerCert, issuerKey), serial, (notBefore, notAfter
     cert.sign(issuerKey, digest)
     return cert
 
-# Password
+# Passphrase
 def getPass():
     import getpass
-    return getpass.getpass('Enter password: ')
+    return getpass.getpass('Enter passphrase for private key: ')
 
 # Simple routines to load/save files using crypto lib
 # Save private key to file
 def save_key ( fn, key ):
     fp = open ( fn, 'w' )
-    # Experimental: adding password to private key
-    if options.password:
+    # Adding passphrase to private key
+    if options.passphrase:
         fp.write ( crypto.dump_privatekey ( FILETYPE, key, ciphermethod, getPass() ) )
     else:
         fp.write ( crypto.dump_privatekey ( FILETYPE, key ) )
