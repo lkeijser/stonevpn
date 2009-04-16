@@ -1,3 +1,7 @@
+2009-04-15	Léon Keijser	<keijser@stone-it.com>
+
+	* Fixed: minor typo: password -> passphrase
+
 2009-03-27	Léon Keijser	<keijser@stone-it.com>
 
 	* Added: stonevpn.spec SPEC file

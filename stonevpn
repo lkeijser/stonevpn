@@ -652,3 +652,4 @@ if options.emailaddress:
         # Also include the CA certificate
         mail_attachment.append(cacertfile)
         send_mail(mail_from, mail_to, 'StoneVPN: generated files for ' + str(options.cname), mail_msg, mail_attachment)
+
