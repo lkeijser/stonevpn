@@ -1,17 +1,22 @@
+%{!?python_sitelib: %global python_sitelib %(%{__python} -c "from distutils.sysconfig import get_python_lib; print get_python_lib()")}
+
 Name:		StoneVPN
-Version:	0.4
+Version:	0.4.1
 Release:	1%{?dist}
 Summary:	Easy OpenVPN certificate and configuration management
 
 Group:		Applications/Internet
 License:	GPLv2
-URL:		http://github.com/lkeijser/stonevpn/tree/master
+URL:		http://sf.net/projects/stonevpn
 Source0:	stonevpn.tar.gz
-BuildRoot:	%(mktemp -ud %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
+
+BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildArch:	noarch
+
 Requires:	python-configobj
 Requires:	python-IPy
 Requires:	pyOpenSSL
+BuildRequires:	python
 
 %description
 StoneVPN allows you to manage OpenVPN certificates and create
@@ -32,7 +37,6 @@ install -D -p -m 0644 stonevpn.conf %{buildroot}/etc/stonevpn.conf
 %clean
 rm -rf $RPM_BUILD_ROOT
 
-
 %files
 %defattr(-,root,root,-)
 %doc COPYING README TODO Changelog
@@ -40,5 +44,8 @@ rm -rf $RPM_BUILD_ROOT
 /etc/stonevpn.conf
 
 %changelog
+* Tue May 19 2009 L.S. Keijser <keijser@stone-it.com>
+- bumped to version 0.4.1
+
 * Fri Mar 27 2009 L.S. Keijser <keijser@stone-it.com>
 - initial release

@@ -544,7 +544,6 @@ def revokeCert(serial):
     print "Old index renamed to: " + indexdb + '.old'
 
 def listRevokedCerts():
-    crl = crypto.CRL()
     # read SSL dbase (usually index.txt)
     # this file has 5 columns: Status, Expiry date, Revocation date, Serial nr, file?, Distinguished Name (DN)
     print "Reading SSL database: " + indexdb
@@ -566,8 +565,6 @@ def listRevokedCerts():
         count = count + 1
 
 def listAllCerts():
-    # commented out next line .. not sure if we really gonna need it
-    # crl = crypto.CRL()
     print "Reading SSL database: " + indexdb
     # read SSL dbase (usually index.txt)
     # this file has 5 columns: Status, Expiry date, Revocation date, Serial nr, file?, Distinguished Name (DN)
