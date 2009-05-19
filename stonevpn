@@ -155,6 +155,8 @@ parser.add_option("-p", "--passphrase",
     action="store_true", dest="passphrase", help="prompt for passphrase when generating private key")
 parser.add_option("-r", "--revoke",
     action="store", dest="serial", help="revoke certificate with serial SERIAL")
+parser.add_option("-u", "--route",
+        action="store", dest="route", help="Push extra route to client. Example: --route=172.16.0.0/16")
 parser.add_option("-l", "--listrevoked",
     action="store_true", dest="listrevoked", help="list revoked certificates")
 parser.add_option("-a", "--listall",
@@ -469,6 +471,10 @@ if options.freeip:
     secondFree = ipList[1]
     print "First free address: " + str(firstFree)
     print "Second free address: " + str(secondFree)
+    # check if ccd dir exists:
+    if not os.path.exists(ccddir):
+        print "Client configuration directory didn't exist, making ..."
+        os.mkdir(ccddir)
     # And create the configuration file for these addresses
     f=open(ccddir + '/' + options.fname, 'w')
     f.write('ifconfig-push ' + str(firstFree) + ' ' + str(secondFree) + '\n')
@@ -478,6 +484,9 @@ if options.freeip:
 
 # Revoke certificate
 def revokeCert(serial):
+    if not os.path.exists(crlfile):
+        print "Error: CRL file not found at: " + crlfile + " or insufficient rights."
+        sys.exit()
     from time import strftime
     crl = crypto.CRL()
     # we can't replace stuff in the original index file, so we have to create
@@ -653,3 +662,16 @@ if options.emailaddress:
         mail_attachment.append(cacertfile)
         send_mail(mail_from, mail_to, 'StoneVPN: generated files for ' + str(options.cname), mail_msg, mail_attachment)
 
+if options.route:
+    from IPy import IP
+    ip=IP(options.route).strNormal(2)
+    route = str(ip).split('/')
+    nospaces_cname =  options.cname.replace(' ', '_')
+    # check if ccd dir exists:
+    if not os.path.exists(ccddir):
+        print "Client configuration directory didn't exist, making ..."
+        os.mkdir(ccddir)
+    f=open(ccddir + '/' + nospaces_cname, 'w')
+    f.write("push route \"" + route[0] + " " + route[1] + "\"\n")
+    f.close()
+    print "Wrote extra route(s) to " + ccddir + "/" + nospaces_cname
