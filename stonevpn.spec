@@ -32,7 +32,7 @@ it to a user.
 %install
 rm -rf $RPM_BUILD_ROOT
 install -D -p -m 0755 stonevpn %{buildroot}/usr/local/bin/stonevpn
-install -D -p -m 0644 stonevpn.conf %{buildroot}/etc/stonevpn.conf
+install -D -p -m 0644 stonevpn.conf %{buildroot}/etc/stonevpn.conf.sample
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -41,9 +41,12 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(-,root,root,-)
 %doc COPYING README TODO Changelog
 /usr/local/bin/stonevpn
-/etc/stonevpn.conf
+%config /etc/stonevpn.conf.sample
 
 %changelog
+* Tue Jul 14 2009 L.S. Keijser <keijser@stone-it.com>
+- change the way config file is installed
+
 * Tue May 19 2009 L.S. Keijser <keijser@stone-it.com>
 - bumped to version 0.4.1
 
