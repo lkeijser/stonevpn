@@ -489,6 +489,7 @@ def revokeCert(serial):
         sys.exit()
     from time import strftime
     crl = crypto.CRL()
+
     # we can't replace stuff in the original index file, so we have to create
     # a new one and in the end rename the original one and move the temp file
     # to the final location (usually /etc/ssl/index.txt)

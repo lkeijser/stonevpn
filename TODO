@@ -1,3 +1,6 @@
+- FIXME: indexfile is generated incorrectly. Correct format is:
+    'status' \t 'expiry date' \t 'revocation date' \t 'serial nr' \t 'file' \t 'DN' \n
+- FIXME: revocation doesn't work correctly when DN in indexfile contains underscores while in certificate they're spaces
 - make stonepvn class so it can be used as a module
 - option to PGP encrypt e-mail
 - option to create encrypted zipfile (using 7zip?)

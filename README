@@ -28,22 +28,10 @@ First, download the latest pyOpenSSL:
 
 http://sourceforge.net/project/showfiles.php?group_id=31249
 
-Untar/gunzip it. Then download this patch to the extracted dir:
+Untar/gz the source and patch it with the files included with StoneVPN:
 
-http://arnaud.desmons.free.fr/pyOpenSSL-0.8-pkcs12.patch
-
-Patch it:
-
-$ patch -p1 < pyOpenSSL-0.8-pkcs12.patch
-
-Now the same person who made the above patch, also created the
-CRL patch. Unfortunately it doesn't apply anymore against 0.8 so
-i've made a corrected version which is included with StoneVPN.
-
-You will need to copy pyOpenSSL-0.8-crl.patch to the pyOpenSSL
-directory and apply it as well:
-
-$ patch -p1 < pyOpenSSL-0.8-crl.patch
+$ patch -p1 < pyOpenSSL-0.9-pkcs12.patch
+$ patch -p1 < pyOpenSSL-0.9-crl.patch
 
 Now compile pyOpenSSL (you will need at least the openssl- and
 python-devel packages installed):
