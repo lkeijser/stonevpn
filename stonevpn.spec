@@ -31,7 +31,7 @@ it to a user.
 
 %install
 rm -rf $RPM_BUILD_ROOT
-install -D -p -m 0755 stonevpn %{buildroot}/usr/local/bin/stonevpn
+install -D -p -m 0755 stonevpn %{buildroot}/usr/bin/stonevpn
 install -D -p -m 0644 stonevpn.conf %{buildroot}/etc/stonevpn.conf.sample
 
 %clean
@@ -40,7 +40,7 @@ rm -rf $RPM_BUILD_ROOT
 %files
 %defattr(-,root,root,-)
 %doc COPYING README TODO Changelog
-/usr/local/bin/stonevpn
+/usr/bin/stonevpn
 %config(noreplace) /etc/stonevpn.conf.sample
 
 %changelog
