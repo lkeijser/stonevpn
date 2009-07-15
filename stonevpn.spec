@@ -41,7 +41,7 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(-,root,root,-)
 %doc COPYING README TODO Changelog
 /usr/local/bin/stonevpn
-%config /etc/stonevpn.conf.sample
+%config(noreplace) /etc/stonevpn.conf.sample
 
 %changelog
 * Tue Jul 14 2009 L.S. Keijser <keijser@stone-it.com>
