@@ -1,6 +1,6 @@
 %{!?python_sitelib: %global python_sitelib %(%{__python} -c "from distutils.sysconfig import get_python_lib; print get_python_lib()")}
 
-Name:		StoneVPN
+Name:		stonevpn
 Version:	0.4.1
 Release:	1%{?dist}
 Summary:	Easy OpenVPN certificate and configuration management
@@ -8,7 +8,7 @@ Summary:	Easy OpenVPN certificate and configuration management
 Group:		Applications/Internet
 License:	GPLv2
 URL:		http://sf.net/projects/stonevpn
-Source0:	stonevpn.tar.gz
+Source0:	%{name}-%{version}.tar.gz
 
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildArch:	noarch
