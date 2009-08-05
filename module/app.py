@@ -126,10 +126,10 @@ def main():
         action="store_true",
         dest="printindex",
         help="Prints index file")
-    #parser.add_option("-t", "--test",
-    #    action="store_true",
-    #    dest="test",
-    #    help="Danger, Will Robinson, Danger! test parameter - can do anything! Review source before executing!")
+    parser.add_option("-t", "--test",
+        action="store_true",
+        dest="test",
+        help="Danger, Will Robinson, Danger! test parameter - can do anything! Review source before executing!")
 
     # parse cmd line options
     (options, args) = parser.parse_args()
@@ -151,7 +151,7 @@ def main():
     s.showserial    = options.showserial
     s.printcert     = options.printcert
     s.printindex    = options.printindex
-    #s.test          = options.test
+    s.test          = options.test
     # values we got from parsing the configuration file:
     s.cacertfile    = cacertfile
     s.cakeyfile     = cakeyfile
@@ -208,7 +208,7 @@ class StoneVPN:
         self.showserial    = None
         self.printcert     = None
         self.printindex    = None
-        #self.test          = None
+        self.test          = None
         # should we do the same for values we got from
         # parsing the configuration file? i don't think
         # so, so let's comment them out for now.
@@ -312,7 +312,6 @@ class StoneVPN:
         # Make nice zipfile from all the generated files
         # :: called only when option '-z' is used ::
         if self.zip:
-            checkFileOption()
             import zipfile
             import glob
             print "Adding all files to " + self.fprefix + self.fname + ".zip"
@@ -330,7 +329,6 @@ class StoneVPN:
         # Find free IP-address by parsing config files (usually in /etc/openvpn/ccd/*)
         # :: called only when option '-i' is used ::
         if self.freeip:
-            checkFileOption()
             print "Searching for free IP-address:"
             # since we're writing to the ccd dir, check if we have root privileges
             gotRoot()
