@@ -209,25 +209,7 @@ class StoneVPN:
         self.printcert     = None
         self.printindex    = None
         self.test          = None
-        # should we do the same for values we got from
-        # parsing the configuration file? i don't think
-        # so, so let's comment them out for now.
-        #self.cacertfile    = None
-        #self.cakeyfile     = None
-        #self.openvpnconf   = None
-        #self.stonevpnconf  = None
-        #self.ccddir        = None
-        #self.working       = None
-        #self.opensslconf   = None
-        #self.pushrouter    = None
-        #self.ciphermethod  = None
-        #self.prefix        = None
-        #self.crlfile       = None
-        #self.mail_server   = None
-        #self.mail_cc       = None
-        #self.mail_msg      = None
-        #self.mail_from     = None
-
+        
     # Read certain vars from OpenSSL config file
     def readOpenSSLConf(self):
         config = ConfigObj(self.opensslconf)
@@ -288,12 +270,6 @@ class StoneVPN:
         if not os.path.exists(serialfile):
             print "Error: serialfile not found at: " + serialfile + " or insufficient rights."
             sys.exit()
-
-        # Commented out check for 'fname' since we do that in main()
-        #def checkFileOption():
-        #    if not options.fname:
-        #        print "Error: no filename specified! Try " + sys.argv[0] + " --help"
-        #        sys.exit()
 
         # Make sure FPREFIX ends with a dash
         if not self.fprefix[-1] == '-':
