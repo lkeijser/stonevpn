@@ -32,24 +32,33 @@ def main():
     stonevpnconf = '/etc/stonevpn.conf'
 
     # Read main configuration from stonevpn.conf
-    config = ConfigObj(stonevpnconf)
-    sectionname = 'stonevpn conf'
-    section=config[sectionname]
-    
-    crlfile = section['crlfile']
-    prefix = section['prefix']
-    pushrouter = section['pushrouter']
-    cacertfile = section['cacertfile']
-    cakeyfile = section['cakeyfile']
-    openvpnconf = section['openvpnconf']
-    ccddir = section['ccddir']
-    working = section['working']
-    opensslconf = section['opensslconf']
-    ciphermethod = section['cipher']
-    mail_server = section['mail_server']
-    mail_cc = section['mail_cc']
-    mail_msg = section['mail_msg']
-    mail_from = section['mail_from']
+    if os.path.exists(stonevpnconf):
+        config = ConfigObj(stonevpnconf)
+        sectionname = 'stonevpn conf'
+        section=config[sectionname]
+        
+        crlfile = section['crlfile']
+        prefix = section['prefix']
+        pushrouter = section['pushrouter']
+        cacertfile = section['cacertfile']
+        cakeyfile = section['cakeyfile']
+        openvpnconf = section['openvpnconf']
+        ccddir = section['ccddir']
+        working = section['working']
+        opensslconf = section['opensslconf']
+        ciphermethod = section['cipher']
+        mail_server = section['mail_server']
+        mail_cc = section['mail_cc']
+        mail_msg = section['mail_msg']
+        mail_from = section['mail_from']
+    else:
+        print "File " + stonevpnconf + " does not exist!"
+        sys.exit()
+
+    # define some crypto stuff
+    TYPE_RSA = crypto.TYPE_RSA
+    TYPE_DSA = crypto.TYPE_DSA
+    FILETYPE = crypto.FILETYPE_PEM
 
     # command line options
     parser = OptionParser(usage="%prog -f <filename> -n <commonname> [ -o unix|windows | -z | -h | -i | -r <serial> | -l |-a ]",version="%prog " + stonevpnver)
@@ -159,6 +168,11 @@ def main():
     s.mail_msg      = mail_msg
     s.mail_from     = mail_from
     s.stonevpnconf  = stonevpnconf
+    # and all other variables
+    s.TYPE_RSA      = TYPE_RSA
+    s.TYPE_DSA      = TYPE_DSA
+    s.FILETYPE      = FILETYPE
+    s.stonevpnver   = stonevpnver
 
     # check for all args
     if options.fname is None:
@@ -171,7 +185,7 @@ def main():
             print "Sorry, root privileges required for this action."
             sys.exit(0)
         else:
-            c.run()
+            s.run()
 
 class StoneVPN:
 
@@ -259,12 +273,6 @@ class StoneVPN:
         StoneVPN's main function
         """
 
-        if os.path.exists(self.stonevpnconf):
-            readMainConf()
-        else:
-            print "File " + self.stonevpnconf + " does not exist!"
-            sys.exit()
-
         if os.path.exists(self.opensslconf):
             self.readOpenSSLConf()
         else:
@@ -291,18 +299,13 @@ class StoneVPN:
         if not self.fprefix[-1] == '-':
             self.fprefix = str(self.fprefix) + '-'
 
-        # define some crypto stuff
-        TYPE_RSA = crypto.TYPE_RSA
-        TYPE_DSA = crypto.TYPE_DSA
-        FILETYPE = crypto.FILETYPE_PEM
-
+        
         # check if working dir exists, create it if it doesn't
         if not os.path.exists(self.working):
             print "Working dir didn't exist, making ..."
             os.mkdir(self.working)
         # Make certificates
         if self.cname: 
-            checkFileOption()
             print "Creating " + self.fname + ".key and " + self.fname + ".crt for " + self.cname
             self.makeCert( self.fname, self.cname )
 
@@ -480,7 +483,7 @@ class StoneVPN:
         extensions = []
         # Create the X509 Extensions
         extensions.append(crypto.X509Extension('basicConstraints',1, 'CA:FALSE'))
-        extensions.append(crypto.X509Extension('nsComment',0, 'Created with stonevpn ' + str(stonevpnver)))
+        extensions.append(crypto.X509Extension('nsComment',0, 'Created with stonevpn ' + str(self.stonevpnver)))
         # We're creating a X509 certificate version 2
         cert = crypto.X509()
         cert.set_version ( 2 )
@@ -509,28 +512,28 @@ class StoneVPN:
         fp = open ( fn, 'w' )
         # Adding passphrase to private key
         if self.passphrase:
-            fp.write ( crypto.dump_privatekey ( FILETYPE, key, self.ciphermethod, self.getPass() ) )
+            fp.write ( crypto.dump_privatekey ( self.FILETYPE, key, self.ciphermethod, self.getPass() ) )
         else:
-            fp.write ( crypto.dump_privatekey ( FILETYPE, key ) )
+            fp.write ( crypto.dump_privatekey ( self.FILETYPE, key ) )
         fp.close ()
 
     # Save certificate to file
     def save_cert (self, fn, cert):
         fp = open ( fn, 'w' )
-        fp.write ( crypto.dump_certificate ( FILETYPE, cert ) )
+        fp.write ( crypto.dump_certificate ( self.FILETYPE, cert ) )
         fp.close ()
 
     # Load private key from file
     def load_key (self, fn):
         fp = open ( fn, 'r' )
-        ret = crypto.load_privatekey ( FILETYPE, fp.read() )
+        ret = crypto.load_privatekey ( self.FILETYPE, fp.read() )
         fp.close ()
         return ret
 
     # Load certificate from file
     def load_cert (self, fn):
         fp = open ( fn, 'r' )
-        ret = crypto.load_certificate ( FILETYPE, fp.read() )
+        ret = crypto.load_certificate ( self.FILETYPE, fp.read() )
         fp.close ()
         return ret
 
@@ -568,7 +571,7 @@ class StoneVPN:
 
     # Generate keyfile and certificate
     def makeCert(self, fname, cname):
-        pkey = self.createKeyPair(TYPE_RSA, 1024)
+        pkey = self.createKeyPair(self.TYPE_RSA, 1024)
         req = self.createCertRequest(pkey, CN=cname, C=countryName, ST=stateOrProvinceName, O=organizationName, OU=organizationalUnitName)
         try:
             cacert = self.load_cert( self.cacertfile )
@@ -614,7 +617,7 @@ class StoneVPN:
     # Make config files for OpenVPN
     def makeConfs(self, sname, fname):
         import string
-        config = ConfigObj(stonevpnconf)
+        config = ConfigObj(self.stonevpnconf)
         # Generate appropriate (according to specified OS) configuration for OpenVPN
         if sname == 'unix':
             sectionname = 'unix conf'
@@ -629,7 +632,7 @@ class StoneVPN:
         for var in section:
             # Fill in correct path to generated cert/key/cacert files
             if var == 'ca':
-                cacertfilenopath = self.cacertfile.split('/')[int(len(selfcacertfile.split('/')) - 1)]
+                cacertfilenopath = self.cacertfile.split('/')[int(len(self.cacertfile.split('/')) - 1)]
                 f.write(section[var].replace('cacertfile', cacertfilenopath) + '\n')
             elif var == 'cert':
                 f.write(section[var].replace('clientcertfile', self.fprefix + fname + '.crt') + '\n')
