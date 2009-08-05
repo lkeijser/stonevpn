@@ -175,7 +175,7 @@ def main():
     s.stonevpnver   = stonevpnver
 
     # check for all args
-    if options.fname is None:
+    if options.fname is None and options.serial is not None and options.listrevoked is not None and options.listall is not None and options.showserial is not None and options.printcert is not None and options.printindex is not None and options.test is not None:
         parser.error("Error: you have to specify a filename (FNAME)")
     else:
         # must..have..root..
