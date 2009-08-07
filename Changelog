@@ -1,3 +1,8 @@
+2009-08-07	Léon Keijser	<keijser@stone-it.com>
+	* Added: implemented nice python setup.py to install
+	all the necessary files.
+	* Updated: README file according to new install method
+
 2009-05-19	Léon Keijser	<keijser@stone-it.com>
 	* Fixed: segfault when CRL didn't exist
 	* Added: option to push extra route to client (stored in
