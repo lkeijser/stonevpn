@@ -5,14 +5,14 @@ Author: Léon Keijser - keijser@stone-it.com
 
 
 = Installation =
-* Move stonevpn to /usr/local/bin (make sure it's chmod +x)
+* run 'python setup.py install' as root
 
-* Move stonevpn.conf to /etc
+* copy /usr/share/StoneVPN/example/stonevpn.conf to /etc
 
 * Make the necessary adjustments in /etc/stonevpn.conf
 
 * Make the necessary adjustments in your openssl.cnf (StoneVPN
-should say what they are)
+  should say what they are)
 
 * Optional: patch pyOpenSSL to have CRL support (see below)
 
@@ -30,8 +30,8 @@ http://sourceforge.net/project/showfiles.php?group_id=31249
 
 Untar/gz the source and patch it with the files included with StoneVPN:
 
-$ patch -p1 < pyOpenSSL-0.9-pkcs12.patch
-$ patch -p1 < pyOpenSSL-0.9-crl.patch
+$ patch -p1 < /usr/share/StoneVPN/patches/pyOpenSSL-0.9-pkcs12.patch
+$ patch -p1 < /usr/share/StoneVPN/patches/pyOpenSSL-0.9-crl.patch
 
 Now compile pyOpenSSL (you will need at least the openssl- and
 python-devel packages installed):
@@ -44,25 +44,17 @@ After this is done, StoneVPN should work with CRL.
 = RPM =
 I've included a SPEC file so you can build an RPM yourself. To
 do this i assume you have a working rpmbuild environment and have
-StoneVPN located in /StoneVPN-%version , and created a tar.gz file.
+the StoneVPN tarball located in ~/rpmbuild/SOURCES/stonevpn-%version.tar.gz
 
 For example
 
-$ tar czvf stonevpn.tar.gz ~/StoneVPN-0.4
-
-Move the file to your rpmbuild environment:
-
-$ mv stonevpn.tar.gz ~/rpmbuild/SOURCES
-
-Move the SPEC file there as well:
-
-$ mv stonevpn.spec ~/rpmbuild/SPECS
+$ mv /usr/share/StoneVPN/rpm/stonevpn.spec ~/rpmbuild/SPECS
 
 Build the RPMs:
 
 $ cd ~/rpmbuild/SPECS
 $ rpmbuild -ba stonevpn.spec
 
-If all goes well this will leave you with a StoneVPN-0.4-1.el5.noarch.rpm
+If all goes well this will leave you with a stonevpn-%version.el5.noarch.rpm
 file which you can then use to install on various machines :)
 

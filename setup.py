@@ -23,6 +23,7 @@ setup(name = 'stonevpn',
         ('share/StoneVPN',['README','COPYING','Changelog','TODO']),
         ('share/StoneVPN/example',['conf/stonevpn.conf']),
         ('share/StoneVPN/patches',['patches/pyOpenSSL-0.9-crl.patch','patches/pyOpenSSL-0.9-pkcs12.patch']),
+        ('share/StoneVPN/rpm',['rpm/stonevpn.spec']),
         ]
     )
 
