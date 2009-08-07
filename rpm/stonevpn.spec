@@ -16,7 +16,7 @@ BuildArch:	noarch
 Requires:	python-configobj
 Requires:	python-IPy
 Requires:	pyOpenSSL
-BuildRequires:	python
+BuildRequires:	python-devel
 
 %description
 StoneVPN allows you to manage OpenVPN certificates and create
@@ -40,11 +40,18 @@ it to a user.
 %files
 %defattr(-,root,root,-)
 %doc COPYING README TODO Changelog
-%config(noreplace) /etc/stonevpn.conf
-%{python_sitearch}/StoneVPN/
-%{python_sitearch}/%{name}*.egg-info
+%dir %{python_sitelib}/StoneVPN
+%{python_sitelib}/StoneVPN/app.py*
+%{python_sitelib}/StoneVPN/__init__.py*
+%{python_sitelib}/%{name}*.egg-info
+%{_bindir}/stonevpn
+%dir %{_datadir}/StoneVPN
+%{_datadir}/StoneVPN/*
 
 %changelog
+* Fri Aug 7 2009 L.S. Keijser <keijser@stone-it.com> 
+- modify according to new way of installation
+
 * Tue Jul 14 2009 L.S. Keijser <keijser@stone-it.com>
 - change the way config file is installed
 
