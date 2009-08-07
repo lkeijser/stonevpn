@@ -1,0 +1,5 @@
+include COPYING Changelog README TODO stonevpn
+recursive-include conf *
+recursive-include patches *
+recursive-include rpm *
+recursive-include StoneVPN *

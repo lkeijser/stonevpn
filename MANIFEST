@@ -1,0 +1,12 @@
+COPYING
+Changelog
+README
+TODO
+setup.py
+stonevpn
+StoneVPN/__init__.py
+StoneVPN/app.py
+conf/stonevpn.conf
+patches/pyOpenSSL-0.9-crl.patch
+patches/pyOpenSSL-0.9-pkcs12.patch
+rpm/stonevpn.spec
