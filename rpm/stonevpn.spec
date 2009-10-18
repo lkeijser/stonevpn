@@ -2,7 +2,7 @@
 
 Name:		stonevpn
 Version:	0.4.2
-Release:	1%{?dist}
+Release:	2%{?dist}
 Summary:	Easy OpenVPN certificate and configuration management
 
 Group:		Applications/Internet
@@ -13,10 +13,8 @@ Source0:	%{name}-%{version}.tar.gz
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildArch:	noarch
 
-Requires:	python-configobj
-Requires:	python-IPy
-Requires:	pyOpenSSL
-BuildRequires:	python-devel
+BuildRequires:	python
+Requires:	python python-configobj python-IPy pyOpenSSL python-devel
 
 %description
 StoneVPN allows you to manage OpenVPN certificates and create
@@ -43,13 +41,17 @@ it to a user.
 %dir %{python_sitelib}/StoneVPN
 %{python_sitelib}/StoneVPN/app.py*
 %{python_sitelib}/StoneVPN/__init__.py*
-%{python_sitelib}/%{name}*.egg-info
+#%{python_sitelib}/%{name}*.egg-info
 %{_bindir}/stonevpn
 %dir %{_datadir}/StoneVPN
 %{_datadir}/StoneVPN/*
 
 %changelog
-* Fri Aug 7 2009 L.S. Keijser <keijser@stone-it.com> 
+* Sat Oct 17 2009 L.S. Keijser <keijser@stone-it.com> - 0.4.2-2
+- fixed all rpmlint warnings/errors
+- cleaned up spec file
+
+* Fri Aug 7 2009 L.S. Keijser <keijser@stone-it.com>
 - modify according to new way of installation
 
 * Tue Jul 14 2009 L.S. Keijser <keijser@stone-it.com>

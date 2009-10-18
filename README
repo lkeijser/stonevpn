@@ -4,6 +4,7 @@ StoneVPN - Easy OpenVPN certificate and configuration management
 Author: Léon Keijser - keijser@stone-it.com
 
 
+
 = Installation =
 * run 'python setup.py install' as root
 
