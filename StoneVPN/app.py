@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 """
 
  StoneVPN - Easy OpenVPN certificate and configuration management
@@ -110,6 +109,10 @@ def main():
         action="store_true",
         dest="listrevoked",
         help="list revoked certificates")
+    parser.add_option("--crl",
+        action="store_true",
+        dest="displaycrl",
+        help="display CRL file contents")
     parser.add_option("-a", "--listall",
         action="store_true",
         dest="listall",
@@ -147,6 +150,7 @@ def main():
     s.serial        = options.serial
     s.route         = options.route
     s.listrevoked   = options.listrevoked
+    s.displaycrl    = options.displaycrl
     s.listall       = options.listall
     s.showserial    = options.showserial
     s.printcert     = options.printcert
@@ -204,6 +208,7 @@ class StoneVPN:
         self.serial        = None
         self.route         = None
         self.listrevoked   = None
+        self.displaycrl    = None
         self.listall       = None
         self.showserial    = None
         self.printcert     = None
@@ -361,6 +366,9 @@ class StoneVPN:
         if self.listall:
             self.listAllCerts()
 
+        if self.displaycrl:
+            self.displayCRL()
+
         if self.listrevoked:
             self.listRevokedCerts()
 
@@ -516,7 +524,7 @@ class StoneVPN:
         try:
             certfile = self.load_cert( cert )
         except:
-            print "Error opening certificate file"
+            print "Error opening certificate file" 
             sys.exit()
         # Some objects are 'X509Name objects' so we have to fiddle a bit to output to a human-readable format
         certIssuerArray = str(certfile.get_issuer()).replace('<X509Name object \'', '').replace('\'>','').split('/')
@@ -622,6 +630,7 @@ class StoneVPN:
             print "Error: CRL file not found at: " + self.crlfile + " or insufficient rights."
             sys.exit()
         from time import strftime
+	from datetime import datetime
         crl = crypto.CRL()
 
         # we can't replace stuff in the original index file, so we have to create
@@ -647,8 +656,17 @@ class StoneVPN:
                 else:
                     revSerial = str(line.split()[3])
                     revDate = str(line.split()[2])
-                    crl.make_revoked(revDate, revSerial)
-                    print "Adding to CRL with date " + revDate + " and serial " + revSerial
+                    # old way:
+                    #crl.make_revoked(revDate, revSerial)
+                    # new way:
+                    revoked = crypto.Revoked()
+                    revoked.set_rev_date('20' + str(revDate))
+                    revoked.set_serial(revSerial)
+                    #no reason needed?
+                    #revoked.set_reason('revoked')
+                    crl.add_revoked(revoked)
+                    # /new way
+                    print "Re-adding existing revoked certificate to CRL with date " + revDate + " and serial " + revSerial
                     t.write(line)
             # the line contains a valid certificate. Check if the serial is the same as the
             # one we're trying to revoke
@@ -662,21 +680,38 @@ class StoneVPN:
             # to the index file
                     t.write(line)
         # crlTime = str(strftime("%y%m%d%H%M%S")) + 'Z'
-        print "adding new revoked certificate to CRL with date " + crlTime + " and serial " + serial
-        crl.make_revoked(crlTime, serial)
+        print "Adding new revoked certificate to CRL with date " + crlTime + " and serial " + serial
+	# old way:
+	#crl.make_revoked(crlTime, serial)
+	# new way:
+	revoked = crypto.Revoked()
+	now = datetime.now().strftime("%Y%m%d%H%M%SZ")
+	revoked.set_rev_date(now)
+	revoked.set_serial(serial)
+	#no reason needed?
+	#revoked.set_reason('sUpErSeDEd')
+	crl.add_revoked(revoked)
+	# /new way
         cacert = self.load_cert(self.cacertfile)
         cakey = self.load_key(self.cakeyfile)
-        newCRL = crypto.dump_crl(crl, cacert, cakey)
+        # old way:
+        #newCRL = crypto.dump_crl(crl, cacert, cakey)
+        # new way:
+	newCRL = crl.export(cacert, cakey, days=20)
+        # /new way
         f.write(newCRL)
         f.close()
         shutil.move(indexdb,indexdb + '.old')
         shutil.move(self.working + '/index.tmp',indexdb)
         shutil.move(self.crlfile,self.crlfile + '.old')
         shutil.move(self.working + '/revoked.crl',self.crlfile)
-        print "New CRL written to: " + self.crlfile
-        print "Old CRL renamed to: " + self.crlfile + '.old'
-        print "New index written to: " + indexdb
-        print "Old index renamed to: " + indexdb + '.old'
+        print "New CRL written to: %s. Backup created as: %s." % (self.crlfile,self.crlfile + '.old')
+        print "New index written to: %s. Backup created as: %s." % (indexdb,indexdb + '.old')
+
+    def displayCRL(self):
+        crl = crypto.load_crl(crypto.FILETYPE_PEM, self.crlfile)
+        revs = crl.get_revoked()
+        print revs
 
     def listRevokedCerts(self):
         # read SSL dbase (usually index.txt)
