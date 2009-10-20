@@ -709,9 +709,20 @@ class StoneVPN:
         print "New index written to: %s. Backup created as: %s." % (indexdb,indexdb + '.old')
 
     def displayCRL(self):
-        crl = crypto.load_crl(crypto.FILETYPE_PEM, self.crlfile)
+        import time
+        text = open(self.crlfile, 'r').read()
+        print "Parsing CRL file %s" % self.crlfile
+        crl = crypto.load_crl(crypto.FILETYPE_PEM, text)
         revs = crl.get_revoked()
-        print revs
+        print "Total certificates revoked: %s\n" % len(revs)
+        print "Serial\tRevoked at date"
+        print "======\t========================"
+        for revoked in revs:
+            revSerial = revoked.get_serial()
+            revDate = revoked.get_rev_date()[0:-1]
+            revoDate = time.strptime(revDate, "%Y%m%d%H%M%S")
+            print revSerial + "\t" + time.strftime("%c", revoDate)
+
 
     def listRevokedCerts(self):
         # read SSL dbase (usually index.txt)
