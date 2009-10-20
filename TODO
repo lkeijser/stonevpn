@@ -4,4 +4,4 @@
 - option to PGP encrypt e-mail
 - option to create encrypted zipfile (using 7zip?)
 - have CRL patches be included in upstream :)
-
+- if to-be-revoked serial doesn't exist (in indexdb) ask for confirmation
