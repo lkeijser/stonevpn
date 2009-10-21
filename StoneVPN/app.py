@@ -60,13 +60,13 @@ def main():
     FILETYPE = crypto.FILETYPE_PEM
 
     # command line options
-    parser = OptionParser(usage="%prog -f <filename> -n <commonname> [ -o unix|windows | -z | -h | -i | -r <serial> | -l |-a ]",version="%prog " + stonevpnver)
+    parser = OptionParser(usage="%prog -f <filename> -n <commonname> [ OPTIONS ]",version="%prog " + stonevpnver)
 
     parser.add_option("-n", "--name",
         action="store",
         type="string",
         dest="cname",
-        help="Common Name, use quotes: \"CNAME\"")
+        help="Common Name, use quotes eg.: \"CNAME\"")
     parser.add_option("-f", "--file",
         dest="fname",
         help="write to file FNAME (no extension!)")
