@@ -29,9 +29,10 @@ First, download the latest pyOpenSSL via bazaar:
 
 $ bzr branch lp:pyopenssl
 
-Then, patch it with the patchfile included with StoneVPN:
+Then, change into the newly created directory and patch pyOpenSSL with 
+the patchfile included with StoneVPN:
 
-$ patch -p1 < /usr/share/StoneVPN/patches/pyOpenSSL-0.9-crl_and_revoked.patch
+$ patch -p0 < /usr/share/StoneVPN/patches/pyOpenSSL-0.9-crl_and_revoked.patch
 
 Now compile pyOpenSSL (you will need at least the openssl- and
 python-devel packages installed):
