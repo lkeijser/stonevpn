@@ -47,6 +47,9 @@ it to a user.
 %{_datadir}/StoneVPN/*
 
 %changelog
+* Thu Oct 22 2009 L.S. Keijser <keijser@stone-it.com> - 0.4.3-0
+- changed for Fedora packaging release testing
+
 * Sat Oct 17 2009 L.S. Keijser <keijser@stone-it.com> - 0.4.2-2
 - fixed all rpmlint warnings/errors
 - cleaned up spec file
