@@ -465,7 +465,14 @@ class StoneVPN:
         extensions = []
         # Create the X509 Extensions
         extensions.append(crypto.X509Extension('basicConstraints',1, 'CA:FALSE'))
-        extensions.append(crypto.X509Extension('nsComment',0, 'Created with stonevpn ' + str(self.stonevpnver)))
+        try:
+        	extensions.append(crypto.X509Extension('nsComment',0, 'Created with stonevpn ' + str(self.stonevpnver)))
+        except ValueError:
+        	print "\n=================================================================="
+        	print "Warning: your version of pyOpenSSL doesn't support X509Extensions."
+        	print "Please consult the README file that came with StoneVPN in order to"
+        	print "fix this by upgrading to at least pyOpenSSL 0.9."
+        	print "==================================================================\n"
         # We're creating a X509 certificate version 2
         cert = crypto.X509()
         cert.set_version ( 2 )
@@ -631,8 +638,14 @@ class StoneVPN:
             sys.exit()
         from time import strftime
 	from datetime import datetime
-        crl = crypto.CRL()
-
+	try:
+        	crl = crypto.CRL()
+	except:
+		print "\nError: CRL support is not available in your version of"
+		print "pyOpenSSL. Please check the README file that came with"
+		print "StoneVPN to see what you can do about this. For now, "
+		print "you will have to revoke certificates manually.\n"
+		sys.exit()
         # we can't replace stuff in the original index file, so we have to create
         # a new one and in the end rename the original one and move the temp file
         # to the final location (usually /etc/ssl/index.txt)
@@ -712,8 +725,16 @@ class StoneVPN:
         import time
         text = open(self.crlfile, 'r').read()
         print "Parsing CRL file %s" % self.crlfile
-        crl = crypto.load_crl(crypto.FILETYPE_PEM, text)
-        revs = crl.get_revoked()
+        try:
+        	crl = crypto.load_crl(crypto.FILETYPE_PEM, text)
+        	revs = crl.get_revoked()
+	except:
+		print "\nError: CRL support is not available in your version of"
+		print "pyOpenSSL. Please check the README file that came with"
+		print "StoneVPN to see what you can do about this. For now, "
+		print "you will have to display the CRL file manually using:\n"
+		print "$ openssl crl -in %s -noout -text\n" % self.crlfile
+		sys.exit()
         print "Total certificates revoked: %s\n" % len(revs)
         print "Serial\tRevoked at date"
         print "======\t========================"
