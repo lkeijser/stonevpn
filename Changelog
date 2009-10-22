@@ -3,6 +3,7 @@
 	methods since upstream has already added PKCS12 support
 	and will likely accept this patch as well. Code adapted.
 	* Added: method to display information in CRL file
+	* Changed: version 0.4.3
 
 2009-08-07	Léon Keijser	<keijser@stone-it.com>
 	* Added: implemented nice python setup.py to install
