@@ -13,8 +13,8 @@ Source0:	%{name}-%{version}.tar.gz
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildArch:	noarch
 
-BuildRequires:	python
-Requires:	python python-configobj python-IPy pyOpenSSL python-devel
+BuildRequires:	python-devel
+Requires:	python-configobj python-IPy pyOpenSSL
 
 %description
 StoneVPN allows you to manage OpenVPN certificates and create
@@ -41,7 +41,7 @@ it to a user.
 %dir %{python_sitelib}/StoneVPN
 %{python_sitelib}/StoneVPN/app.py*
 %{python_sitelib}/StoneVPN/__init__.py*
-#%{python_sitelib}/%{name}*.egg-info
+%{python_sitelib}/%{name}*.egg-info
 %{_bindir}/stonevpn
 %dir %{_datadir}/StoneVPN
 %{_datadir}/StoneVPN/*
