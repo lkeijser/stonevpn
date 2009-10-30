@@ -312,7 +312,6 @@ class StoneVPN:
         if self.freeip:
             print "Searching for free IP-address:"
             # since we're writing to the ccd dir, check if we have root privileges
-            gotRoot()
             import glob, fileinput, string
             # parse config file in search for ifconfig-pool
             for line in fileinput.input(self.openvpnconf):
@@ -323,7 +322,14 @@ class StoneVPN:
             import IPy
             IPy.check_addr_prefixlen = False    # set so that IP-addresses other than x.x.x.0/x can be handled
             from IPy import IP
-            range = IP(pool_from + '-' + pool_to)
+            try:
+                range = IP(pool_from + '-' + pool_to)
+            except ValueError as E_range:
+                print "An error occured when trying to determine a valid"
+                print "network prefix for your pool. Reverting to /25"
+                print "If this is not desirable, please specify a valid"
+                print "range in %s." % self.openvpnconf
+                range = IP(pool_from).make_net('255.255.255.128')
             # define list of IP-addresses
             ipList = []
             for x in range:

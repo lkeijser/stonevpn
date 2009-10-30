@@ -24,6 +24,6 @@ setup(name = 'stonevpn',
         ('share/StoneVPN/example',['conf/stonevpn.conf']),
         ('share/StoneVPN/patches',['patches/pyOpenSSL-0.9-crl_and_revoked.patch']),
         ('share/StoneVPN/rpm',['rpm/stonevpn.spec']),
-        ]
+        ],
     )
 
