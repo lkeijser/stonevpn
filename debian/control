@@ -1,0 +1,15 @@
+Source: stonevpn
+Section: net
+Priority: optional
+Maintainer: Léon Keijser <keijser@stone-it.com>
+Build-Depends: debhelper (>= 5)
+Standards-Version: 3.7.2
+
+Package: stonevpn
+Architecture: any
+Depends: python (>=2.4), python-pyopenssl (>=0.9), python-ipy (>=0.55), python-configobj (>=4.4.0)
+Description: Easy OpenVPN certificate and configuration management
+    StoneVPN allows you to manage OpenVPN certificates and create
+    configurations for Windows and Linux machines based on a
+    template. It can package everything into a zipfile and mail
+    it to a user.
