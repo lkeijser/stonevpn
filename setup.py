@@ -20,7 +20,6 @@ setup(name = 'stonevpn',
     package_data = {'stonevpn': files},
     scripts = ["stonevpn"],
     data_files=[
-        ('share/doc/stonevpn',['README','COPYING','Changelog','TODO']),
         ('/etc',['conf/stonevpn.conf']),
         ],
     )
