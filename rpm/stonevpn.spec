@@ -31,8 +31,6 @@ it to a user.
 %install
 %{__rm} -rf %{buildroot}
 %{__python} setup.py install --root %{buildroot}
-%{__install} -m 644 -D %{buildroot}/%{_datadir}/StoneVPN/example/stonevpn.conf %{buildroot}/%{_sysconfdir}/stonevpn.conf
-%{__rm} -rf %{buildroot}/rpm %{buildroot}/patches
 
 %clean
 %{__rm} -rf %{buildroot}
