@@ -20,10 +20,8 @@ setup(name = 'stonevpn',
     package_data = {'stonevpn': files},
     scripts = ["stonevpn"],
     data_files=[
-        ('share/StoneVPN',['README','COPYING','Changelog','TODO']),
-        ('share/StoneVPN/example',['conf/stonevpn.conf']),
-        ('share/StoneVPN/patches',['patches/pyOpenSSL-0.9-crl_and_revoked.patch']),
-        ('share/StoneVPN/rpm',['rpm/stonevpn.spec']),
+        ('share/doc/stonevpn',['README','COPYING','Changelog','TODO']),
+        ('/etc',['conf/stonevpn.conf']),
         ],
     )
 
