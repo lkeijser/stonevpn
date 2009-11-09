@@ -1,6 +1,5 @@
 2009-11-09	Léon Keijser	<keijser@stone-it.com>
-	* Changed: don't install doc/patch/spec since this should
-	be handled by the distro (packaging)
+	* Changed: install doc/example files seperately using 'install_docs'
 	* Added: debian files so StoneVPN can be debianized :)
 	* Fixed: warning msg in freeip routine instead of exception
 	* Fixed: probable incorrect path to cert/key files
