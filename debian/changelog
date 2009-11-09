@@ -1,3 +1,9 @@
+stonevpn (0.4.4-1) unstable; urgency=low
+
+  * New version from upstream
+
+ -- Léon Keijser <keijser@stone-it.com>  Mon, 09 Nov 2009 07:22:48 +0100
+
 stonevpn (0.4.3-1) unstable; urgency=low
 
   * Initial release (Closes: #nnnn)  <nnnn is the bug number of your ITP>

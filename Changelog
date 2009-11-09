@@ -1,3 +1,12 @@
+2009-11-09	Léon Keijser	<keijser@stone-it.com>
+	* Changed: don't install doc/patch/spec since this should
+	be handled by the distro (packaging)
+	* Added: debian files so StoneVPN can be debianized :)
+	* Fixed: warning msg in freeip routine instead of exception
+	* Fixed: probable incorrect path to cert/key files
+	* Changed: updated spec file
+	* Changed: version 0.4.4
+
 2009-10-20	Léon Keijser	<keijser@stone-it.com>
 	* Changed: new patch to add CRL support in favor of old
 	methods since upstream has already added PKCS12 support

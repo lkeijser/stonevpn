@@ -27,7 +27,7 @@ from configobj import ConfigObj
 
 
 def main():
-    stonevpnver = '0.4.3'
+    stonevpnver = '0.4.4'
     stonevpnconf = '/etc/stonevpn.conf'
 
     # Read main configuration from stonevpn.conf

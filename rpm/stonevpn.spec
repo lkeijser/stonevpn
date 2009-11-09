@@ -1,8 +1,8 @@
 %{!?python_sitelib: %global python_sitelib %(%{__python} -c "from distutils.sysconfig import get_python_lib; print get_python_lib()")}
 
 Name:		stonevpn
-Version:	0.4.3
-Release:	2%{?dist}
+Version:	0.4.4
+Release:	1%{?dist}
 Summary:	Easy OpenVPN certificate and configuration management
 
 Group:		Applications/Internet
@@ -46,8 +46,11 @@ it to a user.
 %config(noreplace) %{_sysconfdir}/%{name}.conf
 
 %changelog
+* Mon Nov 09 2009 L.S. Keijser <keijser@stone-it.com> - 0.4.4-1
+- new version from upstream
+
 * Fri Nov 06 2009 L.S. Keijser <keijser@stone-it.com> - 0.4.3-2
-* _really_ removed unnecessary files residing in /usr/share/StoneVPN
+- _really_ removed unnecessary files residing in /usr/share/StoneVPN
 
 * Fri Nov 06 2009 L.S. Keijser <keijser@stone-it.com> - 0.4.3-1
 - fixed EVR: now set to 1 (Fedora standard)
