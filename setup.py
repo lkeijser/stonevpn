@@ -1,8 +1,40 @@
 #!/usr/bin/env python
 
-from distutils.core import setup
+from distutils.core import setup, Command
 import os, sys
 
+
+from distutils.core import setup, Command
+
+class SetupBuildCommand(Command):
+    user_options = []
+    def initialize_options(self):
+        self._dir = os.getcwd()
+    def finalize_options(self):
+        pass
+
+class InstallDocsCommand(SetupBuildCommand):
+    """
+    Extra command to install documentation files
+    """
+    description = "also install documentation files"
+    def run(self):
+        import shutil
+        doc_files=(
+                ('share/StoneVPN',['README','COPYING','Changelog','TODO']),
+                ('share/StoneVPN/example',['conf/stonevpn.conf']),
+                ('share/StoneVPN/rpm',['rpm/stonevpn.spec']),
+                ('share/StoneVPN/patches',['patches/pyOpenSSL-0.9-crl_and_revoked.patch'])
+            )
+        for dst_path,files in doc_files:
+            for src in files:
+                filename = str(src.split('/')[len(src.split('/'))-1])
+                print "copying %s to /usr/%s/%s" % (src,dst_path,filename)
+		if not os.path.isdir('/usr/' + str(dst_path)):
+		    os.mkdir('/usr/' + str(dst_path))
+                shutil.copy(src, '/usr/' + str(dst_path) + "/" + str(filename))
+
+# Generate list of files
 files=[]
 for f in os.path.abspath(''):
     files.append(f)
@@ -22,5 +54,5 @@ setup(name = 'stonevpn',
     data_files=[
         ('/etc',['conf/stonevpn.conf']),
         ],
-    )
-
+    cmdclass = { 'install_docs': InstallDocsCommand }
+    ),

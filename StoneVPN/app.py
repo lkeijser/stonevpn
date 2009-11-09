@@ -324,7 +324,7 @@ class StoneVPN:
             from IPy import IP
             try:
                 range = IP(pool_from + '-' + pool_to)
-            except ValueError as E_range:
+            except ValueError:
                 print "An error occured when trying to determine a valid"
                 print "network prefix for your pool. Reverting to /25"
                 print "If this is not desirable, please specify a valid"

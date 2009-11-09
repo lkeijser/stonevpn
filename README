@@ -8,6 +8,9 @@ Author: Léon Keijser - keijser@stone-it.com
 = Installation =
 * run 'python setup.py install' as root
 
+* run 'python setup.py install_docs' to install example config and
+  documentation in /usr/share/StoneVPN
+
 * copy /usr/share/StoneVPN/example/stonevpn.conf to /etc
 
 * Make the necessary adjustments in /etc/stonevpn.conf
