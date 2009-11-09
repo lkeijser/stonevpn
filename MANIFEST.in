@@ -3,3 +3,4 @@ recursive-include conf *
 recursive-include patches *
 recursive-include rpm *
 recursive-include StoneVPN *
+recursive-include debian *
