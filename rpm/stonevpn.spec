@@ -31,6 +31,10 @@ it to a user.
 %install
 %{__rm} -rf %{buildroot}
 %{__python} setup.py install --root %{buildroot}
+#mkdir %{buildroot}/%{_mandir}
+mkdir -p %{buildroot}/%{_mandir}/man{1,5}
+install -m 644 man/stonevpn.1 %{buildroot}/%{_mandir}/man1/
+install -m 644 man/stonevpn.conf.5 %{buildroot}/%{_mandir}/man5/
 
 %clean
 %{__rm} -rf %{buildroot}
@@ -44,6 +48,8 @@ it to a user.
 %{python_sitelib}/%{name}*.egg-info
 %{_bindir}/stonevpn
 %config(noreplace) %{_sysconfdir}/%{name}.conf
+%{_mandir}/man1/%{name}.*
+%{_mandir}/man5/%{name}.*
 
 %changelog
 * Mon Nov 09 2009 L.S. Keijser <keijser@stone-it.com> - 0.4.4-1

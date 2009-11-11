@@ -3,9 +3,6 @@
 from distutils.core import setup, Command
 import os, sys
 
-
-from distutils.core import setup, Command
-
 class SetupBuildCommand(Command):
     user_options = []
     def initialize_options(self):
@@ -24,7 +21,9 @@ class InstallDocsCommand(SetupBuildCommand):
                 ('share/StoneVPN',['README','COPYING','Changelog','TODO']),
                 ('share/StoneVPN/example',['conf/stonevpn.conf']),
                 ('share/StoneVPN/rpm',['rpm/stonevpn.spec']),
-                ('share/StoneVPN/patches',['patches/pyOpenSSL-0.9-crl_and_revoked.patch'])
+                ('share/StoneVPN/patches',['patches/pyOpenSSL-0.9-crl_and_revoked.patch']),
+                ('share/man/man1',['man/stonevpn.1']),
+                ('share/man/man5',['man/stonevpn.conf.5'])
             )
         for dst_path,files in doc_files:
             for src in files:
@@ -33,6 +32,10 @@ class InstallDocsCommand(SetupBuildCommand):
 		if not os.path.isdir('/usr/' + str(dst_path)):
 		    os.mkdir('/usr/' + str(dst_path))
                 shutil.copy(src, '/usr/' + str(dst_path) + "/" + str(filename))
+        cmd = 'gzip /usr/share/man/man1/stonevpn.1'
+        os.system(cmd)
+        cmd = 'gzip /usr/share/man/man5/stonevpn.conf.5'
+        os.system(cmd)
 
 # Generate list of files
 files=[]
