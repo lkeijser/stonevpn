@@ -1,0 +1,105 @@
+.TH STONEVPN 1 "November 2009" "" "StoneVPN User Manual"
+.SH NAME
+stonevpn \- Easy OpenVPN certificate and configuration management
+
+.SH SYNOPSIS
+.B stonevpn -f 
+.I filename
+.B -n 
+.I commonname
+.B [ OPTIONS ]
+
+.SH DESCRIPTION
+.B StoneVPN
+allows you to manage OpenVPN certificates and create
+configurations for Windows and Linux machines based on a
+template. It can package everything into a zipfile and mail
+it to a user.
+
+.SH OPTIONS
+.TP 
+.BI --version
+show program's version number and exit
+.TP
+.BI -h "\fR,\fB --help
+show this help message and exit
+.TP
+.BI -n " CNAME" "\fR,\fP \-\^\-name=" CNAME
+Common Name, use quotes eg.: "CNAME"
+.TP
+.BI -f " FNAME" "\fR,\fP \-\^\-file=" FNAME
+write to file FNAME (no extension!)
+.TP
+.BI -o " CONFS" "\fR,\fP \-\^\-config=" CONFS
+create config files for [windows|unix]
+.TP
+.BI -e " FPREFIX" "\fR,\fP \-\^\-prefix=" FPREFIX
+prefix (almost all) generated files. Default = lc-
+.TP
+.BI -z \fR, \fB\-\^\-zip
+create ZIP-file and delete the rest
+.TP
+.BI -m " EMAILADDRESS" "\fR,\fP \-\^\-mail=" EMAILADDRESS
+Send all generated files to EMAILADDRESS
+.TP
+.BI -i \fR, \fB\-\^\-free-ip
+locate and assign free ip (EXPERIMENTAL)
+.TP
+.BI -p \fR, \fB\-\^\-passphrase
+prompt for passphrase when generating private key
+.TP
+.BI -r " SERIAL" "\fR,\fP \-\^\-revoke=" SERIAL
+revoke certificate with serial SERIAL
+.TP
+.BI -u " ROUTE" "\fR,\fP \-\^\-route=" ROUTE
+Push extra route to client. Example:
+--route=172.16.0.0/16
+.TP
+.BI -l \fR, \fB\-\^\-listrevoked
+list revoked certificates
+.TP
+.BI --crl
+display CRL file contents
+.TP
+.BI -a \fR, \fB\-\^\-listall
+list all certificates
+.TP
+.BI -s \fR, \fB\-\^\-showserial
+display current SSL serial number
+.TP
+.BI -c " PRINTCERT" "\fR,\fP \-\^\-printcert=" PRINTCERT
+Prints information about a certficiate file
+.TP
+.BI -d \fR, \fB\-\^\-printindex
+Prints index file
+.TP
+.BI -t \fR, \fB\-\^\-test
+Danger, Will Robinson, Danger! test parameter - can do
+anything! Review source before executing!
+
+.SH FILES
+.I /etc/stonevpn.conf
+.RS
+Configuration file. See
+.BR stonevpn (5)
+for further details.
+
+.SH EXAMPLES
+.TP
+Create a certificate and (Unix) configuration file for John Cleese and pack everything into johncleese.zip:
+
+stonevpn -f johncleese -n "John Cleese" -z
+
+.TP
+The same, but now encrypt the user's private key with a password and email the zipfile to them:
+
+stonevpn -f johncleese -n "John Cleese" -z -p -m user@domain.tld
+
+.SH BUGS
+Please report bugs on http://github.com/lkeijser/stonevpn/issues or mail the author.
+
+.SH AUTHOR
+Léon Keijser <keijser at stone-it dot com>
+
+.SH "SEE ALSO"
+.RI stonevpn (5),

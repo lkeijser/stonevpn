@@ -1,0 +1,38 @@
+.TH STONEVPN.CONF 1 "November 2009" "" "StoneVPN Configuration File"
+.SH NAME
+stonevpn.conf \- configuration file for OpenVPN
+
+.SH SYNOPSIS
+.B stonevpn.conf 
+
+.SH DESCRIPTION
+.I stonevpn.conf
+is the configuration file for \fBStoneVPN\fR. It follows the rules for
+.B python-configobj
+
+.SH SECTIONS
+.TP
+The configuration file has three sections:
+.TP
+.B "[stonevpn conf]"
+generic configuration for the program, such as the paths to OpenSSL-related files
+.TP
+.B "[windows conf]"
+configuration template to generate OpenVPN configuration files for Microsoft Windows (TM) 
+.TP
+.B "[unix conf]"
+configuration template to generate OpenVPN configuration files for *nix systems
+
+.SH FILES
+.TP 
+/etc/stonevpn.conf
+.RS
+Configuration file for
+.RI stonevpn (1)
+
+.SH AUTHOR
+Léon Keijser <keijser at stone-it dot com>
+
+.SH "SEE ALSO"
+.RI stonevpn (1)
+
