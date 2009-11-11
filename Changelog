@@ -1,3 +1,6 @@
+2009-11-11	Léon Keijser	<keijser@stone-it.com>
+	* Added: manpages for stonevpn (1) and stonevpn.conf (5)
+
 2009-11-09	Léon Keijser	<keijser@stone-it.com>
 	* Added: debian files so StoneVPN can be debianized :)
 	* Fixed: warning msg in freeip routine instead of exception
