@@ -1,7 +1,7 @@
 %{!?python_sitelib: %global python_sitelib %(%{__python} -c "from distutils.sysconfig import get_python_lib; print get_python_lib()")}
 
 Name:		stonevpn
-Version:	0.4.4
+Version:	0.4.5beta1
 Release:	1%{?dist}
 Summary:	Easy OpenVPN certificate and configuration management
 
