@@ -4,11 +4,12 @@ BUGS:
 - revocation doesn't work correctly when DN in indexfile contains underscores while in certificate they're spaces
 - don't update indexdb if cert can't be generated (due to missing X509Ext method in pyOpenSSL for example)
 
-NICETOHAVES:
+NICETOHAVES (in order of priority, first is higher):
+- option to generate certificate with a specific expiration date- have a Mac (OSX) template
 - option to PGP encrypt e-mail
-- option to create encrypted zipfile (using 7zip?)
+- option to use a different configuration file (defaults to /etc/stonevpn.conf)
 - have CRL patches be included in upstream :)
 - if to-be-revoked serial doesn't exist (in indexdb) ask for confirmation
+- option to create encrypted zipfile (using 7zip?)
 - option to create: openvpn CA cert, empty CRL file, more?
-- have a Mac (OSX) template
-- option to use a different configuration file (defaults to /etc/stonevpn.conf)
+
