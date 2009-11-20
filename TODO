@@ -12,4 +12,4 @@ NICETOHAVES (in order of priority, first is higher):
 - if to-be-revoked serial doesn't exist (in indexdb) ask for confirmation
 - option to create encrypted zipfile (using 7zip?)
 - option to create: openvpn CA cert, empty CRL file, more?
-
+- a web interface would be cool .. in Django! python kicks butt
