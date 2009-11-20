@@ -138,7 +138,7 @@ def main():
     parser.add_option("-x", "--expire",
         action="store",
         dest="expiredate",
-        help="certificate expires in EXPIREDATE days (default is " + str(defaultDays) + " from now")
+        help="certificate expires in EXPIREDATE days (default is " + str(defaultDays) + ")")
     parser.add_option("-t", "--test",
         action="store_true",
         dest="test",
