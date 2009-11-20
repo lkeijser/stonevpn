@@ -5,7 +5,7 @@ BUGS:
 - don't update indexdb if cert can't be generated (due to missing X509Ext method in pyOpenSSL for example)
 
 NICETOHAVES (in order of priority, first is higher):
-- option to generate certificate with a specific expiration date- have a Mac (OSX) template
+- have a Mac (OSX) template
 - option to PGP encrypt e-mail
 - option to use a different configuration file (defaults to /etc/stonevpn.conf)
 - have CRL patches be included in upstream :)
