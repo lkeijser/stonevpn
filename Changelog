@@ -1,5 +1,6 @@
-2009-11-11	Léon Keijser	<keijser@stone-it.com>
+20??-??-??	Léon Keijser	<keijser@stone-it.com>
 	* Added: manpages for stonevpn (1) and stonevpn.conf (5)
+	* Added: option for custom expiration date of certificate
 	* Changed: version 0.4.5beta1 (won't release officially)
 
 2009-11-09	Léon Keijser	<keijser@stone-it.com>
