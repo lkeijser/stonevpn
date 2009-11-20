@@ -28,14 +28,16 @@ For StoneVPN to work optimally, you will need to download and
 patch the latest pyOpenSSL. The extra functionality is CRL
 management.
 
-First, download the latest pyOpenSSL via bazaar:
+First, download pyOpenSSL from http://pypi.python.org/pypi/pyOpenSSL/0.10
 
-$ bzr branch lp:pyopenssl
+$ wget http://pypi.python.org/packages/source/p/pyOpenSSL/pyOpenSSL-0.10.tar.gz#md5=34db8056ec53ce80c7f5fc58bee9f093
 
 Then, change into the newly created directory and patch pyOpenSSL with 
 the patchfile included with StoneVPN:
 
 $ patch -p0 < /usr/share/StoneVPN/patches/pyOpenSSL-0.9-crl_and_revoked.patch
+
+Yes, the patch was created for pyOpenSSL-0.9 but works fine with 0.10
 
 Now compile pyOpenSSL (you will need at least the openssl- and
 python-devel packages installed):
@@ -46,6 +48,9 @@ After this is done, StoneVPN should work with CRL.
 
 
 = RPM =
+StoneVPN is now included in EPEL, Fedora 11, 12 and rawhide, so following
+instructions are only for those who are on different distro's:
+
 I've included a SPEC file so you can build an RPM yourself. To
 do this i assume you have a working rpmbuild environment and have
 the StoneVPN tarball located in ~/rpmbuild/SOURCES/stonevpn-%version.tar.gz

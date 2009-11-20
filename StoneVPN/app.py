@@ -54,6 +54,12 @@ def main():
         print "File " + stonevpnconf + " does not exist!"
         sys.exit()
 
+    # retrieve default expiration date from openssl.cnf, needed for optionparse 
+    config = ConfigObj(opensslconf)
+    sectionname = 'CA_default'
+    section=config[sectionname]
+    defaultDays = section['default_days']
+
     # define some crypto stuff
     TYPE_RSA = crypto.TYPE_RSA
     TYPE_DSA = crypto.TYPE_DSA
@@ -129,6 +135,10 @@ def main():
         action="store_true",
         dest="printindex",
         help="Prints index file")
+    parser.add_option("-x", "--expire",
+        action="store",
+        dest="expiredate",
+        help="certificate expires in EXPIREDATE days (default is " + str(defaultDays) + " from now")
     parser.add_option("-t", "--test",
         action="store_true",
         dest="test",
@@ -155,6 +165,7 @@ def main():
     s.showserial    = options.showserial
     s.printcert     = options.printcert
     s.printindex    = options.printindex
+    s.expiredate    = options.expiredate
     s.test          = options.test
     # values we got from parsing the configuration file:
     s.cacertfile    = cacertfile
@@ -213,6 +224,7 @@ class StoneVPN:
         self.showserial    = None
         self.printcert     = None
         self.printindex    = None
+        self.expiredate    = None
         self.test          = None
         
     # Read certain vars from OpenSSL config file
@@ -584,7 +596,13 @@ class StoneVPN:
         newSerialDec = newSerial
         # Now convert dec back to hex 
         newSerial = self.dec2hex(newSerial)
-        cert = self.createCertificate(req, (cacert, cakey), newSerialDec, (0, 24 * 60 * 60 * int(defaultDays)))
+        # Check if a different expiration date for certificate
+        if self.expiredate:
+            cert = self.createCertificate(req, (cacert, cakey), newSerialDec, (0, 24 * 60 * 60 * int(self.expiredate)))
+            print "Certificate is valid for %s day(s)." % self.expiredate
+        else:
+            cert = self.createCertificate(req, (cacert, cakey), newSerialDec, (0, 24 * 60 * 60 * int(defaultDays)))
+            print "Certificate is valid for %s day(s)." % defaultDays
         self.save_key ( self.working + '/' + self.fprefix + fname + '.key', pkey )
         self.save_cert ( self.working + '/' + self.fprefix + fname + '.crt', cert )
         # Write serial (hex) to serial file
