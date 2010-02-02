@@ -1,7 +1,7 @@
 %{!?python_sitelib: %global python_sitelib %(%{__python} -c "from distutils.sysconfig import get_python_lib; print get_python_lib()")}
 
 Name:		stonevpn
-Version:	0.4.5beta1
+Version:	0.4.5
 Release:	1%{?dist}
 Summary:	Easy OpenVPN certificate and configuration management
 
@@ -52,6 +52,9 @@ install -m 644 man/stonevpn.conf.5 %{buildroot}/%{_mandir}/man5/
 %{_mandir}/man5/%{name}.*
 
 %changelog
+* Tue Feb 02 2010 L.S. Keijser <keijser@stone-it.com> - 0.4.5-1
+- new version from upstream
+
 * Mon Nov 09 2009 L.S. Keijser <keijser@stone-it.com> - 0.4.4-1
 - new version from upstream
 
