@@ -1,9 +1,10 @@
-20??-??-??	Léon Keijser	<keijser@stone-it.com>
+2010-02-02	Léon Keijser	<keijser@stone-it.com> 0.4.5
 	* Added: manpages for stonevpn (1) and stonevpn.conf (5)
 	* Added: option for custom expiration date of certificate
-	* Changed: version 0.4.5beta1 (won't release officially)
+	* Fixed: crash when reading an incorrectly written index.txt
+	* Changed: version 0.4.5
 
-2009-11-09	Léon Keijser	<keijser@stone-it.com>
+2009-11-09	Léon Keijser	<keijser@stone-it.com> 0.4.4
 	* Added: debian files so StoneVPN can be debianized :)
 	* Fixed: warning msg in freeip routine instead of exception
 	* Fixed: probable incorrect path to cert/key files
@@ -11,7 +12,7 @@
 	* Changed: updated spec file
 	* Changed: version 0.4.4
 
-2009-10-20	Léon Keijser	<keijser@stone-it.com>
+2009-10-20	Léon Keijser	<keijser@stone-it.com> 0.4.3
 	* Changed: new patch to add CRL support in favor of old
 	methods since upstream has already added PKCS12 support
 	and will likely accept this patch as well. Code adapted.
