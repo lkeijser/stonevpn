@@ -20,14 +20,14 @@
 
 """
 
-import os, sys, shutil
+import os, sys, shutil, string
 from OpenSSL import SSL, crypto
 from optparse import OptionParser
 from configobj import ConfigObj
 
 
 def main():
-    stonevpnver = '0.4.5beta1'
+    stonevpnver = '0.4.5'
     stonevpnconf = '/etc/stonevpn.conf'
 
     # Read main configuration from stonevpn.conf
@@ -624,7 +624,7 @@ class StoneVPN:
         # convert cname: spaces to underscores for inclusion in indexdb
         nospaces_cname =  cname.replace(' ', '_')
         # Format index line and write to OpenSSL index file
-        index = 'V\t' + str(expDate) + 'Z\t' + str(serialNumber) + '\tunknown\t' + '/C=' + str(countryName) + '/ST=' + str(stateOrProvinceName) + '/O=' + str(organizationName) + '/OU=' + str(organizationalUnitName) + '/CN=' + str(nospaces_cname) + '\tUser/emailAddress=' + str(fname) + '@local\n'
+        index = 'V\t' + str(expDate) + 'Z\t' + str(serialNumber) + '\tunknown\t' + '/C=' + str(countryName) + '/ST=' + str(stateOrProvinceName) + '/O=' + str(organizationName) + '/OU=' + str(organizationalUnitName) + '/CN=' + str(nospaces_cname) + '/emailAddress=' + str(fname) + '@local\n'
         self.writeIndex(index)
 
     # Make config files for OpenVPN
@@ -711,7 +711,9 @@ class StoneVPN:
                 if line.split()[2] == serial:
                     # we have a match! do not write this line again to the new index file
                     # instead, change it to the revoked-format
-                    t.write('R\t' + str(line.split()[1]) + '\t' + crlTime + '\t' + serial + '\tunknown\t' + str(line.split()[4]) + '\n')
+                    newDN = '/'.join(line.split('/')[1:])
+                    revokedLine = 'R\t' + str(line.split()[1]) + '\t' + crlTime + '\t' + serial + '\tunknown\t' + str(newDN)
+                    t.write(revokedLine)
                 else:
             # this is not the match we're looking for, so just write the line again
             # to the index file
@@ -798,18 +800,27 @@ class StoneVPN:
         print "Listing all issued certificates..."
         for line in input:
             if line.split()[0] == 'R':
-                print "Certificate:\t\t" + str(line.split()[5].split('/CN=')[1])
+                # Print revoked certificate
+                issuee = line.split('/')[-2:][0].replace('CN=','').replace('_',' ')
+                print "Issued to:\t\t" + str(issuee)
                 print "Status:\t\t\tRevoked"
                 print "Expiry date:\t\t" + str(line.split()[1])
                 print "Revocation date:\t" + str(line.split()[2])
                 print "Serial:\t\t\t" + str(line.split()[3])
-                print "DN:\t\t\t" + str(line.split()[5])
+                lineDN = line.split('unknown')[1].strip()
+                newDN = '/' + ''.join(lineDN)
+                print "DN:\t\t\t" + str(newDN)
             else:
-                print "Certificate:\t\t" + str(line.split()[4].split('/CN=')[1])
+                # Print valid certificate
+                # everything starting with the first '/' until the end = issuee, replaced spaces with underlines
+                issuee = line.split('/')[-2:-1][0].split('\t')[0].replace('CN=','').replace('_',' ')
+                print "Issued to:\t\t" + issuee
                 print "Status:\t\t\tValid"
                 print "Expiry date:\t\t" + str(line.split()[1])
                 print "Serial:\t\t\t" + str(line.split()[2])
-            print "DN:\t\t\t" + str(line.split()[4])
+                lineDN = line.split('/')[-6:][0:]
+                newDN = '/'.join(lineDN)
+                print "DN:\t\t\t/" + str(newDN)
             print "\n"
 
 
