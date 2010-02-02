@@ -45,7 +45,9 @@ install -m 644 man/stonevpn.conf.5 %{buildroot}/%{_mandir}/man5/
 %dir %{python_sitelib}/StoneVPN
 %{python_sitelib}/StoneVPN/app.py*
 %{python_sitelib}/StoneVPN/__init__.py*
+%if 0%{?el5}
 %{python_sitelib}/%{name}*.egg-info
+%endif
 %{_bindir}/stonevpn
 %config(noreplace) %{_sysconfdir}/%{name}.conf
 %{_mandir}/man1/%{name}.*
