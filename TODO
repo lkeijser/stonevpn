@@ -1,7 +1,4 @@
 BUGS:
-- indexfile is generated incorrectly. Correct format is:
-    'status' \t 'expiry date' \t 'revocation date' \t 'serial nr' \t 'file' \t 'DN' \n
-- revocation doesn't work correctly when DN in indexfile contains underscores while in certificate they're spaces
 - don't update indexdb if cert can't be generated (due to missing X509Ext method in pyOpenSSL for example)
 
 NICETOHAVES (in order of priority, first is higher):
