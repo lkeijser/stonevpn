@@ -2,7 +2,7 @@
 
 Name:		stonevpn
 Version:	0.4.5
-Release:	1%{?dist}
+Release:	2%{?dist}
 Summary:	Easy OpenVPN certificate and configuration management
 
 Group:		Applications/Internet
@@ -45,7 +45,7 @@ install -m 644 man/stonevpn.conf.5 %{buildroot}/%{_mandir}/man5/
 %dir %{python_sitelib}/StoneVPN
 %{python_sitelib}/StoneVPN/app.py*
 %{python_sitelib}/StoneVPN/__init__.py*
-%if 0%{?el5}
+%if 0%{?fedora}
 %{python_sitelib}/%{name}*.egg-info
 %endif
 %{_bindir}/stonevpn
@@ -54,6 +54,9 @@ install -m 644 man/stonevpn.conf.5 %{buildroot}/%{_mandir}/man5/
 %{_mandir}/man5/%{name}.*
 
 %changelog
+* Wed Feb 03 2010 L.S. Keijser <keijser@stone-it.com> - 0.4.5-2
+- typo in branch tag in files section
+
 * Tue Feb 02 2010 L.S. Keijser <keijser@stone-it.com> - 0.4.5-1
 - new version from upstream
 

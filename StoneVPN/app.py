@@ -27,7 +27,7 @@ from configobj import ConfigObj
 
 
 def main():
-    stonevpnver = '0.4.5'
+    stonevpnver = '0.4.6beta1'
     stonevpnconf = '/etc/stonevpn.conf'
 
     # Read main configuration from stonevpn.conf
@@ -115,7 +115,7 @@ def main():
         action="store_true",
         dest="listrevoked",
         help="list revoked certificates")
-    parser.add_option("--crl",
+    parser.add_option("-C", "--crl",
         action="store_true",
         dest="displaycrl",
         help="display CRL file contents")
@@ -754,21 +754,24 @@ class StoneVPN:
         try:
         	crl = crypto.load_crl(crypto.FILETYPE_PEM, text)
         	revs = crl.get_revoked()
-	except:
-		print "\nError: CRL support is not available in your version of"
-		print "pyOpenSSL. Please check the README file that came with"
-		print "StoneVPN to see what you can do about this. For now, "
-		print "you will have to display the CRL file manually using:\n"
-		print "$ openssl crl -in %s -noout -text\n" % self.crlfile
-		sys.exit()
-        print "Total certificates revoked: %s\n" % len(revs)
-        print "Serial\tRevoked at date"
-        print "======\t========================"
-        for revoked in revs:
-            revSerial = revoked.get_serial()
-            revDate = revoked.get_rev_date()[0:-1]
-            revoDate = time.strptime(revDate, "%Y%m%d%H%M%S")
-            print revSerial + "\t" + time.strftime("%c", revoDate)
+        except:
+            print "\nError: CRL support is not available in your version of"
+            print "pyOpenSSL. Please check the README file that came with"
+            print "StoneVPN to see what you can do about this. For now, "
+            print "you will have to display the CRL file manually using:\n"
+            print "$ openssl crl -in %s -noout -text\n" % self.crlfile
+            sys.exit()
+        if not revs is None:
+            print "Total certificates revoked: %s\n" % len(revs)
+            print "Serial\tRevoked at date"
+            print "======\t========================"
+            for revoked in revs:
+                revSerial = revoked.get_serial()
+                revDate = revoked.get_rev_date()[0:-1]
+                revoDate = time.strptime(revDate, "%Y%m%d%H%M%S")
+                print revSerial + "\t" + time.strftime("%c", revoDate)
+        else:
+            print "No revoked certificates found."
 
 
     def listRevokedCerts(self):
