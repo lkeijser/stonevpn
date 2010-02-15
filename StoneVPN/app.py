@@ -705,9 +705,9 @@ class StoneVPN:
                     # /new way
                     print "Re-adding existing revoked certificate to CRL with date " + revDate + " and serial " + revSerial
                     t.write(line)
-            # the line contains a valid certificate. Check if the serial is the same as the
-            # one we're trying to revoke
             else:
+                # the line contains a valid certificate. Check if the serial is the same as the
+                # one we're trying to revoke
                 if line.split()[2] == serial:
                     # we have a match! do not write this line again to the new index file
                     # instead, change it to the revoked-format
@@ -715,28 +715,29 @@ class StoneVPN:
                     revokedLine = 'R\t' + str(line.split()[1]) + '\t' + crlTime + '\t' + serial + '\tunknown\t' + str(newDN)
                     t.write(revokedLine)
                 else:
-            # this is not the match we're looking for, so just write the line again
-            # to the index file
+                    # this is not the match we're looking for, so just write the line again
+                    # to the index file
                     t.write(line)
         # crlTime = str(strftime("%y%m%d%H%M%S")) + 'Z'
         print "Adding new revoked certificate to CRL with date " + crlTime + " and serial " + serial
-	# old way:
-	#crl.make_revoked(crlTime, serial)
-	# new way:
-	revoked = crypto.Revoked()
-	now = datetime.now().strftime("%Y%m%d%H%M%SZ")
-	revoked.set_rev_date(now)
-	revoked.set_serial(serial)
-	#no reason needed?
-	#revoked.set_reason('sUpErSeDEd')
-	crl.add_revoked(revoked)
-	# /new way
+        t.close()
+        # old way:
+        #crl.make_revoked(crlTime, serial)
+        # new way:
+        revoked = crypto.Revoked()
+        now = datetime.now().strftime("%Y%m%d%H%M%SZ")
+        revoked.set_rev_date(now)
+        revoked.set_serial(serial)
+        #no reason needed?
+        #revoked.set_reason('sUpErSeDEd')
+        crl.add_revoked(revoked)
+        # /new way
         cacert = self.load_cert(self.cacertfile)
         cakey = self.load_key(self.cakeyfile)
         # old way:
         #newCRL = crypto.dump_crl(crl, cacert, cakey)
         # new way:
-	newCRL = crl.export(cacert, cakey, days=20)
+        newCRL = crl.export(cacert, cakey, days=20)
         # /new way
         f.write(newCRL)
         f.close()
