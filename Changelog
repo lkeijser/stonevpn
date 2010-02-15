@@ -1,5 +1,6 @@
 2010-0?-??	Léon Keijser	<keijser@stone-it.com> 0.4.6beta1
 	* Fixed: crash when trying to parse an empty CRL file
+	* Fixed: indexdb wasn't closed after writing to it
 	* Changed: version 0.4.6beta1 (won't release officially)
 
 2010-02-02	Léon Keijser	<keijser@stone-it.com> 0.4.5
