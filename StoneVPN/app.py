@@ -511,16 +511,28 @@ class StoneVPN:
     # Passphrase
     def getPass(self):
         import getpass
-        return getpass.getpass('Enter passphrase for private key: ')
+        passA = getpass.getpass('Enter passphrase for private key: ')
+        passB = getpass.getpass('Enter passphrase for private key (again): ')
+        if passA == passB:
+            return passB
+        else:
+            print "Error: passwords don't match!"
+            return "password_error"
 
     # Simple routines to load/save files using crypto lib
     # Save private key to file
     def save_key (self, fn, key):
-        fp = open ( fn, 'w' )
         # Adding passphrase to private key
         if self.passphrase:
-            fp.write ( crypto.dump_privatekey ( self.FILETYPE, key, self.ciphermethod, self.getPass() ) )
+            keyPass = self.getPass()
+            if keyPass is "password_error":
+                # Don't write keyfile if supplied passwords mismatch
+                sys.exit()
+            else:
+                fp = open ( fn, 'w' )
+                fp.write ( crypto.dump_privatekey ( self.FILETYPE, key, self.ciphermethod, keyPass ) )
         else:
+            fp = open ( fn, 'w' )
             fp.write ( crypto.dump_privatekey ( self.FILETYPE, key ) )
         fp.close ()
 
