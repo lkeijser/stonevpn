@@ -1,8 +1,8 @@
 %{!?python_sitelib: %global python_sitelib %(%{__python} -c "from distutils.sysconfig import get_python_lib; print get_python_lib()")}
 
 Name:		stonevpn
-Version:	0.4.6beta2
-Release:	2%{?dist}
+Version:	0.4.6
+Release:	1%{?dist}
 Summary:	Easy OpenVPN certificate and configuration management
 
 Group:		Applications/Internet
@@ -31,7 +31,6 @@ it to a user.
 %install
 %{__rm} -rf %{buildroot}
 %{__python} setup.py install --root %{buildroot}
-#mkdir %{buildroot}/%{_mandir}
 mkdir -p %{buildroot}/%{_mandir}/man{1,5}
 install -m 644 man/stonevpn.1 %{buildroot}/%{_mandir}/man1/
 install -m 644 man/stonevpn.conf.5 %{buildroot}/%{_mandir}/man5/
@@ -54,6 +53,9 @@ install -m 644 man/stonevpn.conf.5 %{buildroot}/%{_mandir}/man5/
 %{_mandir}/man5/%{name}.*
 
 %changelog
+* Fri Feb 19 2010 L.S. Keijser <keijser@stone-it.com> - 0.4.6-1
+- new version from upstream
+
 * Wed Feb 03 2010 L.S. Keijser <keijser@stone-it.com> - 0.4.5-2
 - typo in branch tag in files section
 

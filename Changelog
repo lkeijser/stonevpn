@@ -1,8 +1,8 @@
-2010-0?-??	Léon Keijser	<keijser@stone-it.com> 0.4.6beta2
+2010-02-19	Léon Keijser	<keijser@stone-it.com> 0.4.6
 	* Fixed: crash when trying to parse an empty CRL file
 	* Fixed: indexdb wasn't closed after writing to it
 	* Added: now prompts twice for password to verify
-	* Changed: version 0.4.6beta2 (won't release officially)
+	* Changed: version 0.4.6
 
 2010-02-02	Léon Keijser	<keijser@stone-it.com> 0.4.5
 	* Added: manpages for stonevpn (1) and stonevpn.conf (5)
