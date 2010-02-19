@@ -705,9 +705,6 @@ class StoneVPN:
                 else:
                     revSerial = str(line.split()[3])
                     revDate = str(line.split()[2])
-                    # old way:
-                    #crl.make_revoked(revDate, revSerial)
-                    # new way:
                     revoked = crypto.Revoked()
                     revoked.set_rev_date('20' + str(revDate))
                     revoked.set_serial(revSerial)
@@ -733,9 +730,6 @@ class StoneVPN:
         # crlTime = str(strftime("%y%m%d%H%M%S")) + 'Z'
         print "Adding new revoked certificate to CRL with date " + crlTime + " and serial " + serial
         t.close()
-        # old way:
-        #crl.make_revoked(crlTime, serial)
-        # new way:
         revoked = crypto.Revoked()
         now = datetime.now().strftime("%Y%m%d%H%M%SZ")
         revoked.set_rev_date(now)
@@ -743,14 +737,9 @@ class StoneVPN:
         #no reason needed?
         #revoked.set_reason('sUpErSeDEd')
         crl.add_revoked(revoked)
-        # /new way
         cacert = self.load_cert(self.cacertfile)
         cakey = self.load_key(self.cakeyfile)
-        # old way:
-        #newCRL = crypto.dump_crl(crl, cacert, cakey)
-        # new way:
         newCRL = crl.export(cacert, cakey, days=20)
-        # /new way
         f.write(newCRL)
         f.close()
         shutil.move(indexdb,indexdb + '.old')
@@ -782,7 +771,7 @@ class StoneVPN:
                 revSerial = revoked.get_serial()
                 revDate = revoked.get_rev_date()[0:-1]
                 revoDate = time.strptime(revDate, "%Y%m%d%H%M%S")
-                print revSerial + "\t" + time.strftime("%c", revoDate)
+                print str(revSerial) + "\t" + time.strftime("%c", revoDate)
         else:
             print "No revoked certificates found."
 
