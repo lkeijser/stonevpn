@@ -444,6 +444,7 @@ class StoneVPN:
             if os.path.exists(self.crlfile):
                 overwrite=raw_input("Existing crlfile was found. Do you want to overwrite (y/N): ") 
                 if overwrite not in ('y', 'Y'):
+                    print "Doing nothing.."
                     sys.exit()
                 else:
                     try:
