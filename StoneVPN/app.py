@@ -831,6 +831,7 @@ class StoneVPN:
 
     def listAllCerts(self):
         print "Reading SSL database: " + indexdb
+        from time import *
         # read SSL dbase (usually index.txt)
         # this file has 5 columns: Status, Expiry date, Revocation date, Serial nr, file?, Distinguished Name (DN)
         input = open(indexdb, 'r')
@@ -841,8 +842,8 @@ class StoneVPN:
                 issuee = line.split('/')[-2:][0].replace('CN=','').replace('_',' ')
                 print "Issued to:\t\t" + str(issuee)
                 print "Status:\t\t\tRevoked"
-                print "Expiry date:\t\t" + str(line.split()[1])
-                print "Revocation date:\t" + str(line.split()[2])
+                revDate = str(line.split()[2]).replace('Z','')
+                print "Revocation date:\t20%s-%s-%s %s:%s:%s" % (revDate[:2],revDate[2:4],revDate[4:6],revDate[6:8],revDate[8:10],revDate[10:12])
                 print "Serial:\t\t\t" + str(line.split()[3])
                 lineDN = line.split('unknown')[1].strip()
                 newDN = '/' + ''.join(lineDN)
@@ -853,7 +854,8 @@ class StoneVPN:
                 issuee = line.split('/')[-2:-1][0].split('\t')[0].replace('CN=','').replace('_',' ')
                 print "Issued to:\t\t" + issuee
                 print "Status:\t\t\tValid"
-                print "Expiry date:\t\t" + str(line.split()[1])
+                expDate = str(line.split()[1]).replace('Z','')
+                print "Expiry date:\t\t20%s-%s-%s %s:%s:%s" % (expDate[:2],expDate[2:4],expDate[4:6],expDate[6:8],expDate[8:10],expDate[10:12])
                 print "Serial:\t\t\t" + str(line.split()[2])
                 lineDN = line.split('/')[-6:][0:]
                 newDN = '/'.join(lineDN)
