@@ -27,7 +27,7 @@ from configobj import ConfigObj
 
 
 def main():
-    stonevpnver = '0.4.6'
+    stonevpnver = '0.4.7beta1'
     stonevpnconf = '/etc/stonevpn.conf'
 
     # Read main configuration from stonevpn.conf
@@ -139,10 +139,15 @@ def main():
         action="store",
         dest="expiredate",
         help="certificate expires in EXPIREDATE days (default is " + str(defaultDays) + ")")
+    parser.add_option("-N", "--newcrl",
+        action="store_true",
+        dest="emptycrl",
+        help="Create an empty CRL file (or overwrite an existing one)")
     parser.add_option("-t", "--test",
         action="store_true",
         dest="test",
         help="Danger, Will Robinson, Danger! test parameter - can do anything! Review source before executing!")
+
 
     # parse cmd line options
     (options, args) = parser.parse_args()
@@ -166,6 +171,7 @@ def main():
     s.printcert     = options.printcert
     s.printindex    = options.printindex
     s.expiredate    = options.expiredate
+    s.emptycrl       = options.emptycrl
     s.test          = options.test
     # values we got from parsing the configuration file:
     s.cacertfile    = cacertfile
@@ -190,7 +196,7 @@ def main():
     s.stonevpnver   = stonevpnver
 
     # check for all args
-    if options.fname is None and options.serial is not None and options.listrevoked is not None and options.listall is not None and options.showserial is not None and options.printcert is not None and options.printindex is not None and options.test is not None:
+    if options.fname is None and options.serial is not None and options.listrevoked is not None and options.listall is not None and options.showserial is not None and options.printcert is not None and options.printindex is not None and options.emptycrl is not None and options.test is not None:
         parser.error("Error: you have to specify a filename (FNAME)")
     else:
         # must..have..root..
@@ -225,6 +231,7 @@ class StoneVPN:
         self.printcert     = None
         self.printindex    = None
         self.expiredate    = None
+        self.emptycrl      = None
         self.test          = None
         
     # Read certain vars from OpenSSL config file
@@ -432,6 +439,30 @@ class StoneVPN:
             f.write("push route \"" + route[0] + " " + route[1] + "\"\n")
             f.close()
             print "Wrote extra route(s) to " + self.ccddir + "/" + nospaces_cname
+        
+        if self.emptycrl:
+            if os.path.exists(self.crlfile):
+                overwrite=raw_input("Existing crlfile was found. Do you want to overwrite (y/N): ") 
+                if overwrite not in ('y', 'Y'):
+                    sys.exit()
+                else:
+                    try:
+                        crl = crypto.CRL()
+                    except:
+                        print "\nError: CRL support is not available in your version of"
+                        print "pyOpenSSL. Please check the README file that came with"
+                        print "StoneVPN to see what you can do about this. For now, "
+                        print "you will have to revoke certificates manually.\n"
+                        sys.exit()
+                    print "Creating empty CRL file at %s" % self.crlfile
+                    cacert = self.load_cert(self.cacertfile)
+                    cakey = self.load_key(self.cakeyfile)
+                    newCRL = crl.export(cacert, cakey, days=90)
+                    f=open(self.crlfile, 'w')
+                    f.write(newCRL)
+                    f.close()
+
+
 
     # Create key
     def createKeyPair(self, type, bits):
@@ -610,10 +641,10 @@ class StoneVPN:
         newSerial = self.dec2hex(newSerial)
         # Check if a different expiration date for certificate
         if self.expiredate:
-            cert = self.createCertificate(req, (cacert, cakey), newSerialDec, (0, 24 * 60 * 60 * int(self.expiredate)))
+            cert = self.createCertificate(req, (cacert, cakey), newSerial, (0, 24 * 60 * 60 * int(self.expiredate)))
             print "Certificate is valid for %s day(s)." % self.expiredate
         else:
-            cert = self.createCertificate(req, (cacert, cakey), newSerialDec, (0, 24 * 60 * 60 * int(defaultDays)))
+            cert = self.createCertificate(req, (cacert, cakey), newSerial, (0, 24 * 60 * 60 * int(defaultDays)))
             print "Certificate is valid for %s day(s)." % defaultDays
         self.save_key ( self.working + '/' + self.fprefix + fname + '.key', pkey )
         self.save_cert ( self.working + '/' + self.fprefix + fname + '.crt', cert )
@@ -681,7 +712,7 @@ class StoneVPN:
 		print "pyOpenSSL. Please check the README file that came with"
 		print "StoneVPN to see what you can do about this. For now, "
 		print "you will have to revoke certificates manually.\n"
-		sys.exit()
+   		sys.exit()
         # we can't replace stuff in the original index file, so we have to create
         # a new one and in the end rename the original one and move the temp file
         # to the final location (usually /etc/ssl/index.txt)
