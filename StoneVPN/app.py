@@ -831,11 +831,10 @@ class StoneVPN:
 
     def listAllCerts(self):
         print "Reading SSL database: " + indexdb
-        from time import *
         # read SSL dbase (usually index.txt)
         # this file has 5 columns: Status, Expiry date, Revocation date, Serial nr, file?, Distinguished Name (DN)
         input = open(indexdb, 'r')
-        print "Listing all issued certificates..."
+        print "Listing all issued certificates:\n"
         for line in input:
             if line.split()[0] == 'R':
                 # Print revoked certificate
@@ -860,7 +859,7 @@ class StoneVPN:
                 lineDN = line.split('/')[-6:][0:]
                 newDN = '/'.join(lineDN)
                 print "DN:\t\t\t/" + str(newDN)
-            print "\n"
+            #print "\n"
 
 
     def send_mail(self, send_from, send_to, subject, text, attachment=[]):
