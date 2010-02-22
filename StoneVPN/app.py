@@ -820,12 +820,17 @@ class StoneVPN:
                 revCerts.append(line)
         count = 0
         while count < len(revCerts):
-            print "Revoked certificate:\t" + str(revCerts[count].split()[5].split('/CN=')[1])
-            print "Status:\t\t\t" + str(revCerts[count].split()[0])
-            print "Expiry date:\t\t" + str(revCerts[count].split()[1])
-            print "Revocation date:\t" + str(revCerts[count].split()[2])
-            print "Serial:\t\t\t" + str(revCerts[count].split()[3])
-            print "DN:\t\t\t" + str(revCerts[count].split()[5])
+            #print "Revoked certificate:\t" + str(revCerts[count].split()[5].split('/CN=')[1])
+            print "Issued to:\t\t%s" % str(revCerts[count]).split('CN=')[1].split('/')[0]
+            print "Status:\t\t\tRevoked"
+            expDate = str(revCerts[count].split()[1])
+            print "Expiry date:\t\t20%s-%s-%s %s:%s:%s" % (expDate[:2],expDate[2:4],expDate[4:6],expDate[6:8],expDate[8:10],expDate[10:12])
+            revDate = str(revCerts[count].split()[2])
+            print "Revocation date:\t20%s-%s-%s %s:%s:%s" % (revDate[:2],revDate[2:4],revDate[4:6],revDate[6:8],revDate[8:10],revDate[10:12]) 
+            print "Serial:\t\t\t%s" % str(revCerts[count].split()[3])
+            lineDN = line.split('unknown')[1].strip()
+            newDN = ''.join(lineDN).replace('/',',')
+            print "DN:\t\t\t%s" % newDN
             print "\n"
             count = count + 1
 
