@@ -845,8 +845,8 @@ class StoneVPN:
                 print "Revocation date:\t20%s-%s-%s %s:%s:%s" % (revDate[:2],revDate[2:4],revDate[4:6],revDate[6:8],revDate[8:10],revDate[10:12])
                 print "Serial:\t\t\t" + str(line.split()[3])
                 lineDN = line.split('unknown')[1].strip()
-                newDN = '/' + ''.join(lineDN)
-                print "DN:\t\t\t" + str(newDN)
+                newDN = ''.join(lineDN).replace('/',',')
+                print "DN:\t\t\t" + str(newDN) + "\n"
             else:
                 # Print valid certificate
                 # everything starting with the first '/' until the end = issuee, replaced spaces with underlines
@@ -857,8 +857,8 @@ class StoneVPN:
                 print "Expiry date:\t\t20%s-%s-%s %s:%s:%s" % (expDate[:2],expDate[2:4],expDate[4:6],expDate[6:8],expDate[8:10],expDate[10:12])
                 print "Serial:\t\t\t" + str(line.split()[2])
                 lineDN = line.split('/')[-6:][0:]
-                newDN = '/'.join(lineDN)
-                print "DN:\t\t\t/" + str(newDN)
+                newDN = ','.join(lineDN)
+                print "DN:\t\t\t" + str(newDN)
             #print "\n"
 
 

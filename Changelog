@@ -1,3 +1,9 @@
+2010-0?-??	Léon Keijser	<keijser@stone-it.com> 0.4.7beta1
+	* Fixed: certificates were generated with an incorrect
+	serial number.
+	* Added: new option to generate an empty CRL file
+	* Changed: version 0.4.7beta1
+
 2010-02-19	Léon Keijser	<keijser@stone-it.com> 0.4.6
 	* Fixed: crash when trying to parse an empty CRL file
 	* Fixed: indexdb wasn't closed after writing to it
