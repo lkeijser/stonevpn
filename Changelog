@@ -1,6 +1,7 @@
 2010-0?-??	Léon Keijser	<keijser@stone-it.com> 0.4.7beta1
 	* Fixed: certificates were generated with an incorrect
 	serial number.
+	* Fixed: bug when listing all revoked certificates
 	* Added: new option to generate an empty CRL file
 	* Changed: version 0.4.7beta1
 
