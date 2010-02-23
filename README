@@ -4,8 +4,16 @@ StoneVPN - Easy OpenVPN certificate and configuration management
 Author: Léon Keijser - keijser@stone-it.com
 
 
-
 = Installation =
+In CentOS / RedHat / Fedora:
+
+StoneVPN is included in EPEL5 and Fedora11,12 and 13. Just use yum to install:
+
+  $ yum install stonevpn
+
+
+From the tarball:
+
 * run 'python setup.py install' as root
 
 * run 'python setup.py install_docs' to install example config and
