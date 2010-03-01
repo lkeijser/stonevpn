@@ -74,3 +74,4 @@ $ rpmbuild -ba stonevpn.spec
 
 If all goes well this will leave you with a stonevpn-%version.el5.noarch.rpm
 file which you can then use to install on various machines :)
+
