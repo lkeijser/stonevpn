@@ -441,27 +441,29 @@ class StoneVPN:
             print "Wrote extra route(s) to " + self.ccddir + "/" + nospaces_cname
         
         if self.emptycrl:
+            try:
+                crl = crypto.CRL()
+            except:
+                print "\nError: CRL support is not available in your version of"
+                print "pyOpenSSL. Please check the README file that came with"
+                print "StoneVPN to see what you can do about this. For now, "
+                print "you will have to revoke certificates manually.\n"
+                sys.exit()
             if os.path.exists(self.crlfile):
                 overwrite=raw_input("Existing crlfile was found. Do you want to overwrite (y/N): ") 
                 if overwrite not in ('y', 'Y'):
                     print "Doing nothing.."
                     sys.exit()
                 else:
-                    try:
-                        crl = crypto.CRL()
-                    except:
-                        print "\nError: CRL support is not available in your version of"
-                        print "pyOpenSSL. Please check the README file that came with"
-                        print "StoneVPN to see what you can do about this. For now, "
-                        print "you will have to revoke certificates manually.\n"
-                        sys.exit()
-                    print "Creating empty CRL file at %s" % self.crlfile
-                    cacert = self.load_cert(self.cacertfile)
-                    cakey = self.load_key(self.cakeyfile)
-                    newCRL = crl.export(cacert, cakey, days=90)
-                    f=open(self.crlfile, 'w')
-                    f.write(newCRL)
-                    f.close()
+                    pass
+            else:
+                print "Creating empty CRL file at %s" % self.crlfile
+                cacert = self.load_cert(self.cacertfile)
+                cakey = self.load_key(self.cakeyfile)
+                newCRL = crl.export(cacert, cakey, days=90)
+                f=open(self.crlfile, 'w')
+                f.write(newCRL)
+                f.close()
 
 
 
