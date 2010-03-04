@@ -1,7 +1,9 @@
 BUGS:
 - don't update indexdb if cert can't be generated (due to missing X509Ext method in pyOpenSSL for example)
+- crash when selecting anything other than unix|windows (
 
 NICETOHAVES (in order of priority, first is higher):
+- create both sets of configuration files (unix/windows)
 - ability to include custom documentation in zipfile and/or attached to mail
 - have a Mac (OSX) template
 - option to PGP encrypt e-mail

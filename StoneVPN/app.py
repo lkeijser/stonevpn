@@ -22,12 +22,12 @@
 
 import os, sys, shutil, string
 from OpenSSL import SSL, crypto
-from optparse import OptionParser
+from optparse import OptionParser, OptionGroup
 from configobj import ConfigObj
 
 
 def main():
-    stonevpnver = '0.4.7beta1'
+    stonevpnver = '0.4.7beta2'
     stonevpnconf = '/etc/stonevpn.conf'
 
     # Read main configuration from stonevpn.conf
@@ -68,86 +68,99 @@ def main():
     # command line options
     parser = OptionParser(usage="%prog -f <filename> -n <commonname> [ OPTIONS ]",version="%prog " + stonevpnver)
 
-    parser.add_option("-n", "--name",
+    # define groups
+    group_crl = OptionGroup(parser, "Certificate revocation options")
+    group_general = OptionGroup(parser, "General options")
+    group_extra = OptionGroup(parser, "Extra options")
+    group_test = OptionGroup(parser, "Test/experimental options",
+            "Caution: use these options with care.")
+
+    # populate groups
+    group_general.add_option("-n", "--name",
         action="store",
         type="string",
         dest="cname",
         help="Common Name, use quotes eg.: \"CNAME\"")
-    parser.add_option("-f", "--file",
+    group_general.add_option("-f", "--file",
         dest="fname",
         help="write to file FNAME (no extension!)")
-    parser.add_option("-o", "--config",
+    group_general.add_option("-o", "--config",
         action="store",
         dest="confs",
         default="unix",
         help="create config files for [windows|unix]")
-    parser.add_option("-e", "--prefix",
+    group_extra.add_option("-e", "--prefix",
         action="store",
         dest="fprefix",
         default=prefix,
         help="prefix (almost all) generated files. Default = " + str(prefix))
-    parser.add_option("-z", "--zip",
+    group_extra.add_option("-z", "--zip",
         action="store_true",
         dest="zip",
-        help="create ZIP-file and delete the rest")
-    parser.add_option("-m", "--mail",
+        help="add all generated files to a ZIP-file")
+    group_extra.add_option("-m", "--mail",
         action="store",
         type="string",
         dest="emailaddress",
         help="Send all generated files to EMAILADDRESS")
-    parser.add_option("-i", "--free-ip",
+    group_test.add_option("-i", "--free-ip",
         action="store_true",
         dest="freeip", 
         help="locate and assign free ip (EXPERIMENTAL)")
-    parser.add_option("-p", "--passphrase",
+    group_extra.add_option("-p", "--passphrase",
         action="store_true",
         dest="passphrase",
         help="prompt for passphrase when generating private key")
-    parser.add_option("-r", "--revoke",
+    group_crl.add_option("-r", "--revoke",
         action="store",
         dest="serial",
         help="revoke certificate with serial SERIAL")
-    parser.add_option("-u", "--route",
+    group_extra.add_option("-u", "--route",
         action="store",
         dest="route",
         help="Push extra route to client. Example: --route=172.16.0.0/16")
-    parser.add_option("-l", "--listrevoked",
+    group_crl.add_option("-l", "--listrevoked",
         action="store_true",
         dest="listrevoked",
         help="list revoked certificates")
-    parser.add_option("-C", "--crl",
+    group_crl.add_option("-C", "--crl",
         action="store_true",
         dest="displaycrl",
         help="display CRL file contents")
-    parser.add_option("-a", "--listall",
+    group_extra.add_option("-a", "--listall",
         action="store_true",
         dest="listall",
         help="list all certificates")
-    parser.add_option("-s", "--showserial",
+    group_extra.add_option("-s", "--showserial",
         action="store_true",
         dest="showserial",
         help="Display current SSL serial number")
-    parser.add_option("-c", "--printcert",
+    group_extra.add_option("-c", "--printcert",
         action="store",
         dest="printcert",
         help="Prints information about a certficiate file")
-    parser.add_option("-d", "--printindex",
+    group_extra.add_option("-d", "--printindex",
         action="store_true",
         dest="printindex",
         help="Prints index file")
-    parser.add_option("-x", "--expire",
+    group_extra.add_option("-x", "--expire",
         action="store",
         dest="expiredate",
-        help="certificate expires in EXPIREDATE days (default is " + str(defaultDays) + ")")
-    parser.add_option("-N", "--newcrl",
+        help="certificate expires in EXPIREDATE days (default is defaultDays)")
+    group_crl.add_option("-N", "--newcrl",
         action="store_true",
         dest="emptycrl",
         help="Create an empty CRL file (or overwrite an existing one)")
-    parser.add_option("-t", "--test",
+    group_test.add_option("-t", "--test",
         action="store_true",
         dest="test",
         help="Danger, Will Robinson, Danger! test parameter - can do anything! Review source before executing!")
 
+    # add optiongroups
+    parser.add_option_group(group_general)
+    parser.add_option_group(group_extra)
+    parser.add_option_group(group_crl)
+    parser.add_option_group(group_test)
 
     # parse cmd line options
     (options, args) = parser.parse_args()
