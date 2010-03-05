@@ -72,6 +72,7 @@ def main():
     group_crl = OptionGroup(parser, "Certificate revocation options")
     group_general = OptionGroup(parser, "General options")
     group_extra = OptionGroup(parser, "Extra options")
+    group_info = OptionGroup(parser, "Information/printing options")
     group_test = OptionGroup(parser, "Test/experimental options",
             "Caution: use these options with care.")
 
@@ -127,19 +128,19 @@ def main():
         action="store_true",
         dest="displaycrl",
         help="display CRL file contents")
-    group_extra.add_option("-a", "--listall",
+    group_info.add_option("-a", "--listall",
         action="store_true",
         dest="listall",
         help="list all certificates")
-    group_extra.add_option("-s", "--showserial",
+    group_info.add_option("-s", "--showserial",
         action="store_true",
         dest="showserial",
         help="Display current SSL serial number")
-    group_extra.add_option("-c", "--printcert",
+    group_info.add_option("-c", "--printcert",
         action="store",
         dest="printcert",
         help="Prints information about a certficiate file")
-    group_extra.add_option("-d", "--printindex",
+    group_info.add_option("-d", "--printindex",
         action="store_true",
         dest="printindex",
         help="Prints index file")
@@ -159,6 +160,7 @@ def main():
     # add optiongroups
     parser.add_option_group(group_general)
     parser.add_option_group(group_extra)
+    parser.add_option_group(group_info)
     parser.add_option_group(group_crl)
     parser.add_option_group(group_test)
 
