@@ -1,4 +1,4 @@
-2010-0?-??	Léon Keijser	<keijser@stone-it.com> 0.4.7beta1
+2010-0?-??	Léon Keijser	<keijser@stone-it.com> 0.4.7beta2
 	* Fixed: certificates were generated with an incorrect
 	serial number.
 	* Fixed: bug when listing all revoked certificates
