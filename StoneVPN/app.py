@@ -345,7 +345,12 @@ class StoneVPN:
         # :: called only when option '-i' is used ::
         if self.freeip:
             print "Searching for free IP-address:"
+            # FIXME: next line still necessary?
             # since we're writing to the ccd dir, check if we have root privileges
+            # see if vpn server conf file exists
+            if not os.path.exists(self.openvpnconf):
+                print "Error: OpenVPN server configuration file was not found at %s" % self.openvpnconf
+                sys.exit()
             import glob, fileinput, string
             # parse config file in search for ifconfig-pool
             for line in fileinput.input(self.openvpnconf):
