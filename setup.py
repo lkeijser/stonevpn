@@ -3,6 +3,8 @@
 from distutils.core import setup, Command
 import os, sys
 
+stonevpnver = '0.4.7beta3'
+
 class SetupBuildCommand(Command):
     user_options = []
     def initialize_options(self):
@@ -43,7 +45,7 @@ for f in os.path.abspath(''):
     files.append(f)
 
 setup(name = 'stonevpn',
-    version = '0.4.7beta2',
+    version = stonevpnver,
     description = 'Easy OpenVPN certificate and configuration management',
     long_description = 'StoneVPN is a system that makes it easy to create certificates and configuration files for use with an OpenVPN server for both Windows and Linux users. It has the ability to create a zip file and e-mail the entire package to a user. It uses pyOpenSSL and custom patches that allow it to manage a CRL file.',
     author = 'Leon Keijser',

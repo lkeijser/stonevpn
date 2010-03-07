@@ -2,7 +2,7 @@
 
 Name:		stonevpn
 Version:	0.4.7
-Release:	0.beta2%{?dist}
+Release:	0.beta3%{?dist}
 Summary:	Easy OpenVPN certificate and configuration management
 
 Group:		Applications/Internet

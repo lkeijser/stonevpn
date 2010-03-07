@@ -1,10 +1,11 @@
-2010-0?-??	Léon Keijser	<keijser@stone-it.com> 0.4.7beta2
+2010-0?-??	Léon Keijser	<keijser@stone-it.com> 0.4.7beta3
 	* Fixed: certificates were generated with an incorrect
 	serial number.
 	* Fixed: bug when listing all revoked certificates
 	* Added: new option to generate an empty CRL file
 	* Added: grouped all options to make --help output look better
-	* Changed: version 0.4.7beta2 (won't release officially)
+	* Changed: method of checking for required arguments
+	* Changed: version 0.4.7beta3 (won't release officially)
 
 2010-02-19	Léon Keijser	<keijser@stone-it.com> 0.4.6
 	* Fixed: crash when trying to parse an empty CRL file
