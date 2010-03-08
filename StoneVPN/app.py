@@ -489,16 +489,13 @@ class StoneVPN:
                 if overwrite not in ('y', 'Y'):
                     print "Doing nothing.."
                     sys.exit()
-                else:
-                    pass
-            else:
-                print "Creating empty CRL file at %s" % self.crlfile
-                cacert = self.load_cert(self.cacertfile)
-                cakey = self.load_key(self.cakeyfile)
-                newCRL = crl.export(cacert, cakey, days=90)
-                f=open(self.crlfile, 'w')
-                f.write(newCRL)
-                f.close()
+            print "Creating empty CRL file at %s" % self.crlfile
+            cacert = self.load_cert(self.cacertfile)
+            cakey = self.load_key(self.cakeyfile)
+            newCRL = crl.export(cacert, cakey, days=90)
+            f=open(self.crlfile, 'w')
+            f.write(newCRL)
+            f.close()
 
 
 
