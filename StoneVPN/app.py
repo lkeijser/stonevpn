@@ -321,12 +321,18 @@ class StoneVPN:
             os.mkdir(self.working)
         # Make certificates
         if self.cname: 
+            if self.fname is None:
+                print "Error: required option -f/--file is missing."
+                sys.exit()
             print "Creating " + self.fname + ".key and " + self.fname + ".crt for " + self.cname
             self.makeCert( self.fname, self.cname )
 
         # Make nice zipfile from all the generated files
         # :: called only when option '-z' is used ::
         if self.zip:
+            if self.fname is None or self.cname is None:
+                print "Error: required option -f/--file and/or -n/--name is missing."
+                sys.exit()
             import zipfile
             import glob
             print "Adding all files to " + self.fprefix + self.fname + ".zip"
@@ -344,6 +350,9 @@ class StoneVPN:
         # Find free IP-address by parsing config files (usually in /etc/openvpn/ccd/*)
         # :: called only when option '-i' is used ::
         if self.freeip:
+            if self.fname is None:
+                print "Error: required option -f/--file is missing."
+                sys.exit()
             print "Searching for free IP-address:"
             # FIXME: next line still necessary?
             # since we're writing to the ccd dir, check if we have root privileges
@@ -431,6 +440,9 @@ class StoneVPN:
             self.print_cert ( self.printcert )
 
         if self.emailaddress:
+            if self.fname is None or self.cname is None:
+                print "Error: required option -f/--file and/or -n/--name is missing."
+                sys.exit()
             mail_attachment = []
             mail_to = self.emailaddress
             # First check if we've generated a ZIP file (include just one attachment) or not (include all generated files)
@@ -447,6 +459,9 @@ class StoneVPN:
                 self.send_mail(self.mail_from, mail_to, 'StoneVPN: generated files for ' + str(self.cname), self.mail_msg, mail_attachment)
 
         if self.route:
+            if self.fname is None or self.cname is None:
+                print "Error: required option -f/--file and/or -n/--name is missing."
+                sys.exit()
             from IPy import IP
             ip=IP(self.route).strNormal(2)
             route = str(ip).split('/')
