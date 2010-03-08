@@ -27,7 +27,7 @@ from configobj import ConfigObj
 
 
 def main():
-    stonevpnver = '0.4.7beta3'
+    stonevpnver = '0.4.7beta2'
     stonevpnconf = '/etc/stonevpn.conf'
 
     # Read main configuration from stonevpn.conf
@@ -64,15 +64,6 @@ def main():
     TYPE_RSA = crypto.TYPE_RSA
     TYPE_DSA = crypto.TYPE_DSA
     FILETYPE = crypto.FILETYPE_PEM
-
-    # extend OptionParser to implement 'required' options
-    import optparse
-    class OptionParser (optparse.OptionParser):
-        def check_required (self, opt):
-          option = self.get_option(opt)
-          # Assumes the option's 'default' is set to None!
-          if getattr(self.values, option.dest) is None:
-              self.error("%s option not supplied" % option)
 
     # command line options
     parser = OptionParser(usage="%prog -f <filename> -n <commonname> [ OPTIONS ]",version="%prog " + stonevpnver)
@@ -219,24 +210,18 @@ def main():
     s.FILETYPE      = FILETYPE
     s.stonevpnver   = stonevpnver
 
-    # check for required args
-    parser.check_required("-f")
-
     # check for all args
-    #print "fname: %s, freeip: %s" % (options.fname,options.freeip)
-    #if options.fname is None and options.serial is not None and options.listrevoked is not None and options.listall is not None and options.showserial is not None and options.printcert is not None and options.printindex is not None and options.emptycrl is not None and options.test is not None and options.freeip is not None:
-    #   parser.error("Error: you have to specify a filename (FNAME)")
-    #else:
-    
-    # must..have..root..
-    import commands
-    myId = commands.getstatusoutput('id -u')[1]
-    if not myId == '0':
-        print "Sorry, root privileges required for this action."
-        sys.exit(0)
+    if options.fname is None and options.serial is not None and options.listrevoked is not None and options.listall is not None and options.showserial is not None and options.printcert is not None and options.printindex is not None and options.emptycrl is not None and options.test is not None:
+        parser.error("Error: you have to specify a filename (FNAME)")
     else:
-        s.run()
-
+        # must..have..root..
+        import commands
+        myId = commands.getstatusoutput('id -u')[1]
+        if not myId == '0':
+            print "Sorry, root privileges required for this action."
+            sys.exit(0)
+        else:
+            s.run()
 
 class StoneVPN:
 
@@ -358,7 +343,6 @@ class StoneVPN:
 
         # Find free IP-address by parsing config files (usually in /etc/openvpn/ccd/*)
         # :: called only when option '-i' is used ::
-        # FIXME: needs to check for a valid user/cert/file/whatever. Else, what's the use?
         if self.freeip:
             print "Searching for free IP-address:"
             # FIXME: next line still necessary?
