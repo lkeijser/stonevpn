@@ -70,8 +70,10 @@ def main():
 
     # define groups
     group_crl = OptionGroup(parser, "Certificate revocation options")
-    group_general = OptionGroup(parser, "General options")
-    group_extra = OptionGroup(parser, "Extra options")
+    group_general = OptionGroup(parser, "General options",
+            "All general options are mandatory")
+    group_extra = OptionGroup(parser, "Extra options",
+            "To be used in conjunction with the general options.")
     group_info = OptionGroup(parser, "Information/printing options")
     group_test = OptionGroup(parser, "Test/experimental options",
             "Caution: use these options with care.")
