@@ -121,7 +121,7 @@ def main():
     group_test.add_option("-u", "--route",
         action="store",
         dest="route",
-        help="Push extra route to client. Example: --route=172.16.0.0/16")
+        help="Push extra route to client. Currently only works with .0/8,16,24. Example: --route=172.16.0.0/16")
     group_crl.add_option("-l", "--listrevoked",
         action="store_true",
         dest="listrevoked",
