@@ -118,7 +118,7 @@ def main():
         action="store",
         dest="serial",
         help="revoke certificate with serial SERIAL")
-    group_extra.add_option("-u", "--route",
+    group_test.add_option("-u", "--route",
         action="store",
         dest="route",
         help="Push extra route to client. Example: --route=172.16.0.0/16")
@@ -461,18 +461,31 @@ class StoneVPN:
                 self.send_mail(self.mail_from, mail_to, 'StoneVPN: generated files for ' + str(self.cname), self.mail_msg, mail_attachment)
 
         if self.route:
-            if self.fname is None or self.cname is None:
-                print "Error: required option -f/--file and/or -n/--name is missing."
+            if self.cname is None:
+                print "Error: required option -n/--name is missing."
                 sys.exit()
             from IPy import IP
-            ip=IP(self.route).strNormal(2)
+            IPy.check_addr_prefixlen = False
+            ip=IP(self.route)
+            ip.NoPrefixForSingleIp = None
+            print "DEBUG: ip: %s" % ip
+            # check if supplied argument is an IPv4 address
+            if IP(ip).version() != 4:
+                print "Error: only IPv4 addresses are supported."
+                sys.exit()
             route = str(ip).split('/')
+            print "DEBUG: route: %s" % route
+            print "DEBUG: args given: %s" % len(route)
+            if len(route) == 1:
+                print "DEBUG: only IP given, assume /32 netmask"
             nospaces_cname =  self.cname.replace(' ', '_')
             # check if ccd dir exists:
             if not os.path.exists(self.ccddir):
                 print "Client configuration directory didn't exist, making ..."
                 os.mkdir(self.ccddir)
-            f=open(self.ccddir + '/' + nospaces_cname, 'w')
+            f=open(self.ccddir + '/' + nospaces_cname, 'a')
+            print "DEBUG: route: %s" % route
+            print "DEBUG: route0: %s, route1: %s" % (route[0],route[1])
             f.write("push route \"" + route[0] + " " + route[1] + "\"\n")
             f.close()
             print "Wrote extra route(s) to " + self.ccddir + "/" + nospaces_cname
