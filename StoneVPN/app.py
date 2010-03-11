@@ -121,7 +121,7 @@ def main():
     group_test.add_option("-u", "--route",
         action="store",
         dest="route",
-        help="Push extra route to client. Currently only works with .0/8,16,24. Example: --route=172.16.0.0/16")
+        help="Push extra route to client. Currently only works with 0.0.0/8, 0.0/16 and .0/24. Example: --route=172.16.0.0/16")
     group_crl.add_option("-l", "--listrevoked",
         action="store_true",
         dest="listrevoked",
@@ -465,9 +465,14 @@ class StoneVPN:
                 print "Error: required option -n/--name is missing."
                 sys.exit()
             from IPy import IP
-            IPy.check_addr_prefixlen = False
-            ip=IP(self.route)
+            IP.check_addr_prefixlen = False
+            try:
+                ip=IP(self.route)
+            except ValueError:
+                print "Error: invalid prefix length given."
+                sys.exit()
             ip.NoPrefixForSingleIp = None
+            ip.WantPrefixLen = 2
             print "DEBUG: ip: %s" % ip
             # check if supplied argument is an IPv4 address
             if IP(ip).version() != 4:
@@ -483,7 +488,7 @@ class StoneVPN:
             if not os.path.exists(self.ccddir):
                 print "Client configuration directory didn't exist, making ..."
                 os.mkdir(self.ccddir)
-            f=open(self.ccddir + '/' + nospaces_cname, 'a')
+            f=open(self.ccddir + '/' + nospaces_cname, 'w')
             print "DEBUG: route: %s" % route
             print "DEBUG: route0: %s, route1: %s" % (route[0],route[1])
             f.write("push route \"" + route[0] + " " + route[1] + "\"\n")
