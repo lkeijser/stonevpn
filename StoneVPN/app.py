@@ -837,6 +837,10 @@ class StoneVPN:
 
     def displayCRL(self):
         import time
+        if not os.path.exists(self.crlfile):
+            print "Error: CRL file not found at %s" % self.crlfile
+            print "You can create one with: stonevpn --newcrl"
+            sys.exit()
         text = open(self.crlfile, 'r').read()
         print "Parsing CRL file %s" % self.crlfile
         try:
