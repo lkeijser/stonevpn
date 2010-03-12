@@ -2,7 +2,7 @@
 
 Name:		stonevpn
 Version:	0.4.7
-Release:	0.beta2%{?dist}
+Release:	1%{?dist}
 Summary:	Easy OpenVPN certificate and configuration management
 
 Group:		Applications/Internet
@@ -53,7 +53,7 @@ install -m 644 man/stonevpn.conf.5 %{buildroot}/%{_mandir}/man5/
 %{_mandir}/man5/%{name}.*
 
 %changelog
-* ??? ??? ?? 2010 L.S. Keijser <keijser@stone-it.com> - 0.4.7-1
+* Fri Mar 12 2010 L.S. Keijser <keijser@stone-it.com> - 0.4.7-1
 - new version from upstream
 
 * Fri Feb 19 2010 L.S. Keijser <keijser@stone-it.com> - 0.4.6-1

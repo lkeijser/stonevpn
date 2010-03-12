@@ -1,4 +1,4 @@
-2010-0?-??	Léon Keijser	<keijser@stone-it.com> 0.4.7beta2
+2010-03-12	Léon Keijser	<keijser@stone-it.com> 0.4.7
 	* Fixed: certificates were generated with an incorrect
 	serial number (hex was written as decimal)
 	* Fixed: bug when listing all revoked certificates
@@ -6,7 +6,7 @@
 	parse it.
 	* Added: new option to generate an empty CRL file
 	* Added: grouped all options to make --help output look better
-	* Changed: version 0.4.7beta2 (won't release officially)
+	* Changed: version 0.4.7
 
 2010-02-19	Léon Keijser	<keijser@stone-it.com> 0.4.6
 	* Fixed: crash when trying to parse an empty CRL file
