@@ -1,7 +1,9 @@
 2010-0?-??	Léon Keijser	<keijser@stone-it.com> 0.4.7beta2
 	* Fixed: certificates were generated with an incorrect
-	serial number.
+	serial number (hex was written as decimal)
 	* Fixed: bug when listing all revoked certificates
+	* Fixed: check for existence of crlfile before trying to
+	parse it.
 	* Added: new option to generate an empty CRL file
 	* Added: grouped all options to make --help output look better
 	* Changed: version 0.4.7beta2 (won't release officially)
