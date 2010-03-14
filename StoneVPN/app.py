@@ -27,7 +27,7 @@ from configobj import ConfigObj
 
 
 def main():
-    stonevpnver = '0.4.7'
+    stonevpnver = '0.4.8beta1'
     stonevpnconf = '/etc/stonevpn.conf'
 
     # Read main configuration from stonevpn.conf
@@ -337,7 +337,7 @@ class StoneVPN:
                 sys.exit()
             import zipfile
             import glob
-            print "Adding all files to " + self.fprefix + self.fname + ".zip"
+            print "Adding all files to " + self.working + "/" + self.fprefix + self.fname + ".zip"
             z = zipfile.ZipFile(self.working + "/" + self.fprefix + self.fname + ".zip", "w")
             for name in glob.glob(self.working + "/" + self.fprefix + self.fname + ".*"):
                 # only add the files that begin with the name specified with the -f option, don't add the zipfile itself (duh)
