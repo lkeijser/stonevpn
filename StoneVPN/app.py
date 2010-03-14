@@ -472,7 +472,6 @@ class StoneVPN:
                 overwrite=raw_input("Existing client configuration file was found. Do you want to overwrite (y/N): ")
                 if overwrite not in ('y', 'Y'):
                     print "Not writing client file.."
-                    #sys.exit()
                 else:
                     os.remove(clientfile)
                     for newroute in self.route:
