@@ -79,6 +79,10 @@ def main():
             "Caution: use these options with care.")
 
     # populate groups
+    parser.add_option("-D", "--debug",
+        action="count", 
+        dest="debug",
+        help="enable use['less','full'] debugging output")
     group_general.add_option("-n", "--name",
         action="store",
         type="string",
@@ -171,6 +175,7 @@ def main():
 
     s = StoneVPN()
     # values we got from optparse:
+    s.debug         = options.debug
     s.cname         = options.cname
     s.fname         = options.fname
     s.confs         = options.confs
@@ -468,42 +473,51 @@ class StoneVPN:
             IP.check_addr_prefixlen = False
             nospaces_cname =  self.cname.replace(' ', '_')
             clientfile = self.ccddir + "/" + nospaces_cname
+            # nowwhat : 0=continue normally (append), 1=don't write clientfile, 2=overwrite)
+            # setting to 'append' by default
+            nowwhat=0
             if os.path.exists(clientfile):
-                overwrite=raw_input("Existing client configuration file was found. Do you want to overwrite (y/N): ")
-                if overwrite not in ('y', 'Y'):
-                    print "Not writing client file.."
-                else:
+                overwrite=raw_input("Existing client configuration file was found. Do you want to (o)verwrite, (A)ppend or (s)kip): ")
+                if overwrite in ('o', 'O'):
                     os.remove(clientfile)
-                    for newroute in self.route:
-                        try:
-                            ip=IP(newroute)
-                        except ValueError:
-                            print "Error: invalid prefix length given."
-                            sys.exit()
-                        ip.NoPrefixForSingleIp = None
-                        ip.WantPrefixLen = 2
-                        #print "DEBUG: ip: %s" % ip
-                        # check if supplied argument is an IPv4 address
-                        if IP(ip).version() != 4:
-                            print "Error: only IPv4 addresses are supported."
-                            sys.exit()
-                        route = str(ip).split('/')
-                        #print "DEBUG: route: %s" % route
-                        #print "DEBUG: args given: %s" % len(route)
-                        #if len(route) == 1:
-                        #    print "DEBUG: only IP given, assume /32 netmask"
-                        # check if ccd dir exists:
-                        if not os.path.exists(self.ccddir):
-                            print "Client configuration directory didn't exist, making ..."
-                            os.mkdir(self.ccddir)
-                        f=open(self.ccddir + '/' + nospaces_cname, 'a')
-                        #print "DEBUG: route: %s" % route
-                        #print "DEBUG: route0: %s, route1: %s" % (route[0],route[1])
-                        print "Adding route %s / %s" % (route[0],route[1])
-                        f.write("push route \"" + route[0] + " " + route[1] + "\"\n")
-                        f.close()
-                    print "Wrote extra route(s) to " + self.ccddir + "/" + nospaces_cname
-        
+                    nowwhat=2
+                elif overwrite in ('s', 'S'):
+                    nowwhat=1
+            if self.debug: print "DEBUG: adding %s routes" % len(self.route)
+            for newroute in self.route:
+                try:
+                    ip=IP(newroute)
+                except ValueError:
+                    print "Error: invalid prefix length given."
+                    sys.exit()
+                ip.NoPrefixForSingleIp = None
+                ip.WantPrefixLen = 2
+                if self.debug: print "DEBUG: ip: %s" % ip
+                # check if supplied argument is an IPv4 address
+                if IP(ip).version() != 4:
+                    print "Error: only IPv4 addresses are supported."
+                    sys.exit()
+                route = str(ip).split('/')
+                if self.debug: print "DEBUG: args given: %s" % len(route)
+                if self.debug:
+                    if len(route) == 1:
+                        print "DEBUG: only IP given, assume /32 netmask"
+                # check if ccd dir exists:
+                if not os.path.exists(self.ccddir):
+                    print "Client configuration directory didn't exist, making ..."
+                    os.mkdir(self.ccddir)
+                f=open(self.ccddir + '/' + nospaces_cname, 'a')
+                if self.debug: print "DEBUG: route: %s" % route
+                if nowwhat == 1:
+                    if self.debug: print "DEBUG: not writing route to client configfile!"
+                # only write routes if we didn't skip overwriting/appending earlier
+                if nowwhat != 1:
+                    print "Adding route %s / %s" % (route[0],route[1])
+                    f.write("push route \"" + route[0] + " " + route[1] + "\"\n")
+                f.close()
+            if nowwhat != 1:
+                print "Wrote extra route(s) to " + self.ccddir + "/" + nospaces_cname
+    
         if self.emptycrl:
             try:
                 crl = crypto.CRL()
@@ -877,7 +891,7 @@ class StoneVPN:
 
     def listRevokedCerts(self):
         # read SSL dbase (usually index.txt)
-        # this file has 5 columns: Status, Expiry date, Revocation date, Serial nr, file?, Distinguished Name (DN)
+        # this file has 5 columns: Status, Expiry date, Revocation date, Serial nr, unknown, Distinguished Name (DN)
         print "Reading SSL database: " + indexdb
         input = open(indexdb, 'r')
         revCerts = []
