@@ -498,7 +498,6 @@ class StoneVPN:
                     print "Error: only IPv4 addresses are supported."
                     sys.exit()
                 route = str(ip).split('/')
-                if self.debug: print "DEBUG: args given: %s" % len(route)
                 if self.debug:
                     if len(route) == 1:
                         print "DEBUG: only IP given, assume /32 netmask"
