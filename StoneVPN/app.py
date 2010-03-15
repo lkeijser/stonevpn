@@ -122,10 +122,10 @@ def main():
         action="store",
         dest="serial",
         help="revoke certificate with serial SERIAL")
-    group_test.add_option("-u", "--route",
+    group_extra.add_option("-u", "--route",
         action="append",
         dest="route",
-        help="Push extra route(s) to client. Specify multiple routes as: -u 1.2.3.4/32 -u 2.3.4.5/32") 
+        help="Push extra route(s) to client. Specify multiple routes as: -u 192.168.1.1/32 -u 10.1.4.0/24") 
     group_crl.add_option("-l", "--listrevoked",
         action="store_true",
         dest="listrevoked",
@@ -361,8 +361,6 @@ class StoneVPN:
                 print "Error: required option -f/--file is missing."
                 sys.exit()
             print "Searching for free IP-address:"
-            # FIXME: next line still necessary?
-            # since we're writing to the ccd dir, check if we have root privileges
             # see if vpn server conf file exists
             if not os.path.exists(self.openvpnconf):
                 print "Error: OpenVPN server configuration file was not found at %s" % self.openvpnconf
