@@ -153,7 +153,7 @@ def main():
     group_extra.add_option("-x", "--expire",
         action="store",
         dest="expiredate",
-        help="certificate expires in EXPIREDATE days (default is defaultDays)")
+        help="certificate expires in EXPIREDATE days (default is " + str(defaultDays) + ")")
     group_crl.add_option("-N", "--newcrl",
         action="store_true",
         dest="emptycrl",
