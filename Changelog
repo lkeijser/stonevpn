@@ -2,6 +2,7 @@
 	* Added: now accepts adding multiple routes to clientfile
 	* Added: debug option
 	* Fixed: rewrote 'route' section
+	* Fixed: small cosmetic changes
 	* Changed: version 0.4.8beta1 (won't release oficially)
 
 2010-03-12	Léon Keijser	<keijser@stone-it.com> 0.4.7
