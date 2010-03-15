@@ -416,11 +416,12 @@ class StoneVPN:
                 print "Client configuration directory didn't exist, making ..."
                 os.mkdir(self.ccddir)
             # And create the configuration file for these addresses
-            f=open(self.ccddir + '/' + self.fname, 'w')
+            nospaces_cname =  self.cname.replace(' ', '_')
+            f=open(self.ccddir + '/' + nospaces_cname, 'w')
             f.write('ifconfig-push ' + str(firstFree) + ' ' + str(secondFree) + '\n')
             f.write('push "route ' + self.pushrouter + ' 255.255.255.255"\n')
             f.close()
-            print "CCD file written to: " + self.ccddir + '/' + self.fname
+            print "CCD file written to: " + self.ccddir + '/' + nospaces_cname
 
         if self.listall:
             self.listAllCerts()
@@ -474,13 +475,14 @@ class StoneVPN:
             # nowwhat : 0=continue normally (append), 1=don't write clientfile, 2=overwrite)
             # setting to 'append' by default
             nowwhat=0
-            if os.path.exists(clientfile):
-                overwrite=raw_input("Existing client configuration file was found. Do you want to (o)verwrite, (A)ppend or (s)kip): ")
-                if overwrite in ('o', 'O'):
-                    os.remove(clientfile)
-                    nowwhat=2
-                elif overwrite in ('s', 'S'):
-                    nowwhat=1
+            if not self.freeip:
+                if os.path.exists(clientfile):
+                    overwrite=raw_input("Existing client configuration file was found. Do you want to (o)verwrite, (A)ppend or (s)kip): ")
+                    if overwrite in ('o', 'O'):
+                        os.remove(clientfile)
+                        nowwhat=2
+                    elif overwrite in ('s', 'S'):
+                        nowwhat=1
             if self.debug: print "DEBUG: adding %s routes" % len(self.route)
             for newroute in self.route:
                 try:
