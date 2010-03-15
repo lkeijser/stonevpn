@@ -53,6 +53,9 @@ install -m 644 man/stonevpn.conf.5 %{buildroot}/%{_mandir}/man5/
 %{_mandir}/man5/%{name}.*
 
 %changelog
+* ??? ??? ?? ???? L.S. Keijser <keijser@stone-it.com> - 0.4.8-1
+- new version from upstream
+
 * Fri Mar 12 2010 L.S. Keijser <keijser@stone-it.com> - 0.4.7-1
 - new version from upstream
 
