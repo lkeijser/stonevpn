@@ -19,53 +19,59 @@ it to a user.
 .SH OPTIONS
 .TP 
 .BI --version
-show program's version number and exit
+Show program's version number and exit
 .TP
 .BI -h "\fR,\fB --help
-show the help message and exit
+Show the help message and exit
+.TP
+.BI -D "\fR,\fB --debug
+Enable debugging information.
 .TP
 .BI -n " CNAME" "\fR,\fP \-\^\-name=" CNAME
 Common Name, use quotes eg.: "John Cleese"
 .TP
 .BI -f " FNAME" "\fR,\fP \-\^\-file=" FNAME
-write to file FNAME (no extension!)
+Write to file FNAME (no extension!)
 .TP
 .BI -o " CONFS" "\fR,\fP \-\^\-config=" CONFS
-create config files for \fB[ \fIwindows\fR | \fIunix\fB ]
+Create config files for \fB[ \fIwindows\fR | \fIunix\fB ]
 .TP
 .BI -e " FPREFIX" "\fR,\fP \-\^\-prefix=" FPREFIX
-prefix (almost all) generated files.
+Prefix (almost all) generated files. For example, if you set FPREFIX to 'mycorp', generated files will look like 'mycorp-user.crt/zip/key'
 .TP
 .BI -z \fR, \fB\-\^\-zip
-create ZIP-file and delete the rest
+Package all generated files into a ZIP file.
 .TP
 .BI -m " EMAILADDRESS" "\fR,\fP \-\^\-mail=" EMAILADDRESS
 Send all generated files by e-mail to \fIEMAILADDRESS\fR. You might want to encrypt the user's key with a password when using this method.
 .TP
 .BI -i \fR, \fB\-\^\-free-ip
-locate and assign free ip (EXPERIMENTAL)
+Locate and assign free ip by parsing the OpenVPN server configuration file, and (if present) client configuration files within the ccd directory (EXPERIMENTAL)
 .TP
 .BI -p \fR, \fB\-\^\-passphrase
-prompt for passphrase when generating the user's private key
+Prompt for passphrase when generating the user's private key
 .TP
 .BI -r " SERIAL" "\fR,\fP \-\^\-revoke=" SERIAL
-revoke certificate with serial SERIAL
+Revoke certificate with serial SERIAL
 .TP
 .BI -u " ROUTE" "\fR,\fP \-\^\-route=" ROUTE
-Push extra route to client. Example:
---route=172.16.0.0/16
+Push extra route(s) to client by means of a client configuration file on the server. For example:
+
+  stonevpn -f user -n "Test User" -u 192.168.1.0/24
+
+This will write the route to /etc/openvpn/cdd/Test_User
 .TP
 .BI -l \fR, \fB\-\^\-listrevoked
-list revoked certificates
+List revoked certificates
 .TP
 .BI --crl
-display CRL file contents
+Display CRL file contents
 .TP
 .BI -a \fR, \fB\-\^\-listall
-list all certificates
+List all certificates
 .TP
 .BI -s \fR, \fB\-\^\-showserial
-display current SSL serial number
+Display current SSL serial number
 .TP
 .BI -c " PRINTCERT" "\fR,\fP \-\^\-printcert=" PRINTCERT
 Prints information about a certficiate file
@@ -74,7 +80,7 @@ Prints information about a certficiate file
 Prints index file
 .TP
 .BI -x " EXPIREDATE" "\fR,\fP \-\^\-expire=" EXPIREDATE
-certificate expires in EXPIREDATE days instead of the default specified in the openssl.cnf
+Certificate expires in EXPIREDATE days instead of the default specified in the openssl.cnf
 .TP
 .BI -N \fR, \fB\-\^\-newcrl
 Create an empty CRL file (or overwrite an existing one)
