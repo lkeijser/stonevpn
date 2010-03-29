@@ -82,7 +82,7 @@ def main():
     parser.add_option("-D", "--debug",
         action="count", 
         dest="debug",
-        help="enable use['less','full'] debugging output")
+        help="enable debugging output")
     group_general.add_option("-n", "--name",
         action="store",
         type="string",
