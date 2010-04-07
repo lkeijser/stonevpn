@@ -1,9 +1,11 @@
-2010-0?-??	Léon Keijser	<keijser@stone-it.com> 0.4.8beta1
+2010-0?-??	Léon Keijser	<keijser@stone-it.com> 0.4.8beta2
 	* Added: now accepts adding multiple routes to clientfile
-	* Added: debug option
+	* Added: debug option (mainly for my own benefit)
+	* Added: expanded expiration date option to specify hours,
+	days or years
 	* Fixed: rewrote 'route' section
 	* Fixed: small cosmetic changes
-	* Changed: version 0.4.8beta1 (won't release oficially)
+	* Changed: version 0.4.8beta2 (won't release oficially)
 
 2010-03-12	Léon Keijser	<keijser@stone-it.com> 0.4.7
 	* Fixed: certificates were generated with an incorrect
