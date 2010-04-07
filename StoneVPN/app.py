@@ -153,13 +153,13 @@ def main():
     group_extra.add_option("-x", "--expire",
         action="store",
         dest="expiredate",
-        help="certificate expires in EXPIREDATE days (default is " + str(defaultDays) + ")")
+        help="certificate expires in EXPIREDATE h(ours), d(ays) or y(ears). The default is " + str(defaultDays) + " days. Example usage: -x 2h")
     group_crl.add_option("-N", "--newcrl",
         action="store_true",
         dest="emptycrl",
         help="Create an empty CRL file (or overwrite an existing one)")
     group_test.add_option("-t", "--test",
-        action="store_true",
+        action="store",
         dest="test",
         help="Danger, Will Robinson, Danger! test parameter - can do anything! Review source before executing!")
 
@@ -539,7 +539,9 @@ class StoneVPN:
             f.write(newCRL)
             f.close()
 
-
+        if self.test:
+            print "Testing 1, 2, 5 ... three Sir!"
+            sys.exit()
 
     # Create key
     def createKeyPair(self, type, bits):
@@ -588,6 +590,7 @@ class StoneVPN:
 
     # Create certificate
     def createCertificate(self, req, (issuerCert, issuerKey), serial, (notBefore, notAfter), digest="md5"):
+        from datetime import datetime, timedelta
         extensions = []
         # Create the X509 Extensions
         extensions.append(crypto.X509Extension('basicConstraints',1, 'CA:FALSE'))
@@ -608,8 +611,14 @@ class StoneVPN:
         from string import atoi
         goodserial = atoi(str(serial), 16)
         cert.set_serial_number(goodserial)
-        cert.gmtime_adj_notBefore(notBefore)
-        cert.gmtime_adj_notAfter(notAfter)
+        if self.debug: print "DEBUG: notBefore is %s, notAfter is %s" % (notBefore,notAfter)
+        #cert.gmtime_adj_notBefore(notBefore)
+        #cert.gmtime_adj_notAfter(notAfter)
+        now = datetime.now().strftime("%Y%m%d%H%M%SZ")
+        if self.debug: print "DEBUG: days is %s" % timedelta(seconds=notAfter)
+        expire = (datetime.now() + timedelta(seconds=notAfter)).strftime("%Y%m%d%H%M%SZ")
+        cert.set_notBefore(now)
+        cert.set_notAfter(expire)
         cert.set_issuer(issuerCert.get_subject())
         cert.set_subject(req.get_subject())
         cert.set_pubkey(req.get_pubkey())
@@ -718,8 +727,22 @@ class StoneVPN:
         newSerial = self.dec2hex(newSerial)
         # Check if a different expiration date for certificate
         if self.expiredate:
-            cert = self.createCertificate(req, (cacert, cakey), newSerial, (0, 24 * 60 * 60 * int(self.expiredate)))
-            print "Certificate is valid for %s day(s)." % self.expiredate
+            # Check for valid arguments: (h)ours, (d)ays, (y)ears.
+            # For example: 2h or 6d or 2y. A combination is not (yet?) possible.
+            exp_time = list(self.expiredate)[0]
+            unit = list(self.expiredate)[1]
+            if unit not in ('h', 'H', 'd', 'D', 'y', 'Y'): 
+                print "Invalid time unit provided. Use h(ours), d(ays) or y(ears)."
+                sys.exit()
+            elif unit in ('h', 'H'):
+                cert = self.createCertificate(req, (cacert, cakey), newSerial, (0, 60 * 60 * int(exp_time)))
+                print "Certificate is valid for %s hour(s)." % exp_time
+            elif unit in ('d', 'D'):
+                cert = self.createCertificate(req, (cacert, cakey), newSerial, (0, 24 * 60 * 60 * int(exp_time)))
+                print "Certificate is valid for %s day(s)." % exp_time
+            elif unit in ('y', 'Y'):
+                cert = self.createCertificate(req, (cacert, cakey), newSerial, (0, 24 * 60 * 60 * 365 * int(exp_time)))
+                print "Certificate is valid for %s year(s)." % exp_time
         else:
             cert = self.createCertificate(req, (cacert, cakey), newSerial, (0, 24 * 60 * 60 * int(defaultDays)))
             print "Certificate is valid for %s day(s)." % defaultDays
