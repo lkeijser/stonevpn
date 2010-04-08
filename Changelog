@@ -7,7 +7,7 @@
 	* Fixed: small cosmetic changes
 	* Changed: expanded expiration date option to specify hours,
 	days or years
-	* Changed: version 0.4.8beta2 (won't release oficially)
+	* Changed: version 0.4.8beta2 (won't release officially)
 
 2010-03-12	Léon Keijser	<keijser@stone-it.com> 0.4.7
 	* Fixed: certificates were generated with an incorrect
