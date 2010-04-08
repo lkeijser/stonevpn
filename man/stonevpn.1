@@ -1,4 +1,4 @@
-.TH STONEVPN 1 "November 2009" "" "StoneVPN User Manual"
+.TH STONEVPN 1 "April 2010" "" "StoneVPN User Manual"
 .SH NAME
 stonevpn \- Easy OpenVPN certificate and configuration management
 
@@ -25,7 +25,7 @@ Show program's version number and exit
 Show the help message and exit
 .TP
 .BI -D "\fR,\fB --debug
-Enable debugging information.
+Enable debugging information. You probably don't want to use this option as it prints quite useless information for normal usage.
 .TP
 .BI -n " CNAME" "\fR,\fP \-\^\-name=" CNAME
 Common Name, use quotes eg.: "John Cleese"
@@ -59,7 +59,7 @@ Push extra route(s) to client by means of a client configuration file on the ser
 
   stonevpn -f user -n "Test User" -u 192.168.1.0/24
 
-This will write the route to /etc/openvpn/cdd/Test_User
+You can specify multiple routes with another '-u <route>'. This will write the route(s) to /etc/openvpn/cdd/Test_User 
 .TP
 .BI -l \fR, \fB\-\^\-listrevoked
 List revoked certificates
@@ -80,7 +80,11 @@ Prints information about a certficiate file
 Prints index file
 .TP
 .BI -x " EXPIREDATE" "\fR,\fP \-\^\-expire=" EXPIREDATE
-Certificate expires in EXPIREDATE days instead of the default specified in the openssl.cnf
+Certificate expires in EXPIREDATE hours/days/years instead of the default specified in the openssl.cnf. For example:
+
+  stonevpn -f user -n "User Name" -x 3h   # valid for 3 hours
+  stonevpn -f user -n "User Name" -x 2d   # same, but 2 days
+  stonevpn -f user -n "User Name" -x 1y   # and for one year
 .TP
 .BI -N \fR, \fB\-\^\-newcrl
 Create an empty CRL file (or overwrite an existing one)
