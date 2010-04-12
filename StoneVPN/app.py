@@ -318,9 +318,9 @@ class StoneVPN:
             sys.exit()
 
         # Make sure FPREFIX ends with a dash
-        if not self.fprefix[-1] == '-':
-            self.fprefix = str(self.fprefix) + '-'
-
+        if not self.fprefix == '':
+            if not self.fprefix[-1] == '-':
+                self.fprefix = str(self.fprefix) + '-'
         
         # check if working dir exists, create it if it doesn't
         if not os.path.exists(self.working):
