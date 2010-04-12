@@ -730,7 +730,11 @@ class StoneVPN:
             # Check for valid arguments: (h)ours, (d)ays, (y)ears.
             # For example: 2h or 6d or 2y. A combination is not (yet?) possible.
             exp_time = list(self.expiredate)[0]
-            unit = list(self.expiredate)[1]
+            try:
+                unit = list(self.expiredate)[1]
+            except:
+                print "Incorrect or missing time unit. Use h(ours), d(ays) or y(ears)."
+                sys.exit()
             if unit not in ('h', 'H', 'd', 'D', 'y', 'Y'): 
                 print "Invalid time unit provided. Use h(ours), d(ays) or y(ears)."
                 sys.exit()
