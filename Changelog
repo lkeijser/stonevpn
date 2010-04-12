@@ -1,12 +1,13 @@
 2010-0?-??	Léon Keijser	<keijser@stone-it.com> 0.4.8beta2
 	* Added: now accepts adding multiple routes to clientfile
 	* Added: debug option (mainly for my own benefit)
+	* Added: expanded expiration date option to specify hours,
+	days or years
 	* Fixed: certificates were sometimes generated with an in-
 	correct time, depending on local timezone.
 	* Fixed: rewrote 'route' section
-	* Fixed: small cosmetic changes
-	* Changed: expanded expiration date option to specify hours,
-	days or years
+	* Fixed: crash when providing empty prefix
+	* Changed: small cosmetic changes
 	* Changed: version 0.4.8beta2 (won't release officially)
 
 2010-03-12	Léon Keijser	<keijser@stone-it.com> 0.4.7
