@@ -24,6 +24,8 @@ import os, sys, shutil, string
 from OpenSSL import SSL, crypto
 from optparse import OptionParser, OptionGroup
 from configobj import ConfigObj
+from time import strftime
+from datetime import datetime, timedelta
 
 
 def main():
@@ -590,7 +592,6 @@ class StoneVPN:
 
     # Create certificate
     def createCertificate(self, req, (issuerCert, issuerKey), serial, (notBefore, notAfter), digest="md5"):
-        from datetime import datetime, timedelta
         extensions = []
         # Create the X509 Extensions
         extensions.append(crypto.X509Extension('basicConstraints',1, 'CA:FALSE'))
@@ -720,6 +721,7 @@ class StoneVPN:
             print "Error opening CA key file"
             sys.exit()
         curSerial = self.readSerial()
+        timeNow = datetime.now()
         # We can't work with hex integers. Convert them to dec first
         newSerial = self.hex2dec(curSerial) + 1
         newSerialDec = newSerial
@@ -729,23 +731,30 @@ class StoneVPN:
         if self.expiredate:
             # Check for valid arguments: (h)ours, (d)ays, (y)ears.
             # For example: 2h or 6d or 2y. A combination is not (yet?) possible.
-            exp_time = list(self.expiredate)[0]
+            expList = list(self.expiredate)
             try:
-                unit = list(self.expiredate)[1]
+                unit = list(self.expiredate)[-1]
+                if self.debug: print "DEBUG: time unit is %s" % unit
             except:
                 print "Incorrect or missing time unit. Use h(ours), d(ays) or y(ears)."
                 sys.exit()
+            countRest = len(expList) - 1
+            exp_time = ''.join(expList[0:countRest])
+            if self.debug: print "DEBUG: exp_time is %s" % exp_time
             if unit not in ('h', 'H', 'd', 'D', 'y', 'Y'): 
                 print "Invalid time unit provided. Use h(ours), d(ays) or y(ears)."
                 sys.exit()
             elif unit in ('h', 'H'):
                 cert = self.createCertificate(req, (cacert, cakey), newSerial, (0, 60 * 60 * int(exp_time)))
+                expDate = timeNow + timedelta(hours=int(exp_time))
                 print "Certificate is valid for %s hour(s)." % exp_time
             elif unit in ('d', 'D'):
                 cert = self.createCertificate(req, (cacert, cakey), newSerial, (0, 24 * 60 * 60 * int(exp_time)))
+                expDate = timeNow + timedelta(days=int(exp_time))
                 print "Certificate is valid for %s day(s)." % exp_time
             elif unit in ('y', 'Y'):
                 cert = self.createCertificate(req, (cacert, cakey), newSerial, (0, 24 * 60 * 60 * 365 * int(exp_time)))
+                expDate = timeNow + timedelta(days=int(exp_time) * 365)
                 print "Certificate is valid for %s year(s)." % exp_time
         else:
             cert = self.createCertificate(req, (cacert, cakey), newSerial, (0, 24 * 60 * 60 * int(defaultDays)))
@@ -759,10 +768,8 @@ class StoneVPN:
         # create the configuration files (default 'unix' unless specified with option -c)
         self.makeConfs(self.confs, fname)
         # write index to file
-        from time import strftime
-        curYear = str(strftime("%y"))
-        newYear = int(curYear) + 1
-        expDate = str(newYear) + str(strftime("%m%d%H%M%S"))
+        if self.debug: print "DEBUG: timeNow is %s" % timeNow
+        if self.debug: print "DEBUG: expDate is %s" % expDate
         # OpenSSL only accepts serials of 2 digits, so check for the length and prepend a 0 if necessary
         if len(str(newSerial)) == 1:
             serialNumber = '0' + str(newSerial)
@@ -770,8 +777,11 @@ class StoneVPN:
             serialNumber = newSerial
         # convert cname: spaces to underscores for inclusion in indexdb
         nospaces_cname =  cname.replace(' ', '_')
+        # the expire date for the index file needs some conversion
+        indexDate = expDate.strftime("%y%m%d%H%M%S")
+        if self.debug: print "DEBUG: indexDate is %s" % indexDate
         # Format index line and write to OpenSSL index file
-        index = 'V\t' + str(expDate) + 'Z\t' + str(serialNumber) + '\tunknown\t' + '/C=' + str(countryName) + '/ST=' + str(stateOrProvinceName) + '/O=' + str(organizationName) + '/OU=' + str(organizationalUnitName) + '/CN=' + str(nospaces_cname) + '/emailAddress=' + str(fname) + '@local\n'
+        index = 'V\t' + str(indexDate) + 'Z\t' + str(serialNumber) + '\tunknown\t' + '/C=' + str(countryName) + '/ST=' + str(stateOrProvinceName) + '/O=' + str(organizationName) + '/OU=' + str(organizationalUnitName) + '/CN=' + str(nospaces_cname) + '/emailAddress=' + str(fname) + '@local\n'
         self.writeIndex(index)
 
     # Make config files for OpenVPN
