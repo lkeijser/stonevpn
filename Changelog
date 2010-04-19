@@ -1,4 +1,5 @@
 2010-0?-??	Léon Keijser	<keijser@stone-it.com> 0.4.8beta4
+	* Added: client template for Mac (OSX)
 	* Added: now accepts adding multiple routes to clientfile
 	* Added: debug option (mainly for my own benefit)
 	* Added: expanded expiration date option to specify hours,

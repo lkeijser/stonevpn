@@ -790,7 +790,7 @@ class StoneVPN:
         import string
         config = ConfigObj(self.stonevpnconf)
         # Generate appropriate (according to specified OS) configuration for OpenVPN
-        if sname == 'unix':
+        if sname == 'unix' or sname == 'linux':
             sectionname = 'unix conf'
             print "Generating UNIX configuration file"
             f=open(self.working + '/' + self.fprefix + fname + '.conf', 'w')
