@@ -97,7 +97,7 @@ def main():
         action="store",
         dest="confs",
         default="unix",
-        help="create config files for [windows|unix]")
+        help="create config files for [windows|unix|mac]")
     group_extra.add_option("-e", "--prefix",
         action="store",
         dest="fprefix",
@@ -798,6 +798,13 @@ class StoneVPN:
             sectionname = 'windows conf'
             print "Generating Windows configuration file"
             f=open(self.working + '/' + self.fprefix + fname + '.ovpn', 'w')
+        elif sname == 'mac':
+            sectionname = 'mac conf'
+            print "Generating Mac configuration file"
+            f=open(self.working + '/' + self.fprefix + fname + '.conf', 'w')
+        else:
+            print "Incorrect OS type specified. Valid options are 'unix', 'windows' or 'mac'."
+            sys.exit()
         section=config[sectionname]
         # Go over each entry (variable) and write it to the OpenVPN configuration file
         for var in section:
