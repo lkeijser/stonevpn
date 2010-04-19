@@ -29,7 +29,7 @@ from datetime import datetime, timedelta
 
 
 def main():
-    stonevpnver = '0.4.8beta3'
+    stonevpnver = '0.4.8beta4'
     stonevpnconf = '/etc/stonevpn.conf'
 
     # Read main configuration from stonevpn.conf
