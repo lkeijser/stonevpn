@@ -758,6 +758,7 @@ class StoneVPN:
                 print "Certificate is valid for %s year(s)." % exp_time
         else:
             cert = self.createCertificate(req, (cacert, cakey), newSerial, (0, 24 * 60 * 60 * int(defaultDays)))
+            expDate = timeNow + timedelta(hours=int(defaultDays))
             print "Certificate is valid for %s day(s)." % defaultDays
         self.save_key ( self.working + '/' + self.fprefix + fname + '.key', pkey )
         self.save_cert ( self.working + '/' + self.fprefix + fname + '.crt', cert )
