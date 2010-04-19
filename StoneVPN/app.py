@@ -411,8 +411,8 @@ class StoneVPN:
             # find 2 free IP-addresses:
             firstFree = ipList[0]
             secondFree = ipList[1]
-            print "First free address: " + str(firstFree)
-            print "Second free address: " + str(secondFree)
+            print "First free address: %s (local)" % firstFree
+            print "Second free address: %s (peer)" % secondFree
             # check if ccd dir exists:
             if not os.path.exists(self.ccddir):
                 print "Client configuration directory didn't exist, making ..."
@@ -423,7 +423,7 @@ class StoneVPN:
             f.write('ifconfig-push ' + str(firstFree) + ' ' + str(secondFree) + '\n')
             f.write('push "route ' + self.pushrouter + ' 255.255.255.255"\n')
             f.close()
-            print "CCD file written to: " + self.ccddir + '/' + nospaces_cname
+            print "CCD file written to: %s\nPlease review or make additional changes."  % (self.ccddir + '/' + nospaces_cname)
 
         if self.listall:
             self.listAllCerts()
