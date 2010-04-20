@@ -420,7 +420,7 @@ class StoneVPN:
             # And create the configuration file for these addresses
             nospaces_cname =  self.cname.replace(' ', '_')
             f=open(self.ccddir + '/' + nospaces_cname, 'w')
-            f.write('ifconfig-push ' + str(firstFree) + ' ' + str(secondFree) + '\n')
+            f.write('ifconfig-push ' + str(secondFree) + ' ' + str(firstFree) + '\n')
             f.write('push "route ' + self.pushrouter + ' 255.255.255.255"\n')
             f.close()
             print "CCD file written to: %s\nPlease review or make additional changes."  % (self.ccddir + '/' + nospaces_cname)
