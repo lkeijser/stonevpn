@@ -26,6 +26,7 @@ from optparse import OptionParser, OptionGroup
 from configobj import ConfigObj
 from time import strftime
 from datetime import datetime, timedelta
+import re
 
 
 def main():
@@ -374,24 +375,40 @@ class StoneVPN:
                     pool_from = line.split()[1]
                     pool_to = line.split()[2]
                     print "Pool runs from " + pool_from + " to " + pool_to
-            import IPy
-            IPy.check_addr_prefixlen = False    # set so that IP-addresses other than x.x.x.0/x can be handled
-            from IPy import IP
-            try:
-                range = IP(pool_from + '-' + pool_to)
-            except ValueError:
-                print "An error occured when trying to determine a valid"
-                print "network prefix for your pool. Reverting to /25"
-                print "If this is not desirable, please specify a valid"
-                print "range in %s." % self.openvpnconf
-                range = IP(pool_from).make_net('255.255.255.128')
+            # from here on we have to do some magic to get a list of
+            # valid IP's in the specified pool
+            # we first check if the first 3 octets in both 'from' and 'to'
+            # are the same. 
+            r = re.compile('(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})')
+            mFrom = r.match(pool_from)
+            mTo = r.match(pool_to)
+            if self.debug:
+                print "DEBUG: first 3 octets of ip_from are %s.%s.%s" % (mFrom.group(1),mFrom.group(2),mFrom.group(3))
+                print "DEBUG: first 3 octets of ip_to are %s.%s.%s" % (mTo.group(1),mTo.group(2),mTo.group(3))
+            from_3octs = str(mFrom.group(1)) + '.' + str(mFrom.group(2)) + '.' + str(mFrom.group(3))
+            to_3octs = str(mTo.group(1)) + '.' + str(mTo.group(2)) + '.' + str(mTo.group(3))
+            if from_3octs == to_3octs:
+                if self.debug: 
+                    print "DEBUG: both ip_from and ip_to are in the same subnet!"
+                    print "DEBUG: we don't need to calculate the range"
+            else:
+                from IPy import IP
+                try:
+                    range = IP(pool_from + '-' + pool_to)
+                except ValueError:
+                    print "An error occured when trying to determine a valid"
+                    print "network prefix for your pool. Reverting to /25"
+                    print "If this is not desirable, please specify a valid"
+                    print "range in %s." % self.openvpnconf
+                    range = IP(pool_from).make_net('255.255.255.128')
+                if self.debug: print "DEBUG: range is %s" % range
             # define list of IP-addresses
             ipList = []
             for x in range:
                 ipList.append(x)
             # go through the individual config files to find IP-addresses
             for file in glob.glob(self.ccddir+"/*"):
-                print "Parsing file: " + file
+                if self.debug: print "DEBUG: parsing file: " + file
                 for line in fileinput.input(file):
                     # search for line that starts with 'ifconfig-push'
                     if line.split()[0] == 'ifconfig-push':
@@ -601,7 +618,7 @@ class StoneVPN:
         	print "\n=================================================================="
         	print "Warning: your version of pyOpenSSL doesn't support X509Extensions."
         	print "Please consult the README file that came with StoneVPN in order to"
-        	print "fix this by upgrading to at least pyOpenSSL 0.9."
+        	print "fix this. This is not trivial. The certificate will be generated."
         	print "==================================================================\n"
         # We're creating a X509 certificate version 2
         cert = crypto.X509()
