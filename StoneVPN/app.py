@@ -360,6 +360,7 @@ class StoneVPN:
         # Find free IP-address by parsing config files (usually in /etc/openvpn/ccd/*)
         # :: called only when option '-i' is used ::
         if self.freeip:
+            from IPy import IP
             if self.fname is None:
                 print "Error: required option -f/--file is missing."
                 sys.exit()
@@ -388,23 +389,26 @@ class StoneVPN:
             from_3octs = str(mFrom.group(1)) + '.' + str(mFrom.group(2)) + '.' + str(mFrom.group(3))
             to_3octs = str(mTo.group(1)) + '.' + str(mTo.group(2)) + '.' + str(mTo.group(3))
             if from_3octs == to_3octs:
-                if self.debug: 
-                    print "DEBUG: both ip_from and ip_to are in the same subnet!"
-                    print "DEBUG: we don't need to calculate the range"
+                # ip's in pool are in the same subnet, create a range of valid ip's addresses and put them in a list
+                if self.debug: print "DEBUG: both ip_from and ip_to are in the same subnet\nDEBUG: calculating range the 'easy' way.."
+                range_4oct = range(int(mFrom.group(4)),int(mTo.group(4)))
+                # fill range with ip's
+                rangeIP = []
+                for octet in range_4oct:
+                    rangeIP.append(from_3octs + "." + str(octet))
             else:
-                from IPy import IP
                 try:
-                    range = IP(pool_from + '-' + pool_to)
+                    rangeIP = IP(pool_from + '-' + pool_to)
                 except ValueError:
                     print "An error occured when trying to determine a valid"
                     print "network prefix for your pool. Reverting to /25"
                     print "If this is not desirable, please specify a valid"
                     print "range in %s." % self.openvpnconf
-                    range = IP(pool_from).make_net('255.255.255.128')
-                if self.debug: print "DEBUG: range is %s" % range
+                    rangeIP = IP(pool_from).make_net('255.255.255.128')
+                if self.debug: print "DEBUG: rangeIP is %s" % rangeIP
             # define list of IP-addresses
             ipList = []
-            for x in range:
+            for x in rangeIP:
                 ipList.append(x)
             # go through the individual config files to find IP-addresses
             for file in glob.glob(self.ccddir+"/*"):
@@ -415,13 +419,13 @@ class StoneVPN:
                         # the client IP is the 2nd argument ([2] is 0,1,2nd object on the line)
                         clientip = line.split()[2]
                         # remove IP from range if it exists in the list
-                        if IP(clientip) in ipList:
-                            ipList.remove(IP(clientip)) 
+                        if clientip in ipList:
+                            ipList.remove(clientip) 
                         # the server IP is the 1st argument
                         servip = line.split()[1]
                         # remove IP from range if it exists in the list
-                        if IP(servip) in ipList:
-                            ipList.remove(IP(servip))
+                        if servip in ipList:
+                            ipList.remove(servip)
             # sort list
             ipList.sort()
             # we now have a list of usable IP addresses :)
