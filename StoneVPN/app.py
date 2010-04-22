@@ -389,7 +389,8 @@ class StoneVPN:
             from_3octs = str(mFrom.group(1)) + '.' + str(mFrom.group(2)) + '.' + str(mFrom.group(3))
             to_3octs = str(mTo.group(1)) + '.' + str(mTo.group(2)) + '.' + str(mTo.group(3))
             if from_3octs == to_3octs:
-                # ip's in pool are in the same subnet, create a range of valid ip's addresses and put them in a list
+                # ip's in pool are in a /24 (or higher, thus less addresses) subnet
+                # create a range of valid ip's addresses and put them in a list
                 if self.debug: print "DEBUG: both ip_from and ip_to are in the same subnet\nDEBUG: calculating range the 'easy' way.."
                 range_4oct = range(int(mFrom.group(4)),int(mTo.group(4)))
                 # fill range with ip's
@@ -397,15 +398,29 @@ class StoneVPN:
                 for octet in range_4oct:
                     rangeIP.append(from_3octs + "." + str(octet))
             else:
+                # ip's in pool are not in a /24 subnet. calculate a valid subnet first by lowering the 4th octet
+                # in the pool_to ip until we have a valid CIDR mask.
+                # FIXME: this is just WRONG and IPy won't allow you to specify an invalid CIDR
+                # the correct solution is to manually (well, kind of) calculate the range.
+                valid = 0
                 try:
                     rangeIP = IP(pool_from + '-' + pool_to)
+                    valid = 1
                 except ValueError:
                     print "An error occured when trying to determine a valid"
-                    print "network prefix for your pool. Reverting to /25"
-                    print "If this is not desirable, please specify a valid"
-                    print "range in %s." % self.openvpnconf
-                    rangeIP = IP(pool_from).make_net('255.255.255.128')
-                if self.debug: print "DEBUG: rangeIP is %s" % rangeIP
+                    print "network prefix for your pool. I'll try to calculate"
+                    print "a valid subnet by adjusting your pool."
+                fourth_octet = int(mTo.group(4)) - 1
+                while valid is not 1:
+                    try:
+                        if self.debug: print "DEBUG: trying pool from %s to %s" % (pool_from,str(mTo.group(1)) + '.' + str(mTo.group(2)) + '.' + str(mTo.group(3)) + '.' + str(fourth_octet))
+                        rangeIP = IP('%s-%s') % (pool_from + '-' + str(mTo.group(1)) + '.' + str(mTo.group(2)) + '.' + str(mTo.group(3)) + '.' + str(fourth_octet))
+                        valid = 1
+                    except:
+                        fourth_octet = int(fourth_octet) - 1
+                        if self.debug: print "DEBUG: lowering 4th octet to %s" % str(fourth_octet)
+                        pass
+            if self.debug: print "DEBUG: rangeIP is %s" % rangeIP
             # define list of IP-addresses
             ipList = []
             for x in rangeIP:
