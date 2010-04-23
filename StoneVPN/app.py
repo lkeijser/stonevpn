@@ -398,28 +398,31 @@ class StoneVPN:
                 for octet in range_4oct:
                     rangeIP.append(from_3octs + "." + str(octet))
             else:
-                # ip's in pool are not in a /24 subnet. calculate a valid subnet first by lowering the 4th octet
-                # in the pool_to ip until we have a valid CIDR mask.
-                # FIXME: this is just WRONG and IPy won't allow you to specify an invalid CIDR
-                # the correct solution is to manually (well, kind of) calculate the range.
-                valid = 0
-                try:
-                    rangeIP = IP(pool_from + '-' + pool_to)
-                    valid = 1
-                except ValueError:
-                    print "An error occured when trying to determine a valid"
-                    print "network prefix for your pool. I'll try to calculate"
-                    print "a valid subnet by adjusting your pool."
-                fourth_octet = int(mTo.group(4)) - 1
-                while valid is not 1:
-                    try:
-                        if self.debug: print "DEBUG: trying pool from %s to %s" % (pool_from,str(mTo.group(1)) + '.' + str(mTo.group(2)) + '.' + str(mTo.group(3)) + '.' + str(fourth_octet))
-                        rangeIP = IP('%s-%s') % (pool_from + '-' + str(mTo.group(1)) + '.' + str(mTo.group(2)) + '.' + str(mTo.group(3)) + '.' + str(fourth_octet))
-                        valid = 1
-                    except:
-                        fourth_octet = int(fourth_octet) - 1
-                        if self.debug: print "DEBUG: lowering 4th octet to %s" % str(fourth_octet)
-                        pass
+                rangeIP = []
+                # ip's in pool are not in a /24 subnet
+                # we'll have to manually (well, kind of) calculate the range.
+                range_3oct = range(int(mFrom.group(3)),int(mTo.group(3)))
+                # append last octet since range() doesn't do that
+                range_3oct.append(int(mTo.group(3)))
+                if self.debug: print "DEBUG: range_3oct is %s" % range_3oct
+                # the first element in the range is the starting octet and thus
+                # we should look at the 4th octet now to determine the starting point
+                for octet in range(int(mFrom.group(4)),255):
+                    # fill rangeIP with valid ip's
+                    rangeIP.append(from_3octs + "." + str(octet))
+                # now remove the first octet from the range
+                if self.debug: print "DEBUG: remove %s from %s" % (mFrom.group(3),range_3oct)
+                range_3oct.remove(int(mFrom.group(3)))
+                if self.debug: print "DEBUG: range_3oct is now %s" % range_3oct
+                # now iterate over the rest, until we get to the last (3rd) octet
+                for octet_3 in range_3oct:
+                    if int(octet_3) != int(mTo.group(3)):
+                        for octet in range(1,255):
+                            rangeIP.append(mFrom.group(1) + '.' + mFrom.group(2) + '.' + str(octet_3) + '.' + str(octet))
+                    else:
+                        # this is the last (3rd) octet so only fill the list until the 4th octet of pool_to
+                        for octet in range(1,int(mTo.group(4))):
+                            rangeIP.append(mFrom.group(1) + '.' + mFrom.group(2) + '.' + str(mTo.group(3)) + '.' + str(octet))
             if self.debug: print "DEBUG: rangeIP is %s" % rangeIP
             # define list of IP-addresses
             ipList = []
@@ -445,8 +448,16 @@ class StoneVPN:
             ipList.sort()
             # we now have a list of usable IP addresses :)
             # find 2 free IP-addresses:
-            firstFree = ipList[0]
-            secondFree = ipList[1]
+            try:
+                firstFree = ipList[0]
+            except IndexError:
+                print "Error: no free IP address left in pool!"
+                sys.exit()
+            try:
+                secondFree = ipList[1]
+            except IndexError:
+                print "Error: no free IP address left in pool!"
+                sys.exit()
             print "First free address: %s (local)" % firstFree
             print "Second free address: %s (peer)" % secondFree
             # check if ccd dir exists:
