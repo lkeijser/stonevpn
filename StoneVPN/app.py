@@ -20,14 +20,18 @@
 
 """
 
-import os, sys, shutil, string
 from OpenSSL import SSL, crypto
 from optparse import OptionParser, OptionGroup
 from configobj import ConfigObj
 from time import strftime
 from datetime import datetime, timedelta
-import re
+from IPy import IP
 from StoneVPN import STONEVPN_VERSION
+import os
+import sys
+import shutil
+import string
+import re
 
 
 def main():
@@ -360,7 +364,6 @@ class StoneVPN:
         # Find free IP-address by parsing config files (usually in /etc/openvpn/ccd/*)
         # :: called only when option '-i' is used ::
         if self.freeip:
-            from IPy import IP
             if self.fname is None:
                 print "Error: required option -f/--file is missing."
                 sys.exit()
@@ -517,7 +520,6 @@ class StoneVPN:
             if self.cname is None:
                 print "Error: required option -n/--name is missing."
                 sys.exit()
-            from IPy import IP
             IP.check_addr_prefixlen = False
             nospaces_cname =  self.cname.replace(' ', '_')
             clientfile = self.ccddir + "/" + nospaces_cname
@@ -1076,5 +1078,3 @@ class StoneVPN:
         smtp = smtplib.SMTP(self.mail_server)
         smtp.sendmail(send_from, send_to, msg.as_string())
         smtp.close()
-
-
