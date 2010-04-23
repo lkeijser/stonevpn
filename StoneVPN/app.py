@@ -28,11 +28,10 @@ from time import strftime
 from datetime import datetime, timedelta
 import re
 
+stonevpnver = '0.4.8beta5'
+stonevpnconf = '/etc/stonevpn.conf'
 
 def main():
-    stonevpnver = '0.4.8beta4'
-    stonevpnconf = '/etc/stonevpn.conf'
-
     # Read main configuration from stonevpn.conf
     if os.path.exists(stonevpnconf):
         config = ConfigObj(stonevpnconf)
