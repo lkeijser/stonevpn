@@ -2,7 +2,7 @@
 
  StoneVPN - Easy OpenVPN certificate and configuration management
 
- (C) 2009 by L.S. Keijser, <keijser@stone-it.com>
+ (C) 2009,2010 by L.S. Keijser, <keijser@stone-it.com>
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -20,18 +20,33 @@
 
 """
 
+import smtplib
+import zipfile
+import glob
+import os
+import sys
+import shutil
+import string
+import re
+import commands
+import fileinput
+import getpass
+import time
 from OpenSSL import SSL, crypto
 from optparse import OptionParser, OptionGroup
 from configobj import ConfigObj
 from time import strftime
 from datetime import datetime, timedelta
 from IPy import IP
+from string import atoi
+from time import strftime
+from datetime import datetime
+from email.MIMEMultipart import MIMEMultipart
+from email.MIMEBase import MIMEBase
+from email.MIMEText import MIMEText
+from email.Utils import formatdate
+from email import Encoders
 from StoneVPN import STONEVPN_VERSION
-import os
-import sys
-import shutil
-import string
-import re
 
 
 def main():
@@ -229,7 +244,6 @@ def main():
         parser.error("Error: you have to specify a filename (FNAME)")
     else:
         # must..have..root..
-        import commands
         myId = commands.getstatusoutput('id -u')[1]
         if not myId == '0':
             print "Sorry, root privileges required for this action."
@@ -347,8 +361,6 @@ class StoneVPN:
             if self.fname is None or self.cname is None:
                 print "Error: required option -f/--file and/or -n/--name is missing."
                 sys.exit()
-            import zipfile
-            import glob
             print "Adding all files to " + self.working + "/" + self.fprefix + self.fname + ".zip"
             z = zipfile.ZipFile(self.working + "/" + self.fprefix + self.fname + ".zip", "w")
             for name in glob.glob(self.working + "/" + self.fprefix + self.fname + ".*"):
@@ -372,7 +384,6 @@ class StoneVPN:
             if not os.path.exists(self.openvpnconf):
                 print "Error: OpenVPN server configuration file was not found at %s" % self.openvpnconf
                 sys.exit()
-            import glob, fileinput, string
             # parse config file in search for ifconfig-pool
             for line in fileinput.input(self.openvpnconf):
                 if line.split()[0] == 'ifconfig-pool':
@@ -509,7 +520,6 @@ class StoneVPN:
                 self.send_mail(self.mail_from, mail_to, 'StoneVPN: generated files for ' + str(self.cname), self.mail_msg, mail_attachment)
             else:
                 # Generate a list of filenames to include as attachments
-                import glob
                 for name in glob.glob(self.working + "/" + self.fprefix + self.fname + ".*"):
                     mail_attachment.append(name)
                 # Also include the CA certificate
@@ -658,7 +668,6 @@ class StoneVPN:
         # Add the Extension to the certificate
         cert.add_extensions(extensions)
         # Create a valid hexidecimal serial number
-        from string import atoi
         goodserial = atoi(str(serial), 16)
         cert.set_serial_number(goodserial)
         if self.debug: print "DEBUG: notBefore is %s, notAfter is %s" % (notBefore,notAfter)
@@ -677,7 +686,6 @@ class StoneVPN:
 
     # Passphrase
     def getPass(self):
-        import getpass
         passA = getpass.getpass('Enter passphrase for private key: ')
         passB = getpass.getpass('Enter passphrase for private key (again): ')
         if passA == passB:
@@ -836,7 +844,6 @@ class StoneVPN:
 
     # Make config files for OpenVPN
     def makeConfs(self, sname, fname):
-        import string
         config = ConfigObj(self.stonevpnconf)
         # Generate appropriate (according to specified OS) configuration for OpenVPN
         if sname == 'unix' or sname == 'linux':
@@ -874,8 +881,6 @@ class StoneVPN:
         if not os.path.exists(self.crlfile):
             print "Error: CRL file not found at: " + self.crlfile + " or insufficient rights."
             sys.exit()
-        from time import strftime
-	from datetime import datetime
 	try:
         	crl = crypto.CRL()
 	except:
@@ -952,7 +957,6 @@ class StoneVPN:
         print "New index written to: %s. Backup created as: %s." % (indexdb,indexdb + '.old')
 
     def displayCRL(self):
-        import time
         if not os.path.exists(self.crlfile):
             print "Error: CRL file not found at %s" % self.crlfile
             print "You can create one with: stonevpn --newcrl"
@@ -1042,13 +1046,6 @@ class StoneVPN:
 
 
     def send_mail(self, send_from, send_to, subject, text, attachment=[]):
-        import smtplib
-        import os
-        from email.MIMEMultipart import MIMEMultipart
-        from email.MIMEBase import MIMEBase
-        from email.MIMEText import MIMEText
-        from email.Utils import formatdate
-        from email import Encoders
         print "Generating e-mail"
         msg = MIMEMultipart()
         msg['From'] = send_from
