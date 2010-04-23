@@ -27,11 +27,12 @@ from configobj import ConfigObj
 from time import strftime
 from datetime import datetime, timedelta
 import re
+from StoneVPN import STONEVPN_VERSION
 
-stonevpnver = '0.4.8beta5'
-stonevpnconf = '/etc/stonevpn.conf'
 
 def main():
+    stonevpnconf = '/etc/stonevpn.conf'
+    stonevpnver = STONEVPN_VERSION
     # Read main configuration from stonevpn.conf
     if os.path.exists(stonevpnconf):
         config = ConfigObj(stonevpnconf)
@@ -560,7 +561,7 @@ class StoneVPN:
                 # only write routes if we didn't skip overwriting/appending earlier
                 if nowwhat != 1:
                     print "Adding route %s / %s" % (route[0],route[1])
-                    f.write("push route \"" + route[0] + " " + route[1] + "\"\n")
+                    f.write("push \"route " + route[0] + " " + route[1] + "\"\n")
                 f.close()
             if nowwhat != 1:
                 print "Wrote extra route(s) to " + self.ccddir + "/" + nospaces_cname

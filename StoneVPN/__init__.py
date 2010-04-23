@@ -1,2 +1,1 @@
-from app import stonevpnver
-STONEVPN_VERSION = stonevpnver
+STONEVPN_VERSION = '0.4.8beta5'
