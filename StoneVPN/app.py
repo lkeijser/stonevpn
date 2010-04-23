@@ -112,10 +112,10 @@ def main():
         type="string",
         dest="emailaddress",
         help="Send all generated files to EMAILADDRESS")
-    group_test.add_option("-i", "--free-ip",
+    group_extra.add_option("-i", "--free-ip",
         action="store_true",
         dest="freeip", 
-        help="locate and assign free ip (EXPERIMENTAL)")
+        help="locate and assign free ip")
     group_extra.add_option("-p", "--passphrase",
         action="store_true",
         dest="passphrase",

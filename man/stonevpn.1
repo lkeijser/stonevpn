@@ -46,7 +46,7 @@ Package all generated files into a ZIP file.
 Send all generated files by e-mail to \fIEMAILADDRESS\fR. You might want to encrypt the user's key with a password when using this method.
 .TP
 .BI -i \fR, \fB\-\^\-free-ip
-Locate and assign free ip by parsing the OpenVPN server configuration file, and (if present) client configuration files within the ccd directory (EXPERIMENTAL)
+Locate and assign free ip by parsing the OpenVPN server configuration file (more specifically the 'ifconfig-pool' line), and client configuration files within the ccd directory.
 .TP
 .BI -p \fR, \fB\-\^\-passphrase
 Prompt for passphrase when generating the user's private key
