@@ -1,6 +1,5 @@
 BUGS:
 - don't update indexdb if cert can't be generated (due to missing X509Ext method in pyOpenSSL for example)
-- crash when selecting anything other than unix|windows (
 - also ask for overwrite clientfile if looking for freeip
 - when calculating freeip: don't parse clientfile itself if it exists
 
