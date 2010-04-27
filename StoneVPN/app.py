@@ -39,7 +39,6 @@ from time import strftime
 from datetime import datetime, timedelta
 from IPy import IP
 from string import atoi
-from time import strftime
 from datetime import datetime
 from email.MIMEMultipart import MIMEMultipart
 from email.MIMEBase import MIMEBase
