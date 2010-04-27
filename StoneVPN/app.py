@@ -673,9 +673,9 @@ class StoneVPN:
         if self.debug: print "DEBUG: notBefore is %s, notAfter is %s" % (notBefore,notAfter)
         #cert.gmtime_adj_notBefore(notBefore)
         #cert.gmtime_adj_notAfter(notAfter)
-        now = datetime.now().strftime("%Y%m%d%H%M%SZ")
+        now = datetime.utcnow().strftime("%Y%m%d%H%M%SZ")
         if self.debug: print "DEBUG: days is %s" % timedelta(seconds=notAfter)
-        expire = (datetime.now() + timedelta(seconds=notAfter)).strftime("%Y%m%d%H%M%SZ")
+        expire = (datetime.utcnow() + timedelta(seconds=notAfter)).strftime("%Y%m%d%H%M%SZ")
         cert.set_notBefore(now)
         cert.set_notAfter(expire)
         cert.set_issuer(issuerCert.get_subject())
@@ -778,7 +778,7 @@ class StoneVPN:
             print "Error opening CA key file"
             sys.exit()
         curSerial = self.readSerial()
-        timeNow = datetime.now()
+        timeNow = datetime.utcnow()
         # We can't work with hex integers. Convert them to dec first
         newSerial = self.hex2dec(curSerial) + 1
         newSerialDec = newSerial
@@ -938,7 +938,7 @@ class StoneVPN:
         print "Adding new revoked certificate to CRL with date " + crlTime + " and serial " + serial
         t.close()
         revoked = crypto.Revoked()
-        now = datetime.now().strftime("%Y%m%d%H%M%SZ")
+        now = datetime.utcnow().strftime("%Y%m%d%H%M%SZ")
         revoked.set_rev_date(now)
         revoked.set_serial(serial)
         #no reason needed?
