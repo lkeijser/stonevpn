@@ -20,18 +20,18 @@
 
 """
 
-import smtplib
-import zipfile
-import glob
-import os
-import sys
-import shutil
-import string
-import re
 import commands
 import fileinput
 import getpass
+import glob
+import os
+import re
+import shutil
+import smtplib
+import string
+import sys
 import time
+import zipfile
 from OpenSSL import SSL, crypto
 from optparse import OptionParser, OptionGroup
 from configobj import ConfigObj
