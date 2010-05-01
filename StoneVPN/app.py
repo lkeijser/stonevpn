@@ -777,7 +777,10 @@ class StoneVPN:
             print "Error opening CA key file"
             sys.exit()
         curSerial = self.readSerial()
+        # format current time as UTC, for certificate
         timeNow = datetime.utcnow()
+        # format current time as local, for indexdb
+        timeNowIdx = datetime.now()
         # We can't work with hex integers. Convert them to dec first
         newSerial = self.hex2dec(curSerial) + 1
         newSerialDec = newSerial
@@ -803,18 +806,22 @@ class StoneVPN:
             elif unit in ('h', 'H'):
                 cert = self.createCertificate(req, (cacert, cakey), newSerial, (0, 60 * 60 * int(exp_time)))
                 expDate = timeNow + timedelta(hours=int(exp_time))
+                expDateIdx = timeNowIdx + timedelta(hours=int(exp_time))
                 print "Certificate is valid for %s hour(s)." % exp_time
             elif unit in ('d', 'D'):
                 cert = self.createCertificate(req, (cacert, cakey), newSerial, (0, 24 * 60 * 60 * int(exp_time)))
                 expDate = timeNow + timedelta(days=int(exp_time))
+                expDateIdx = timeNowIdx + timedelta(days=int(exp_time))
                 print "Certificate is valid for %s day(s)." % exp_time
             elif unit in ('y', 'Y'):
                 cert = self.createCertificate(req, (cacert, cakey), newSerial, (0, 24 * 60 * 60 * 365 * int(exp_time)))
                 expDate = timeNow + timedelta(days=int(exp_time) * 365)
+                expDateIdx = timeNowIdx + timedelta(days=int(exp_time) * 365)
                 print "Certificate is valid for %s year(s)." % exp_time
         else:
             cert = self.createCertificate(req, (cacert, cakey), newSerial, (0, 24 * 60 * 60 * int(defaultDays)))
             expDate = timeNow + timedelta(days=int(defaultDays))
+            expDateIdx = timeNowIdx + timedelta(days=int(defaultDays))
             print "Certificate is valid for %s day(s)." % defaultDays
         self.save_key ( self.working + '/' + self.fprefix + fname + '.key', pkey )
         self.save_cert ( self.working + '/' + self.fprefix + fname + '.crt', cert )
@@ -835,7 +842,7 @@ class StoneVPN:
         # convert cname: spaces to underscores for inclusion in indexdb
         nospaces_cname =  cname.replace(' ', '_')
         # the expire date for the index file needs some conversion
-        indexDate = expDate.strftime("%y%m%d%H%M%S")
+        indexDate = expDateIdx.strftime("%y%m%d%H%M%S")
         if self.debug: print "DEBUG: indexDate is %s" % indexDate
         # Format index line and write to OpenSSL index file
         index = 'V\t' + str(indexDate) + 'Z\t' + str(serialNumber) + '\tunknown\t' + '/C=' + str(countryName) + '/ST=' + str(stateOrProvinceName) + '/O=' + str(organizationName) + '/OU=' + str(organizationalUnitName) + '/CN=' + str(nospaces_cname) + '/emailAddress=' + str(fname) + '@local\n'
