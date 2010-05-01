@@ -835,8 +835,7 @@ class StoneVPN:
         # convert cname: spaces to underscores for inclusion in indexdb
         nospaces_cname =  cname.replace(' ', '_')
         # the expire date for the index file needs some conversion
-        # also change back from utc -> local
-        indexDate = expDate.now().strftime("%y%m%d%H%M%S")
+        indexDate = expDate.strftime("%y%m%d%H%M%S")
         if self.debug: print "DEBUG: indexDate is %s" % indexDate
         # Format index line and write to OpenSSL index file
         index = 'V\t' + str(indexDate) + 'Z\t' + str(serialNumber) + '\tunknown\t' + '/C=' + str(countryName) + '/ST=' + str(stateOrProvinceName) + '/O=' + str(organizationName) + '/OU=' + str(organizationalUnitName) + '/CN=' + str(nospaces_cname) + '/emailAddress=' + str(fname) + '@local\n'
