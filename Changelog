@@ -1,4 +1,4 @@
-2010-0?-??	Léon Keijser	<keijser@stone-it.com> 0.4.8beta6
+2010-0?-??	Léon Keijser	<keijser@stone-it.com> 0.4.8beta7
 	* Added: client template for Mac (OSX) - UNTESTED
 	* Added: now accepts adding multiple routes to clientfile
 	* Added: debug option (mainly for my own benefit)
@@ -11,7 +11,7 @@
 	a broader netmask than /24 (or higher).
 	* Fixed: crash when providing empty prefix
 	* Changed: small cosmetic changes
-	* Changed: version 0.4.8beta6 (won't release officially)
+	* Changed: version 0.4.8beta7 (won't release officially)
 
 2010-03-12	Léon Keijser	<keijser@stone-it.com> 0.4.7
 	* Fixed: certificates were generated with an incorrect
