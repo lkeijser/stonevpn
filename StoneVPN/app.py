@@ -108,7 +108,7 @@ def main():
         action="store",
         type="string",
         dest="cname",
-        help="Common Name, use quotes eg.: \"CNAME\"")
+        help="Common Name, use quotes eg.: \"CNAME\" and only alphanumeric characters")
     group_general.add_option("-f", "--file",
         dest="fname",
         help="write to file FNAME (no extension!)")
@@ -130,7 +130,7 @@ def main():
         action="store",
         type="string",
         dest="emailaddress",
-        help="Send all generated files to EMAILADDRESS")
+        help="send all generated files to EMAILADDRESS")
     group_extra.add_option("-i", "--free-ip",
         action="store_true",
         dest="freeip", 
@@ -146,7 +146,7 @@ def main():
     group_extra.add_option("-u", "--route",
         action="append",
         dest="route",
-        help="Push extra route(s) to client. Specify multiple routes as: -u 192.168.1.1/32 -u 10.1.4.0/24") 
+        help="push extra route(s) to client. Specify multiple routes as: -u 192.168.1.1/32 -u 10.1.4.0/24") 
     group_crl.add_option("-l", "--listrevoked",
         action="store_true",
         dest="listrevoked",
@@ -162,15 +162,15 @@ def main():
     group_info.add_option("-s", "--showserial",
         action="store_true",
         dest="showserial",
-        help="Display current SSL serial number")
+        help="display current SSL serial number")
     group_info.add_option("-c", "--printcert",
         action="store",
         dest="printcert",
-        help="Prints information about a certficiate file")
+        help="prints information about a certficiate file")
     group_info.add_option("-d", "--printindex",
         action="store_true",
         dest="printindex",
-        help="Prints index file")
+        help="prints index file")
     group_extra.add_option("-x", "--expire",
         action="store",
         dest="expiredate",
@@ -178,7 +178,7 @@ def main():
     group_crl.add_option("-N", "--newcrl",
         action="store_true",
         dest="emptycrl",
-        help="Create an empty CRL file (or overwrite an existing one)")
+        help="create an empty CRL file (or overwrite an existing one)")
     group_test.add_option("-t", "--test",
         action="store",
         dest="test",
