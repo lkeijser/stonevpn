@@ -286,28 +286,28 @@ class StoneVPN:
         # Check if certain sections in OpenSSL configfile are present, report if they're not
         try:
             countryName = section['countryName_default']
-        except KeyError:
-            print "KeyError: missing section 'countryName_default' in " + self.opensslconf
+        except KeyError as e:
+            print "KeyError: missing section %s in %s" % (e,self.opensslconf)
             sys.exit()
         try:
             stateOrProvinceName = section['stateOrProvinceName_default']
-        except KeyError:
-            print "KeyError: missing section 'stateOrProvinceName_default' in " + self.opensslconf
+        except KeyError as e:
+            print "KeyError: missing section '%s' in %s" % (e,self.opensslconf)
             sys.exit()
         try:
             localityName = section['localityName_default']
-        except KeyError:
-            print "KeyError: missing section 'localityName_default' in " + self.opensslconf
+        except KeyError as e:
+            print "KeyError: missing section '%s' in %s" % (e,self.opensslconf)
             sys.exit()
         try:
             organizationName = section['0.organizationName_default']
-        except KeyError:
-            print "KeyError: missing section '0.organizationName_default' in " + self.opensslconf
+        except KeyError as e:
+            print "KeyError: missing section '%s' in %s" % (e,self.opensslconf)
             sys.exit()
         try:
             organizationalUnitName = section['organizationalUnitName_default']
-        except KeyError:
-            print "KeyError: missing section 'organizationalUnitName_default' in " + self.opensslconf
+        except KeyError as e:
+            print "KeyError: missing section '%s' in %s" % (e,self.opensslconf)
             sys.exit()
         sectionname = 'CA_default'
         section=config[sectionname]
