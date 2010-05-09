@@ -56,8 +56,8 @@ After this is done, StoneVPN should work with CRL.
 
 
 = RPM =
-StoneVPN is now included in EPEL, Fedora 11, 12 and rawhide, so following
-instructions are only for those who are on different distro's:
+StoneVPN is now included in EPEL and so following instructions are only 
+for those who use different distro's:
 
 I've included a SPEC file so you can build an RPM yourself. To
 do this i assume you have a working rpmbuild environment and have
