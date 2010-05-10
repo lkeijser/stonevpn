@@ -1,3 +1,6 @@
+2010-05-10	Léon Keijser	<keijser@stone-it.com> 0.4.8.1
+	* Fixed: incorrect exception handling on python < 2.6
+
 2010-05-06	Léon Keijser	<keijser@stone-it.com> 0.4.8
 	* Added: client template for Mac (OSX) - UNTESTED
 	* Added: now accepts adding multiple routes to clientfile
