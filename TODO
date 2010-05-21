@@ -5,7 +5,6 @@ BUGS:
 - when calculating freeip: don't parse clientfile itself if it exists
 
 NICETOHAVES (in order of priority, first is higher):
-- create all sets of configuration files (unix/windows) for 1 client
 - ability to include custom documentation in zipfile and/or attached to mail
 - option to PGP encrypt e-mail
 - option to use a different configuration file (defaults to /etc/stonevpn.conf)
