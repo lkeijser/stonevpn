@@ -116,7 +116,7 @@ def main():
         action="store",
         dest="confs",
         default="unix",
-        help="create config files for [windows|unix|mac]")
+        help="create config files for [windows|unix|mac|all]")
     group_extra.add_option("-e", "--prefix",
         action="store",
         dest="fprefix",
@@ -864,23 +864,55 @@ class StoneVPN:
             sectionname = 'mac conf'
             print "Generating Mac configuration file"
             f=open(self.working + '/' + self.fprefix + fname + '.conf', 'w')
+        elif sname == 'all':
+            print "Generating all configuration files"
         else:
-            print "Incorrect OS type specified. Valid options are 'unix', 'windows' or 'mac'."
+            print "Incorrect OS type specified. Valid options are 'unix', 'windows', 'mac' or 'all'."
             sys.exit()
-        section=config[sectionname]
-        # Go over each entry (variable) and write it to the OpenVPN configuration file
-        for var in section:
-            # Fill in correct path to generated cert/key/cacert files
-            if var == 'ca':
-                cacertfilenopath = self.cacertfile.split('/')[int(len(self.cacertfile.split('/')) - 1)]
-                f.write(section[var].replace('cacertfile', cacertfilenopath) + '\n')
-            elif var == 'cert':
-                f.write(section[var].replace('clientcertfile', self.fprefix + fname + '.crt') + '\n')
-            elif var == 'key':
-                f.write(section[var].replace('clientkeyfile', self.fprefix + fname + '.key') + '\n')
-            else:
-                f.write(section[var] + '\n')
-        f.close()
+        if sname != 'all':
+            section=config[sectionname]
+            # Go over each entry (variable) and write it to the OpenVPN configuration file
+            for var in section:
+                # Fill in correct path to generated cert/key/cacert files
+                if var == 'ca':
+                    cacertfilenopath = self.cacertfile.split('/')[int(len(self.cacertfile.split('/')) - 1)]
+                    f.write(section[var].replace('cacertfile', cacertfilenopath) + '\n')
+                elif var == 'cert':
+                    f.write(section[var].replace('clientcertfile', self.fprefix + fname + '.crt') + '\n')
+                elif var == 'key':
+                    f.write(section[var].replace('clientkeyfile', self.fprefix + fname + '.key') + '\n')
+                else:
+                    f.write(section[var] + '\n')
+            f.close()
+        else:
+            os_versions = ["windows", "linux", "mac"]
+            for os_type in os_versions:
+                # soort extensie ipv deze regel <<
+                if os_type == 'linux':
+                    sectionname = 'unix conf'
+                    print "Generating Linux configuration file"
+                    f=open(self.working + '/' + self.fprefix + fname + '.linux.conf', 'w')
+                elif os_type == 'windows':
+                    sectionname = 'windows conf'
+                    print "Generating Windows configuration file"
+                    f=open(self.working + '/' + self.fprefix + fname + '.windows.ovpn', 'w')
+                elif os_type == 'mac':
+                    sectionname = 'mac conf'
+                    print "Generating Mac configuration file"
+                    f=open(self.working + '/' + self.fprefix + fname + '.mac.conf', 'w')
+                section=config[sectionname]
+                for var in section:
+                    if var == 'ca':
+                        cacertfilenopath = self.cacertfile.split('/')[int(len(self.cacertfile.split('/')) - 1)]
+                        f.write(section[var].replace('cacertfile', cacertfilenopath) + '\n')
+                    elif var == 'cert':
+                        f.write(section[var].replace('clientcertfile', self.fprefix + fname + '.crt') + '\n')
+                    elif var == 'key':
+                        f.write(section[var].replace('clientkeyfile', self.fprefix + fname + '.key') + '\n')
+                    else:
+                        f.write(section[var] + '\n')
+                f.close()
+
 
     # Revoke certificate
     def revokeCert(self, serial):
