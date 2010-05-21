@@ -1,3 +1,7 @@
+2010-XX-XX	Léon Keijser	<keijser@stone-it.com> 0.4.9beta1
+	* Fixed: corrected Mac template after testing
+	* Changed: version 0.4.9beta1 (won't release officially)
+
 2010-05-10	Léon Keijser	<keijser@stone-it.com> 0.4.8.1
 	* Fixed: incorrect exception handling on python < 2.6
 
