@@ -286,26 +286,41 @@ class StoneVPN:
         # Check if certain sections in OpenSSL configfile are present, report if they're not
         try:
             countryName = section['countryName_default']
+            if len(countryName) is 0: 
+                print "Error: countryName_default is empty. Please edit %s first." % self.opensslconf
+                sys.exit()
         except KeyError:
             print "KeyError: missing section 'countryName_default' in " + self.opensslconf
             sys.exit()
         try:
             stateOrProvinceName = section['stateOrProvinceName_default']
+            if len(stateOrProvinceName) is 0: 
+                print "Error: stateOrProvinceName_default is empty. Please edit %s first." % self.opensslconf
+                sys.exit()
         except KeyError:
             print "KeyError: missing section 'stateOrProvinceName_default' in " + self.opensslconf
             sys.exit()
         try:
             localityName = section['localityName_default']
+            if len(localityName) is 0: 
+                print "Error: localityName_default is empty. Please edit %s first." % self.opensslconf
+                sys.exit()
         except KeyError:
             print "KeyError: missing section 'localityName_default' in " + self.opensslconf
             sys.exit()
         try:
             organizationName = section['0.organizationName_default']
+            if len(organizationName) is 0: 
+                print "Error: 0.organizationName_default is empty. Please edit %s first." % self.opensslconf
+                sys.exit()
         except KeyError:
             print "KeyError: missing section '0.organizationName_default' in " + self.opensslconf
             sys.exit()
         try:
             organizationalUnitName = section['organizationalUnitName_default']
+            if len(organizationalUnitName) is 0: 
+                print "Error: organizationalUnitName_default is empty. Please edit %s first." % self.opensslconf
+                sys.exit()
         except KeyError:
             print "KeyError: missing section 'organizationalUnitName_default' in " + self.opensslconf
             sys.exit()
