@@ -1,6 +1,6 @@
 2010-XX-XX	Léon Keijser	<keijser@stone-it.com> 0.4.9beta1
-	* Added: generate configfiles for all OS's at once
-	* Fixed: check for empty vars in openssl configfile
+	* Added: option to generate configfiles for all OS's at once
+	* Fixed: check for empty variables in openssl configfile
 	* Fixed: corrected Mac template after testing
 	* Changed: version 0.4.9beta1 (won't release officially)
 
