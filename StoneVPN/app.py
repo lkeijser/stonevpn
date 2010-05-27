@@ -99,6 +99,20 @@ def main():
     group_test = OptionGroup(parser, "Test/experimental options",
             "Caution: use these options with care.")
 
+    # define special case for action with optional argument
+    def optional_arg(arg_default):
+        def check_value(option,opt_str,value,parser):
+            # check for remaining args. these shouldn't start with a '-'
+            if parser.rargs and not parser.rargs[0].startswith('-'):
+                val=parser.rargs[0]
+                parser.rargs.pop(0)
+            else:
+                # return the default value for the argument
+                val=arg_default
+            # remove the argument from the list and return the remaining args back to parser
+            setattr(parser.values,option.dest,val)
+        return check_value
+
     # populate groups
     parser.add_option("-D", "--debug",
         action="count", 
@@ -136,7 +150,8 @@ def main():
         dest="freeip", 
         help="locate and assign free ip")
     group_extra.add_option("-p", "--passphrase",
-        action="store_true",
+        action="callback",
+        callback=optional_arg('please_prompt_me'),
         dest="passphrase",
         help="prompt for passphrase when generating private key")
     group_crl.add_option("-r", "--revoke",
@@ -717,13 +732,19 @@ class StoneVPN:
     def save_key (self, fn, key):
         # Adding passphrase to private key
         if self.passphrase:
-            keyPass = self.getPass()
-            if keyPass is "password_error":
-                # Don't write keyfile if supplied passwords mismatch
-                sys.exit()
+            if self.passphrase == 'please_prompt_me':
+                keyPass = self.getPass()
+                if keyPass is "password_error":
+                    # Don't write keyfile if supplied passwords mismatch
+                    sys.exit()
+                else:
+                    fp = open ( fn, 'w' )
+                    fp.write ( crypto.dump_privatekey ( self.FILETYPE, key, self.ciphermethod, keyPass ) )
+                    if self.debug: print "DEBUG: private key encrypted with passphrase: '%s'" % keyPass
             else:
                 fp = open ( fn, 'w' )
-                fp.write ( crypto.dump_privatekey ( self.FILETYPE, key, self.ciphermethod, keyPass ) )
+                fp.write ( crypto.dump_privatekey ( self.FILETYPE, key, self.ciphermethod, self.passphrase ) )
+                if self.debug: print "DEBUG: private key encrypted with passphrase: '%s'" % self.passphrase
         else:
             fp = open ( fn, 'w' )
             fp.write ( crypto.dump_privatekey ( self.FILETYPE, key ) )
