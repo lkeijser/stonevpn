@@ -3,7 +3,8 @@ BUGS:
 - also ask for overwrite clientfile if looking for freeip
 - when calculating freeip: don't parse clientfile itself if it exists
 
-NICETOHAVES (in order of priority, first is higher):
+NICETOHAVES:
+- encrypt private keys with a password without prompting for it (RFE by Shayne <shayne [dot] mcc [at] gmail [dot] com>
 - ability to include custom documentation in zipfile and/or attached to mail
 - option to PGP encrypt e-mail
 - option to use a different configuration file (defaults to /etc/stonevpn.conf)
