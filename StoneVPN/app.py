@@ -153,7 +153,7 @@ def main():
         action="callback",
         callback=optional_arg('please_prompt_me'),
         dest="passphrase",
-        help="prompt for passphrase when generating private key")
+        help="prompt for a passphrase when generating private key, or supply one on the commandline")
     group_crl.add_option("-r", "--revoke",
         action="store",
         dest="serial",

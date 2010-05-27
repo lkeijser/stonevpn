@@ -34,7 +34,9 @@ Common Name, use quotes eg.: "John Cleese"
 Write to file FNAME (no extension!)
 .TP
 .BI -o " CONFS" "\fR,\fP \-\^\-config=" CONFS
-Create config files for \fB[ \fIwindows\fR | \fIunix\fB ]
+Create config files for \fB[ \fIwindows\fR | \fIunix\fB |  \fImac\fB | \fIall\fB ] \fR
+
+When supplying \fIall\fR StoneVPN will generate configuration files for all three Operating Systems. 
 .TP
 .BI -e " FPREFIX" "\fR,\fP \-\^\-prefix=" FPREFIX
 Prefix (almost all) generated files. For example, if you set FPREFIX to 'mycorp', generated files will look like 'mycorp-user.crt/zip/key'
@@ -49,7 +51,10 @@ Send all generated files by e-mail to \fIEMAILADDRESS\fR. You might want to encr
 Locate and assign free ip by parsing the OpenVPN server configuration file (more specifically the 'ifconfig-pool' line), and client configuration files within the ccd directory.
 .TP
 .BI -p \fR, \fB\-\^\-passphrase
-Prompt for passphrase when generating the user's private key
+Prompt for a passphrase when generating the user's private key. Leave empty to provide one on the commandline. For example:
+
+  stonevpn -f user -n "User Name" -p mysecret
+
 .TP
 .BI -r " SERIAL" "\fR,\fP \-\^\-revoke=" SERIAL
 Revoke certificate with serial SERIAL
