@@ -4,7 +4,6 @@ BUGS:
 - when calculating freeip: don't parse clientfile itself if it exists
 
 NICETOHAVES:
-- be able to set the server IP in the commandline switch
 - option to PGP encrypt e-mail
 - option to use a different configuration file (defaults to /etc/stonevpn.conf)
 - have CRL patches be included in upstream :)
