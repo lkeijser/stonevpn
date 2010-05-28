@@ -1,8 +1,10 @@
-2010-XX-XX	Léon Keijser	<keijser@stone-it.com> 0.4.9beta1
+2010-XX-XX	Léon Keijser	<keijser@stone-it.com> 0.4.9beta2
 	* Added: option to generate configfiles for all OS's at once
+	* Added: option to include extra files (eg. documentation
 	* Fixed: check for empty variables in openssl configfile
 	* Fixed: corrected Mac template after testing
-	* Changed: version 0.4.9beta1 (won't release officially)
+	* Changed: passphrase can now be specified on the cmdline
+	* Changed: version 0.4.9beta2 (won't release officially)
 
 2010-05-10	Léon Keijser	<keijser@stone-it.com> 0.4.8.1
 	* Fixed: incorrect exception handling on python < 2.6

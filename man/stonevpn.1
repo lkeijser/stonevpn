@@ -1,4 +1,4 @@
-.TH STONEVPN 1 "April 2010" "" "StoneVPN User Manual"
+.TH STONEVPN 1 "May 2010" "" "StoneVPN User Manual"
 .SH NAME
 stonevpn \- Easy OpenVPN certificate and configuration management
 
@@ -54,7 +54,12 @@ Locate and assign free ip by parsing the OpenVPN server configuration file (more
 Prompt for a passphrase when generating the user's private key. Leave empty to provide one on the commandline. For example:
 
   stonevpn -f user -n "User Name" -p mysecret
+.TP
+.BI -E \fR, \fB\-\^\-extrafile
+Include extra files when generating a certificate. When also specifying the \fB\-\^\-zip\fR option, these will be packed in the zip file. Else, they will remain in a subdirectory of the working directory, based on the given FNAME. Use the full path to the filename to be included.
+You can use this option multiple times:
 
+  stonevpn -f user -n "User Name" -E /path/to/file1 -E /path/to/file2
 .TP
 .BI -r " SERIAL" "\fR,\fP \-\^\-revoke=" SERIAL
 Revoke certificate with serial SERIAL
@@ -62,7 +67,7 @@ Revoke certificate with serial SERIAL
 .BI -u " ROUTE" "\fR,\fP \-\^\-route=" ROUTE
 Push extra route(s) to client by means of a client configuration file on the server. For example:
 
-  stonevpn -f user -n "Test User" -u 192.168.1.0/24
+  stonevpn -f user -n "User Name" -u 192.168.1.0/24
 
 You can specify multiple routes with another '-u <route>'. This will write the route(s) to /etc/openvpn/cdd/Test_User 
 .TP
