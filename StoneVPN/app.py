@@ -149,6 +149,10 @@ def main():
         action="store_true",
         dest="freeip", 
         help="locate and assign free ip")
+    group_extra.add_option("-E", "--extrafile",
+        action="append",
+        dest="extrafile",
+        help="include extra file(s) like documentation. Can be used multiple times")
     group_extra.add_option("-p", "--passphrase",
         action="callback",
         callback=optional_arg('please_prompt_me'),
@@ -220,6 +224,7 @@ def main():
     s.emailaddress  = options.emailaddress
     s.freeip        = options.freeip
     s.passphrase    = options.passphrase
+    s.extrafile     = options.extrafile
     s.serial        = options.serial
     s.route         = options.route
     s.listrevoked   = options.listrevoked
@@ -283,6 +288,7 @@ class StoneVPN:
         self.emailaddress  = None
         self.freeip        = None
         self.passphrase    = None
+        self.extrafile     = None
         self.serial        = None
         self.route         = None
         self.listrevoked   = None
@@ -388,6 +394,25 @@ class StoneVPN:
             print "Creating " + self.fname + ".key and " + self.fname + ".crt for " + self.cname
             self.makeCert( self.fname, self.cname )
 
+        # check for extra files to be included
+        if self.extrafile:
+            if self.fname is None or self.cname is None:
+                print "Error: required option -f/--file and/or -n/--name is missing."
+                sys.exit()
+            for efile in self.extrafile:
+                if os.path.exists(efile):
+                    # copy them to a temp subdir within the working dir to avoid duplicates
+                    try:
+                        os.mkdir(self.working + '/' + self.fname + '-extrafiles')
+                    except:
+                        pass
+                    print "Adding extra file %s" % efile
+                    shutil.copy(efile, self.working + '/' + self.fname + '-extrafiles/')
+                else:
+                    # exit if the file wasn't found
+                    print "Error: file %s was not found."
+                    sys.exit()
+
         # Make nice zipfile from all the generated files
         # :: called only when option '-z' is used ::
         if self.zip:
@@ -398,9 +423,19 @@ class StoneVPN:
             z = zipfile.ZipFile(self.working + "/" + self.fprefix + self.fname + ".zip", "w")
             for name in glob.glob(self.working + "/" + self.fprefix + self.fname + ".*"):
                 # only add the files that begin with the name specified with the -f option, don't add the zipfile itself (duh)
-                if not name == self.working + "/" + self.fprefix + self.fname + ".zip": z.write(name, os.path.basename(name), zipfile.ZIP_DEFLATED)
+                if not name == self.working + "/" + self.fprefix + self.fname + ".zip":
+                    z.write(name, os.path.basename(name), zipfile.ZIP_DEFLATED)
             # and add the CA certificate file
             z.write(self.cacertfile, os.path.basename(self.cacertfile), zipfile.ZIP_DEFLATED)
+            # check if extra files should be included as well
+            if self.extrafile:
+                for efile in self.extrafile:
+                    z.write(efile, os.path.basename(efile), zipfile.ZIP_DEFLATED)
+                # we can safely remove all files in the temp dir now since it was only used when not creating a zip file
+                for file in glob.glob(self.working + "/" + self.fname + "-extrafiles/*"):
+                    os.remove(file)
+                # finally remove the temp dir itself
+                os.rmdir(self.working + "/" + self.fname + "-extrafiles")
             z.close()
             # delete all the files generated, except the ZIP-file
             for file in glob.glob(self.working + "/" + self.fprefix + self.fname + ".*"):
@@ -557,7 +592,13 @@ class StoneVPN:
                     mail_attachment.append(name)
                 # Also include the CA certificate
                 mail_attachment.append(self.cacertfile)
+                # And check for extra files to be included
+                if self.extrafile:
+                    for efile in self.extrafile:
+                        mail_attachment.append(efile)
+                # Finally, send the mail
                 self.send_mail(self.mail_from, mail_to, 'StoneVPN: generated files for ' + str(self.cname), self.mail_msg, mail_attachment)
+
 
         if self.route:
             if self.cname is None:
