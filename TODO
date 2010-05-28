@@ -5,7 +5,6 @@ BUGS:
 
 NICETOHAVES:
 - be able to set the server IP in the commandline switch
-- ability to include custom documentation in zipfile and/or attached to mail
 - option to PGP encrypt e-mail
 - option to use a different configuration file (defaults to /etc/stonevpn.conf)
 - have CRL patches be included in upstream :)
