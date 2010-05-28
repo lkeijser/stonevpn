@@ -158,6 +158,11 @@ def main():
         callback=optional_arg('please_prompt_me'),
         dest="passphrase",
         help="prompt for a passphrase when generating private key, or supply one on the commandline")
+    group_extra.add_option("-S", "--serverip",
+        action="store",
+        type="string",
+        dest="server_ip",
+        help="use this IP address for the server when generating the configuration file, overriding the one specified in stonevpn.conf")
     group_crl.add_option("-r", "--revoke",
         action="store",
         dest="serial",
@@ -225,6 +230,7 @@ def main():
     s.freeip        = options.freeip
     s.passphrase    = options.passphrase
     s.extrafile     = options.extrafile
+    s.server_ip     = options.server_ip
     s.serial        = options.serial
     s.route         = options.route
     s.listrevoked   = options.listrevoked
@@ -289,6 +295,7 @@ class StoneVPN:
         self.freeip        = None
         self.passphrase    = None
         self.extrafile     = None
+        self.server_ip     = None
         self.serial        = None
         self.route         = None
         self.listrevoked   = None
@@ -962,6 +969,11 @@ class StoneVPN:
                     f.write(section[var].replace('clientcertfile', self.fprefix + fname + '.crt') + '\n')
                 elif var == 'key':
                     f.write(section[var].replace('clientkeyfile', self.fprefix + fname + '.key') + '\n')
+                elif var == 'ip':
+                    if self.server_ip:
+                        f.write("remote " + str(self.server_ip) + "\n")
+                    else:
+                        f.write(section[var] + '\n')
                 else:
                     f.write(section[var] + '\n')
             f.close()
