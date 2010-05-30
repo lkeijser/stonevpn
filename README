@@ -7,7 +7,7 @@ Author: Léon Keijser - keijser@stone-it.com
 = Installation =
 In CentOS / RedHat / Fedora:
 
-StoneVPN is included in EPEL5 and Fedora11,12 and 13. Just use yum to install:
+StoneVPN is included in EPEL5 and Fedora 11 and later. Just use yum to install:
 
   $ yum install stonevpn
 
