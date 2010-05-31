@@ -1,11 +1,12 @@
-2010-XX-XX	Léon Keijser	<keijser@stone-it.com> 0.4.9beta2
+2010-XX-XX	Léon Keijser	<keijser@stone-it.com> 0.4.9beta3
 	* Added: option to generate configfiles for all OS's at once
 	* Added: option to include extra files (eg. documentation)
 	* Added: option to override server IP in configfile
+	* Fixed: incorrectly writing serial number to serialfile
 	* Fixed: check for empty variables in openssl configfile
 	* Fixed: corrected Mac template after testing
 	* Changed: passphrase can now be specified on the cmdline
-	* Changed: version 0.4.9beta2 (won't release officially)
+	* Changed: version 0.4.9beta3 (won't release officially)
 
 2010-05-10	Léon Keijser	<keijser@stone-it.com> 0.4.8.1
 	* Fixed: incorrect exception handling on python < 2.6
