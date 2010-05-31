@@ -204,7 +204,7 @@ def main():
         dest="emptycrl",
         help="create an empty CRL file (or overwrite an existing one)")
     group_test.add_option("-t", "--test",
-        action="store",
+        action="store_true",
         dest="test",
         help="Danger, Will Robinson, Danger! test parameter - can do anything! Review source before executing!")
 
@@ -864,16 +864,46 @@ class StoneVPN:
         except:
             print "Error opening CA key file"
             sys.exit()
+
+        # check if the 'next serial number' in serialfile is the same as the serial number of the
+        # last entry in the indexdb. If it is, increase the next serial by one (hex) and write a
+        # new serialfile
+        for line in open(indexdb):
+            last=line
+        last_serial = last.split("\t")[3].strip()
+        if self.debug: print "Last serial in indexdb: '%s'" % last_serial
+        f=open(serialfile, 'r')
+        serial = f.readline().strip()
+        f.close()
+        if self.debug: print "Next serial in serialfile: '%s'" % serial
+        if serial == last_serial:
+            print "Whoops! Last serial number in indexdb is the same as the next"
+            print "one in serialfile: %s. This is probably caused by an older version" % serial
+            print "of StoneVPN. We'll need to correct this (once) by increasing"
+            newSerialDec = self.hex2dec(serial) + 1
+            newSerial = self.dec2hex(newSerialDec)
+            print "the value for next serial number to %s" % newSerial
+            if len(newSerial) == 1:
+                newSerial = '0' + str(newSerial)
+            if self.debug: print "Now increasing %s by 1 to %s" % (serial,newSerial)
+            f=open(serialfile, 'w')
+            f.write(newSerial)
+            f.close()
+
+        # read next serial number from serialfile
         curSerial = self.readSerial()
+
         # format current time as UTC, for certificate
         timeNow = datetime.utcnow()
         # format current time as local, for indexdb
         timeNowIdx = datetime.now()
-        # We can't work with hex integers. Convert them to dec first
+
+        # We can't work with hex numbers. Convert them to dec first and increase its value by 1
         newSerial = self.hex2dec(curSerial) + 1
         newSerialDec = newSerial
         # Now convert dec back to hex 
         newSerial = self.dec2hex(newSerial)
+
         # Check if a different expiration date for certificate
         if self.expiredate:
             # Check for valid arguments: (h)ours, (d)ays, (y)ears.
@@ -892,27 +922,28 @@ class StoneVPN:
                 print "Invalid time unit provided. Use h(ours), d(ays) or y(ears)."
                 sys.exit()
             elif unit in ('h', 'H'):
-                cert = self.createCertificate(req, (cacert, cakey), newSerial, (0, 60 * 60 * int(exp_time)))
+                cert = self.createCertificate(req, (cacert, cakey), curSerial, (0, 60 * 60 * int(exp_time)))
                 expDate = timeNow + timedelta(hours=int(exp_time))
                 expDateIdx = timeNowIdx + timedelta(hours=int(exp_time))
                 print "Certificate is valid for %s hour(s)." % exp_time
             elif unit in ('d', 'D'):
-                cert = self.createCertificate(req, (cacert, cakey), newSerial, (0, 24 * 60 * 60 * int(exp_time)))
+                cert = self.createCertificate(req, (cacert, cakey), curSerial, (0, 24 * 60 * 60 * int(exp_time)))
                 expDate = timeNow + timedelta(days=int(exp_time))
                 expDateIdx = timeNowIdx + timedelta(days=int(exp_time))
                 print "Certificate is valid for %s day(s)." % exp_time
             elif unit in ('y', 'Y'):
-                cert = self.createCertificate(req, (cacert, cakey), newSerial, (0, 24 * 60 * 60 * 365 * int(exp_time)))
+                cert = self.createCertificate(req, (cacert, cakey), curSerial, (0, 24 * 60 * 60 * 365 * int(exp_time)))
                 expDate = timeNow + timedelta(days=int(exp_time) * 365)
                 expDateIdx = timeNowIdx + timedelta(days=int(exp_time) * 365)
                 print "Certificate is valid for %s year(s)." % exp_time
         else:
-            cert = self.createCertificate(req, (cacert, cakey), newSerial, (0, 24 * 60 * 60 * int(defaultDays)))
+            cert = self.createCertificate(req, (cacert, cakey), curSerial, (0, 24 * 60 * 60 * int(defaultDays)))
             expDate = timeNow + timedelta(days=int(defaultDays))
             expDateIdx = timeNowIdx + timedelta(days=int(defaultDays))
             print "Certificate is valid for %s day(s)." % defaultDays
         self.save_key ( self.working + '/' + self.fprefix + fname + '.key', pkey )
         self.save_cert ( self.working + '/' + self.fprefix + fname + '.crt', cert )
+
         # OpenSSL only accepts serials of 2 digits, so check for the length and prepend a 0 if necessary
         if len(str(newSerial)) == 1:
             serialIdx = '0' + str(newSerial)
@@ -928,10 +959,10 @@ class StoneVPN:
         if self.debug: print "DEBUG: timeNow is %s" % timeNow
         if self.debug: print "DEBUG: expDate is %s" % expDate
         # OpenSSL only accepts serials of 2 digits, so check for the length and prepend a 0 if necessary
-        if len(str(newSerial)) == 1:
-            serialNumber = '0' + str(newSerial)
+        if len(str(curSerial)) == 1:
+            serialNumber = '0' + str(curSerial)
         else:
-            serialNumber = newSerial
+            serialNumber = curSerial
         # convert cname: spaces to underscores for inclusion in indexdb
         nospaces_cname =  cname.replace(' ', '_')
         # the expire date for the index file needs some conversion
