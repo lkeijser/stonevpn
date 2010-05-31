@@ -933,7 +933,7 @@ class StoneVPN:
         indexDate = expDateIdx.strftime("%y%m%d%H%M%S")
         if self.debug: print "DEBUG: indexDate is %s" % indexDate
         # Format index line and write to OpenSSL index file
-        index = 'V\t' + str(indexDate) + 'Z\t' + str(serialNumber) + '\tunknown\t' + '/C=' + str(countryName) + '/ST=' + str(stateOrProvinceName) + '/O=' + str(organizationName) + '/OU=' + str(organizationalUnitName) + '/CN=' + str(nospaces_cname) + '/emailAddress=' + str(fname) + '@local\n'
+        index = 'V\t' + str(indexDate) + 'Z\t\t' + str(serialNumber) + '\tunknown\t' + '/C=' + str(countryName) + '/ST=' + str(stateOrProvinceName) + '/O=' + str(organizationName) + '/OU=' + str(organizationalUnitName) + '/CN=' + str(nospaces_cname) + '/emailAddress=' + str(fname) + '@local\n'
         self.writeIndex(index)
 
     # Make config files for OpenVPN
