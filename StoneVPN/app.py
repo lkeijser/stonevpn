@@ -913,8 +913,13 @@ class StoneVPN:
             print "Certificate is valid for %s day(s)." % defaultDays
         self.save_key ( self.working + '/' + self.fprefix + fname + '.key', pkey )
         self.save_cert ( self.working + '/' + self.fprefix + fname + '.crt', cert )
+        # OpenSSL only accepts serials of 2 digits, so check for the length and prepend a 0 if necessary
+        if len(str(newSerial)) == 1:
+            serialIdx = '0' + str(newSerial)
+        else:
+            serialIdx = newSerial
         # Write serial (hex) to serial file
-        self.writeSerial(newSerial)
+        self.writeSerial(serialIdx)
         # copy CA certificate to working dir
         shutil.copy(self.cacertfile, self.working)
         # create the configuration files (default 'unix' unless specified with option -c)
