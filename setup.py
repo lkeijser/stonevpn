@@ -15,7 +15,7 @@ class InstallDocsCommand(SetupBuildCommand):
     """
     Extra command to install documentation files
     """
-    description = "also install documentation files"
+    description = "install documentation and sample configuration files"
     def run(self):
         import shutil
         doc_files=(
