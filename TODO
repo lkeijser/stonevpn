@@ -4,9 +4,8 @@ BUGS:
 - when calculating freeip: don't parse clientfile itself if it exists
 
 NICETOHAVES:
-- option to PGP encrypt e-mail
+- option to (PGP/GPG) encrypt e-mail
 - option to use a different configuration file (defaults to /etc/stonevpn.conf)
-- have CRL patches be included in upstream :)
 - if to-be-revoked serial doesn't exist (in indexdb) ask for confirmation
 - option to create encrypted zipfile (using 7zip?)
 - option to create: openvpn CA cert
