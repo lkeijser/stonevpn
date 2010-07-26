@@ -76,14 +76,14 @@ def main():
         sys.exit()
 
     # retrieve default expiration date from openssl.cnf, needed for optionparse 
-    config = ConfigObj(opensslconf)
-    sectionname = 'CA_default'
-    try:
+    if os.path.exists(opensslconf):
+        config = ConfigObj(opensslconf)
+        sectionname = 'CA_default'
         section=config[sectionname]
-    except KeyError:
+        defaultDays = section['default_days']
+    else:
         print "Error: OpenSSL configuration file not found at %s" % opensslconf
         sys.exit()
-    defaultDays = section['default_days']
 
     # define some crypto stuff
     TYPE_RSA = crypto.TYPE_RSA
