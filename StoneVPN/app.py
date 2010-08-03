@@ -71,6 +71,7 @@ def main():
         mail_cc = section['mail_cc']
         mail_msg = section['mail_msg']
         mail_from = section['mail_from']
+        mail_passtxt = section['mail_passtxt']
     else:
         print "File " + stonevpnconf + " does not exist!"
         sys.exit()
@@ -162,6 +163,10 @@ def main():
         callback=optional_arg('please_prompt_me'),
         dest="passphrase",
         help="prompt for a passphrase when generating private key, or supply one on the commandline")
+    group_extra.add_option("-M", "--mailpass",
+        action="store_true",
+        dest="mailpass",
+        help="include passphrase in e-mail body (only useful with the '-m' option)")
     group_extra.add_option("-S", "--serverip",
         action="store",
         type="string",
@@ -233,6 +238,7 @@ def main():
     s.emailaddress  = options.emailaddress
     s.freeip        = options.freeip
     s.passphrase    = options.passphrase
+    s.mailpass      = options.mailpass
     s.extrafile     = options.extrafile
     s.server_ip     = options.server_ip
     s.serial        = options.serial
@@ -261,6 +267,7 @@ def main():
     s.mail_cc       = mail_cc
     s.mail_msg      = mail_msg
     s.mail_from     = mail_from
+    s.mail_passtxt  = mail_passtxt
     s.stonevpnconf  = stonevpnconf
     # and all other variables
     s.TYPE_RSA      = TYPE_RSA
@@ -298,6 +305,7 @@ class StoneVPN:
         self.emailaddress  = None
         self.freeip        = None
         self.passphrase    = None
+        self.mailpass      = None
         self.extrafile     = None
         self.server_ip     = None
         self.serial        = None
@@ -785,6 +793,7 @@ class StoneVPN:
         # Adding passphrase to private key
         if self.passphrase:
             if self.passphrase == 'please_prompt_me':
+                global keyPass
                 keyPass = self.getPass()
                 if keyPass is "password_error":
                     # Don't write keyfile if supplied passwords mismatch
@@ -1225,6 +1234,15 @@ class StoneVPN:
         msg['Date'] = formatdate(localtime=True)
         msg['Subject'] = subject
         text = text.replace('EMAILRECIPIENT', self.cname)
+        # Append a helpful text when a password was given, but only when specified on the commandline
+        if self.mailpass:
+            if keyPass:
+                if self.debug: print "DEBUG: including password help text in email body"
+                text = text.replace('PASSPHRASETXT', self.mail_passtxt)
+                # And replace the password placeholder with the actual passphrase
+                text = text.replace('OPENSSLPASS', keyPass)
+        else:
+            text = text.replace('PASSPHRASETXT', '')
         msg.attach( MIMEText(text, 'html') )
         # Attachment(s)
         if type(attachment) == 'string':
