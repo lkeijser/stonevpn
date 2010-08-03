@@ -257,7 +257,7 @@ def main():
     s.printcert     = options.printcert
     s.printindex    = options.printindex
     s.expiredate    = options.expiredate
-    s.emptycrl       = options.emptycrl
+    s.emptycrl      = options.emptycrl
     s.test          = options.test
     # values we got from parsing the configuration file:
     s.cacertfile    = cacertfile
@@ -798,6 +798,7 @@ class StoneVPN:
     # Simple routines to load/save files using crypto lib
     # Save private key to file
     def save_key (self, fn, key):
+        global keyPass
         # Adding passphrase to private key
         # do we need a random passphrase?
         if self.randpass:
@@ -805,14 +806,12 @@ class StoneVPN:
             keyPass = ""
             for i in range(int(self.randpass)):
                 keyPass += random.choice('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789')
-            global keyPass
             fp = open ( fn, 'w' )
             fp.write ( crypto.dump_privatekey ( self.FILETYPE, key, self.ciphermethod, keyPass ) )
             if self.debug: print "DEBUG: private key encrypted with RANDOM passphrase: '%s'" % keyPass
         elif self.passphrase:
             if self.passphrase == 'please_prompt_me':
                 keyPass = self.getPass()
-                global keyPass
                 if keyPass is "password_error":
                     # Don't write keyfile if supplied passwords mismatch
                     sys.exit()
