@@ -25,6 +25,7 @@ import fileinput
 import getpass
 import glob
 import os
+import random
 import re
 import shutil
 import smtplib
@@ -167,6 +168,11 @@ def main():
         action="store_true",
         dest="mailpass",
         help="include passphrase in e-mail body (only useful with the '-m' option)")
+    group_extra.add_option("-R", "--randpass",
+        action="store",
+        type="string",
+        dest="randpass",
+        help="generate a random password of RANDPASS characters (eg.: -R 8)")
     group_extra.add_option("-S", "--serverip",
         action="store",
         type="string",
@@ -239,6 +245,7 @@ def main():
     s.freeip        = options.freeip
     s.passphrase    = options.passphrase
     s.mailpass      = options.mailpass
+    s.randpass      = options.randpass
     s.extrafile     = options.extrafile
     s.server_ip     = options.server_ip
     s.serial        = options.serial
@@ -306,6 +313,7 @@ class StoneVPN:
         self.freeip        = None
         self.passphrase    = None
         self.mailpass      = None
+        self.randpass      = None
         self.extrafile     = None
         self.server_ip     = None
         self.serial        = None
@@ -791,10 +799,20 @@ class StoneVPN:
     # Save private key to file
     def save_key (self, fn, key):
         # Adding passphrase to private key
-        if self.passphrase:
+        # do we need a random passphrase?
+        if self.randpass:
+            if self.debug: print "DEBUG: generating a random passphrase of %s characters" % self.randpass
+            keyPass = ""
+            for i in range(int(self.randpass)):
+                keyPass += random.choice('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789')
+            global keyPass
+            fp = open ( fn, 'w' )
+            fp.write ( crypto.dump_privatekey ( self.FILETYPE, key, self.ciphermethod, keyPass ) )
+            if self.debug: print "DEBUG: private key encrypted with RANDOM passphrase: '%s'" % keyPass
+        elif self.passphrase:
             if self.passphrase == 'please_prompt_me':
-                global keyPass
                 keyPass = self.getPass()
+                global keyPass
                 if keyPass is "password_error":
                     # Don't write keyfile if supplied passwords mismatch
                     sys.exit()
@@ -1236,6 +1254,9 @@ class StoneVPN:
         text = text.replace('EMAILRECIPIENT', self.cname)
         # Append a helpful text when a password was given, but only when specified on the commandline
         if self.mailpass:
+            if self.passphrase is None and self.randpass is None:
+                print "Error: you need to specify either a passphrase or generate a random one."
+                sys.exit()
             if keyPass:
                 if self.debug: print "DEBUG: including password help text in email body"
                 text = text.replace('PASSPHRASETXT', self.mail_passtxt)
