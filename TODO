@@ -4,8 +4,6 @@ BUGS:
 - when calculating freeip: don't parse clientfile itself if it exists
 
 NICETOHAVES:
-- when specifying a password and sending an e-mail, include the password in the e-mail body
-- auto-generate a random password
 - option to (PGP/GPG) encrypt e-mail
 - option to use a different configuration file (defaults to /etc/stonevpn.conf)
 - if to-be-revoked serial doesn't exist (in indexdb) ask for confirmation
