@@ -55,6 +55,14 @@ Prompt for a passphrase when generating the user's private key. Leave empty to p
 
   stonevpn -f user -n "User Name" -p mysecret
 .TP
+.BI -M \fR, \fB\-\^\-mailpass      
+Include passphrase in e-mail body (only useful with the '-m' option). You might want to change the mail_passtxt variable in stonevpn.conf as well. 
+.TP
+.BI -R " RANDPASS" "\fR,\fP \-\^\-randpass=" RANDPASS
+Generate a random password of RANDPASS characters. For example, to generate an 8 character passphrase:
+
+  stonevpn -f user -n "User Name" -R 8
+.TP
 .BI -E \fR, \fB\-\^\-extrafile
 Include extra files when generating a certificate. When also specifying the \fB\-\^\-zip\fR option, these will be packed in the zip file. Else, they will remain in a subdirectory of the working directory, based on the given FNAME. Use the full path to the filename to be included.
 You can use this option multiple times:
