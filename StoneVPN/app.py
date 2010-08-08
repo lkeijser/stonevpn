@@ -1102,7 +1102,7 @@ class StoneVPN:
                 # then check if the revoked cert has the same serial nr as the one we're trying to revoke
                 # if so, exit immediately since we can't revoke twice (duh)
                 if line.split()[3] == serial:
-                    print "Certificate already revoked!"
+                    print "Certificate with serial %s already revoked!" % serial
                     os.remove(self.working + '/index.tmp')
                     os.remove(self.working + '/revoked.crl')
                     sys.exit()
