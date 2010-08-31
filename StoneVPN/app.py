@@ -72,7 +72,11 @@ def main():
         mail_cc = section['mail_cc']
         mail_msg = section['mail_msg']
         mail_from = section['mail_from']
-        mail_passtxt = section['mail_passtxt']
+        try:
+            mail_passtxt = section['mail_passtxt']
+        except:
+            print "Missing variable 'mail_passtxt' in %s! Please update your configuration.\nHint: look at the example configuration file." % stonevpnconf
+            sys.exit()
     else:
         print "File " + stonevpnconf + " does not exist!"
         sys.exit()
