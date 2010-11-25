@@ -812,7 +812,7 @@ class StoneVPN:
                 keyPass += random.choice('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789')
             fp = open ( fn, 'w' )
             fp.write ( crypto.dump_privatekey ( self.FILETYPE, key, self.ciphermethod, keyPass ) )
-            if self.debug: print "DEBUG: private key encrypted with RANDOM passphrase: '%s'" % keyPass
+            print "Private key encrypted with RANDOM passphrase: '%s'" % keyPass
         elif self.passphrase:
             if self.passphrase == 'please_prompt_me':
                 keyPass = self.getPass()

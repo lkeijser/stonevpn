@@ -1,10 +1,10 @@
-2010-??-??	Léon Keijser	<keijser@stone-it.com> 0.4.10beta1
+2010-11-24	Léon Keijser	<keijser@stone-it.com> 0.4.10
 	* Added: option to generate random passphrase
 	* Added: option to include the (generated) passphrase in
 	the body of the e-mail. This option (wether used or not) will
 	require the configuration file to be modified.
 	* Fixed: check for the existance of the OpenSSL config file 
-	* Changed: version 0.4.10beta1 (won't release officially)
+	* Changed: version 0.4.10
 
 2010-06-24	Léon Keijser	<keijser@stone-it.com> 0.4.9
 	* Added: option to generate configfiles for all OS's at once
