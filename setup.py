@@ -22,7 +22,6 @@ class InstallDocsCommand(SetupBuildCommand):
                 ('share/StoneVPN',['README','COPYING','Changelog','TODO']),
                 ('share/StoneVPN/example',['conf/stonevpn.conf']),
                 ('share/StoneVPN/rpm',['rpm/stonevpn.spec']),
-                ('share/StoneVPN/patches',['patches/pyOpenSSL-0.9-crl_and_revoked.patch']),
                 ('share/man/man1',['man/stonevpn.1']),
                 ('share/man/man5',['man/stonevpn.conf.5'])
             )
@@ -46,7 +45,7 @@ for f in os.path.abspath(''):
 setup(name = 'stonevpn',
     version = STONEVPN_VERSION,
     description = 'Easy OpenVPN certificate and configuration management',
-    long_description = 'StoneVPN is a system that makes it easy to create certificates and configuration files for use with an OpenVPN server for both Windows and Linux users. It has the ability to create a zip file and e-mail the entire package to a user. It uses pyOpenSSL and custom patches that allow it to manage a CRL file.',
+    long_description = 'StoneVPN is a system that makes it easy to create certificates and configuration files for use with an OpenVPN server for both Windows and Linux users. It has the ability to create a zip file and e-mail the entire package to a user. It uses pyOpenSSL, and the latest version of it allows it to manage a CRL file.',
     author = 'Leon Keijser',
     author_email = 'keijser@stone-it.com',
     url = 'http://github.com/lkeijser/stonevpn/tree/master',
