@@ -1236,8 +1236,29 @@ class StoneVPN:
                 # everything starting with the first '/' until the end = issuee, replaced spaces with underlines
                 issuee = line.split('/')[-2:-1][0].split('\t')[0].replace('CN=','').replace('_',' ')
                 print "Issued to:\t\t" + issuee
-                print "Status:\t\t\tValid"
                 expDate = str(line.split()[1]).replace('Z','')
+                
+                # check if cert has expired
+                ed_long = "20" + str(expDate)
+                expiredate = int(time.mktime(
+                    time.strptime(
+                        str(datetime(
+                            int(ed_long[:4]),
+                            int(ed_long[4:6]),
+                            int(ed_long[6:8]),
+                            int(ed_long[8:10]),
+                            int(ed_long[10:12]),
+                            int(ed_long[12:14])
+                            )
+                           ),
+                        "%Y-%m-%d %H:%M:%S")
+                    )
+                    )
+                timenow = int(time.mktime(time.localtime()))
+                if int(timenow) < int(expiredate):
+                    print "Status:\t\t\tValid"
+                else:
+                    print "Status:\t\t\tExpired"
                 print "Expiry date:\t\t20%s-%s-%s %s:%s:%s" % (expDate[:2],expDate[2:4],expDate[4:6],expDate[6:8],expDate[8:10],expDate[10:12])
                 print "Serial:\t\t\t" + str(line.split()[2])
                 lineDN = line.split('/')[-6:][0:]
