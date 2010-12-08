@@ -21,9 +21,11 @@
 """
 
 import commands
+import cStringIO
 import fileinput
 import getpass
 import glob
+import operator
 import os
 import random
 import re
@@ -33,10 +35,6 @@ import string
 import sys
 import time
 import zipfile
-
-import cStringIO,operator
-import math
-
 from OpenSSL import SSL, crypto
 from optparse import OptionParser, OptionGroup
 from configobj import ConfigObj
