@@ -202,6 +202,10 @@ def main():
         action="store_true",
         dest="listall",
         help="list all certificates")
+    group_info.add_option("--listcsv",
+        action="store_true",
+        dest="listallcsv",
+        help="list all certificates (output as CSV)")
     group_info.add_option("-s", "--showserial",
         action="store_true",
         dest="showserial",
@@ -257,6 +261,7 @@ def main():
     s.listrevoked   = options.listrevoked
     s.displaycrl    = options.displaycrl
     s.listall       = options.listall
+    s.listallcsv    = options.listallcsv
     s.showserial    = options.showserial
     s.printcert     = options.printcert
     s.printindex    = options.printindex
@@ -291,7 +296,7 @@ def main():
         parser.print_help()
 
     # check for valid args
-    if options.fname is None and options.serial is not None and options.listrevoked is not None and options.listall is not None and options.showserial is not None and options.printcert is not None and options.printindex is not None and options.emptycrl is not None and options.test is not None:
+    if options.fname is None and options.serial is not None and options.listrevoked is not None and options.listall is not None and options.listallcsv is not None and options.showserial is not None and options.printcert is not None and options.printindex is not None and options.emptycrl is not None and options.test is not None:
         parser.error("Error: you have to specify a filename (FNAME)")
     else:
         # must..have..root..
@@ -325,6 +330,7 @@ class StoneVPN:
         self.listrevoked   = None
         self.displaycrl    = None
         self.listall       = None
+        self.listallcsv    = None
         self.showserial    = None
         self.printcert     = None
         self.printindex    = None
@@ -587,6 +593,9 @@ class StoneVPN:
 
         if self.listall:
             self.listAllCerts()
+
+        if self.listallcsv:
+            self.listAllCertsCSV()
 
         if self.displaycrl:
             self.displayCRL()
@@ -1237,7 +1246,6 @@ class StoneVPN:
                 issuee = line.split('/')[-2:-1][0].split('\t')[0].replace('CN=','').replace('_',' ')
                 print "Issued to:\t\t" + issuee
                 expDate = str(line.split()[1]).replace('Z','')
-                
                 # check if cert has expired
                 ed_long = "20" + str(expDate)
                 expiredate = int(time.mktime(
@@ -1264,8 +1272,32 @@ class StoneVPN:
                 lineDN = line.split('/')[-6:][0:]
                 newDN = ','.join(lineDN)
                 print "DN:\t\t\t" + str(newDN)
-            #print "\n"
 
+    def listAllCertsCSV(self):
+        # same routine as listAllCerts() except print as 
+        # comma seperated values and without the DN.
+        input = open(indexdb, 'r')
+        for line in input:
+            if line.split()[0] == 'R':
+                issuee = line.split('/')[-2:][0].replace('CN=','').replace('_',' ').replace(',','_')
+                sys.stdout.write(str(issuee) + ",")
+                sys.stdout.write("Revoked,")
+                revDate = str(line.split()[2]).replace('Z','')
+                sys.stdout.write("20%s-%s-%s %s:%s:%s," % (revDate[:2],revDate[2:4],revDate[4:6],revDate[6:8],revDate[8:10],revDate[10:12]))
+                sys.stdout.write(str(line.split()[3]) + ",")
+            else:
+                issuee = line.split('/')[-2:-1][0].split('\t')[0].replace('CN=','').replace('_',' ').replace(',','_')
+                sys.stdout.write(str(issuee) + ",")
+                expDate = str(line.split()[1]).replace('Z','')
+                ed_long = "20" + str(expDate)
+                expiredate = int(time.mktime(time.strptime(str(datetime(int(ed_long[:4]),int(ed_long[4:6]),int(ed_long[6:8]),int(ed_long[8:10]),int(ed_long[10:12]),int(ed_long[12:14]))),"%Y-%m-%d %H:%M:%S")))
+                timenow = int(time.mktime(time.localtime()))
+                if int(timenow) < int(expiredate):
+                    sys.stdout.write("Valid,")
+                else:
+                    sys.stdout.write("Expired,")
+                sys.stdout.write("20%s-%s-%s %s:%s:%s," % (expDate[:2],expDate[2:4],expDate[4:6],expDate[6:8],expDate[8:10],expDate[10:12]))
+                sys.stdout.write(str(line.split()[2]) + ",")
 
     def send_mail(self, send_from, send_to, subject, text, attachment=[]):
         print "Generating e-mail"
