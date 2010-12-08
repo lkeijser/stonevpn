@@ -33,6 +33,10 @@ import string
 import sys
 import time
 import zipfile
+
+import cStringIO,operator
+import math
+
 from OpenSSL import SSL, crypto
 from optparse import OptionParser, OptionGroup
 from configobj import ConfigObj
@@ -1221,57 +1225,67 @@ class StoneVPN:
             print "DN:\t\t\t%s" % newDN
             print "\n"
             count = count + 1
-
+    
+    
+    def indent(self, rows, hasHeader=False, headerChar='-', delim=' | ', justify='left',
+               separateRows=False, prefix='', postfix='', wrapfunc=lambda x:x):
+        # closure for breaking logical rows to physical, using wrapfunc
+        def rowWrapper(row):
+            newRows = [wrapfunc(item).split('\n') for item in row]
+            return [[substr or '' for substr in item] for item in map(None,*newRows)]
+        # break each logical row into one or more physical ones
+        logicalRows = [rowWrapper(row) for row in rows]
+        # columns of physical rows
+        columns = map(None,*reduce(operator.add,logicalRows))
+        # get the maximum of each column by the string length of its items
+        maxWidths = [max([len(str(item)) for item in column]) for column in columns]
+        rowSeparator = headerChar * (len(prefix) + len(postfix) + sum(maxWidths) + \
+                                     len(delim)*(len(maxWidths)-1))
+        # select the appropriate justify method
+        justify = {'center':str.center, 'right':str.rjust, 'left':str.ljust}[justify.lower()]
+        output=cStringIO.StringIO()
+        if separateRows: print >> output, rowSeparator
+        for physicalRows in logicalRows:
+            for row in physicalRows:
+                print >> output, \
+                    prefix \
+                    + delim.join([justify(str(item),width) for (item,width) in zip(row,maxWidths)]) \
+                    + postfix
+            if separateRows or hasHeader: print >> output, rowSeparator; hasHeader=False
+        return output.getvalue()
+    
     def listAllCerts(self):
-        print "Reading SSL database: " + indexdb
-        # read SSL dbase (usually index.txt)
-        # this file has 5 columns: Status, Expiry date, Revocation date, Serial nr, file?, Distinguished Name (DN)
+        # list all certificates in indexdb, output as pretty table
         input = open(indexdb, 'r')
-        print "Listing all issued certificates:\n"
+        data = ''
         for line in input:
             if line.split()[0] == 'R':
-                # Print revoked certificate
-                issuee = line.split('/')[-2:][0].replace('CN=','').replace('_',' ')
-                print "Issued to:\t\t" + str(issuee)
-                print "Status:\t\t\tRevoked"
+                issuee = line.split('/')[-2:][0].replace('CN=','').replace('_',' ').replace(',','_')
+                data = str(data) + str(line.split()[3]) + ',' + str(issuee)
+                data = str(data) + ',' + "Revoked"
                 revDate = str(line.split()[2]).replace('Z','')
-                print "Revocation date:\t20%s-%s-%s %s:%s:%s" % (revDate[:2],revDate[2:4],revDate[4:6],revDate[6:8],revDate[8:10],revDate[10:12])
-                print "Serial:\t\t\t" + str(line.split()[3])
-                lineDN = line.split('unknown')[1].strip()
-                newDN = ''.join(lineDN).replace('/',',')
-                print "DN:\t\t\t" + str(newDN) + "\n"
+                data = str(data) + ',' + '20' + revDate[:2] + '-' + revDate[2:4] + '-' + revDate[4:6] + ' ' + revDate[6:8] + ':' + revDate[8:10] + ':' + revDate[10:12] + '\n'
             else:
-                # Print valid certificate
-                # everything starting with the first '/' until the end = issuee, replaced spaces with underlines
-                issuee = line.split('/')[-2:-1][0].split('\t')[0].replace('CN=','').replace('_',' ')
-                print "Issued to:\t\t" + issuee
+                issuee = line.split('/')[-2:-1][0].split('\t')[0].replace('CN=','').replace('_',' ').replace(',','_')
+                data = str(data) + str(line.split()[2]) + ',' + str(issuee)
                 expDate = str(line.split()[1]).replace('Z','')
-                # check if cert has expired
                 ed_long = "20" + str(expDate)
-                expiredate = int(time.mktime(
-                    time.strptime(
-                        str(datetime(
-                            int(ed_long[:4]),
-                            int(ed_long[4:6]),
-                            int(ed_long[6:8]),
-                            int(ed_long[8:10]),
-                            int(ed_long[10:12]),
-                            int(ed_long[12:14])
-                            )
-                           ),
-                        "%Y-%m-%d %H:%M:%S")
-                    )
-                    )
+                expiredate = int(time.mktime(time.strptime(str(datetime(int(ed_long[:4]),int(ed_long[4:6]),int(ed_long[6:8]),int(ed_long[8:10]),int(ed_long[10:12]),int(ed_long[12:14]))),"%Y-%m-%d %H:%M:%S")))
                 timenow = int(time.mktime(time.localtime()))
                 if int(timenow) < int(expiredate):
-                    print "Status:\t\t\tValid"
+                    data = str(data) + ',Valid'
                 else:
-                    print "Status:\t\t\tExpired"
-                print "Expiry date:\t\t20%s-%s-%s %s:%s:%s" % (expDate[:2],expDate[2:4],expDate[4:6],expDate[6:8],expDate[8:10],expDate[10:12])
-                print "Serial:\t\t\t" + str(line.split()[2])
-                lineDN = line.split('/')[-6:][0:]
-                newDN = ','.join(lineDN)
-                print "DN:\t\t\t" + str(newDN)
+                    data = str(data) + ',Expired'
+                data = str(data) + ',' + '20' + expDate[:2] + '-' + expDate[2:4] + '-' + expDate[4:6] + ' ' + expDate[6:8] + ':' + expDate[8:10] + ':' + expDate[10:12] + '\n'
+
+        rows = []
+        rows.append(('Serial','Name','Status','Expiry date'))
+        for row in data.splitlines():
+            rows.append(row.strip().split(','))
+        width = 60
+        print self.indent(rows,hasHeader=True)
+
+
 
     def listAllCertsCSV(self):
         # same routine as listAllCerts() except print as 
