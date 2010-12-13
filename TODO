@@ -5,6 +5,7 @@ BUGS:
 - when calculating freeip: don't parse clientfile itself if it exists
 
 NICETOHAVES:
+- check for all required fields in stonevpn.conf
 - parse openssl.cnf for ENV variables
 - option to (PGP/GPG) encrypt e-mail
 - option to use a different configuration file (defaults to /etc/stonevpn.conf)
