@@ -1,4 +1,5 @@
 BUGS:
+- when revoking a cert, update indexdb when a lower-case serial is provided
 - printing info about 1 specific cert (option '--printcert') shows non-local timezone
 - don't update indexdb if cert can't be generated (due to missing X509Ext method in pyOpenSSL for example)
 - also ask for overwrite clientfile if looking for freeip
