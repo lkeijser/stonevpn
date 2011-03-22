@@ -463,6 +463,7 @@ class StoneVPN:
             for name in glob.glob(self.working + "/" + self.fprefix + self.fname + ".*"):
                 # only add the files that begin with the name specified with the -f option, don't add the zipfile itself (duh)
                 if not name == self.working + "/" + self.fprefix + self.fname + ".zip":
+                    if self.debug: print "DEBUG: adding %s to %s" % (name.split('/')[-1],self.fprefix + self.fname + '.zip')
                     z.write(name, os.path.basename(name), zipfile.ZIP_DEFLATED)
             # and add the CA certificate file
             z.write(self.cacertfile, os.path.basename(self.cacertfile), zipfile.ZIP_DEFLATED)
@@ -897,6 +898,10 @@ class StoneVPN:
 
     # Generate keyfile and certificate
     def makeCert(self, fname, cname):
+        # remove possible leftover files to prevent the zipfile from packing these
+        for f in glob.glob(self.working + '/' + self.fprefix + fname + '.*'):
+            if self.debug: print "DEBUG: removing old file %s" % f
+            os.remove(f)
         pkey = self.createKeyPair(self.TYPE_RSA, 1024)
         req = self.createCertRequest(pkey, CN=cname, C=countryName, ST=stateOrProvinceName, O=organizationName, OU=organizationalUnitName)
         try:
