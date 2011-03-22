@@ -1,7 +1,8 @@
-2010-??-??	Léon Keijser	<keijser@stone-it.com> 0.4.11beta3
+2010-??-??	Léon Keijser	<keijser@stone-it.com> 0.4.11beta4
 	* Added: display expired certificate status
+	* Fixed: remove old files before creating new certificate
 	* Changed: better output when displaying all certificates
-	* Changed: version 0.4.11beta3 (won't release officially)
+	* Changed: version 0.4.11beta4 (won't release officially)
 
 2010-11-24	Léon Keijser	<keijser@stone-it.com> 0.4.10
 	* Added: option to generate random passphrase

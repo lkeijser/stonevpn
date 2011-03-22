@@ -1098,14 +1098,14 @@ class StoneVPN:
         if not os.path.exists(self.crlfile):
             print "Error: CRL file not found at: " + self.crlfile + " or insufficient rights."
             sys.exit()
-	try:
+        try:
         	crl = crypto.CRL()
-	except:
-		print "\nError: CRL support is not available in your version of"
-		print "pyOpenSSL. Please check the README file that came with"
-		print "StoneVPN to see what you can do about this. For now, "
-		print "you will have to revoke certificates manually.\n"
-   		sys.exit()
+        except:
+            print "\nError: CRL support is not available in your version of"
+            print "pyOpenSSL. Please check the README file that came with"
+            print "StoneVPN to see what you can do about this. For now, "
+            print "you will have to revoke certificates manually.\n"
+            sys.exit()
         # we can't replace stuff in the original index file, so we have to create
         # a new one and in the end rename the original one and move the temp file
         # to the final location (usually /etc/ssl/index.txt)
@@ -1121,8 +1121,8 @@ class StoneVPN:
             if line.split()[0] == 'R':
                 # then check if the revoked cert has the same serial nr as the one we're trying to revoke
                 # if so, exit immediately since we can't revoke twice (duh)
-                if line.split()[3] == serial:
-                    print "Certificate with serial %s already revoked!" % serial
+                if line.split()[3] == serial.upper():
+                    print "Certificate with serial %s already revoked!" % serial.upper()
                     os.remove(self.working + '/index.tmp')
                     os.remove(self.working + '/revoked.crl')
                     sys.exit()
@@ -1141,18 +1141,19 @@ class StoneVPN:
             else:
                 # the line contains a valid certificate. Check if the serial is the same as the
                 # one we're trying to revoke
-                if line.split()[2] == serial:
+                if line.split()[2] == serial.upper():
                     # we have a match! do not write this line again to the new index file
                     # instead, change it to the revoked-format
+                    if self.debug: print "DEBUG: found match for %s in index file" % serial.upper()
                     newDN = '/'.join(line.split('/')[1:])
-                    revokedLine = 'R\t' + str(line.split()[1]) + '\t' + crlTime + '\t' + serial + '\tunknown\t' + str(newDN)
+                    revokedLine = 'R\t' + str(line.split()[1]) + '\t' + crlTime + '\t' + serial.upper() + '\tunknown\t' + str(newDN)
                     t.write(revokedLine)
                 else:
                     # this is not the match we're looking for, so just write the line again
                     # to the index file
                     t.write(line)
         # crlTime = str(strftime("%y%m%d%H%M%S")) + 'Z'
-        print "Adding new revoked certificate to CRL with date " + crlTime + " and serial " + serial
+        print "Adding new revoked certificate to CRL with date " + crlTime + " and serial " + serial.upper()
         t.close()
         revoked = crypto.Revoked()
         now = datetime.utcnow().strftime("%Y%m%d%H%M%SZ")
