@@ -1,8 +1,10 @@
-2010-??-??	Léon Keijser	<keijser@stone-it.com> 0.4.11beta4
+2011-03-24	Léon Keijser	<keijser@stone-it.com> 0.4.11
 	* Added: display expired certificate status
 	* Fixed: remove old files before creating new certificate
+	* Fixed: when revoking a cert, indexdb wasn't updated when a 
+	lower-case serial was provided
 	* Changed: better output when displaying all certificates
-	* Changed: version 0.4.11beta4 (won't release officially)
+	* Changed: version 0.4.11
 
 2010-11-24	Léon Keijser	<keijser@stone-it.com> 0.4.10
 	* Added: option to generate random passphrase
