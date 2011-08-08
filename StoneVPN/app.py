@@ -754,6 +754,9 @@ class StoneVPN:
         f=open(serialfile, 'r')
         serial = f.readline()
         f.close()
+        # see if we got more than just a newline. If not, return 0
+        if not serial.strip():
+            serial = "0"
         return serial
 
     def writeSerial(self, serial):
@@ -918,9 +921,13 @@ class StoneVPN:
         # check if the 'next serial number' in serialfile is the same as the serial number of the
         # last entry in the indexdb. If it is, increase the next serial by one (hex) and write a
         # new serialfile
+        last = None
         for line in open(indexdb):
             last=line
-        last_serial = last.split("\t")[3].strip()
+       	if last: 
+            last_serial = last.split("\t")[3].strip()
+        else:
+            last_serial = 0
         if self.debug: print "Last serial in indexdb: '%s'" % last_serial
         f=open(serialfile, 'r')
         serial = f.readline().strip()
