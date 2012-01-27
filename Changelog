@@ -1,7 +1,7 @@
-2011-??-??	Léon Keijser	<keijser@stone-it.com> 0.4.12beta1
+2012-01-27	Léon Keijser	<keijser@stone-it.com> 0.4.12
 	* Fixed: empty index and serial file caused traceback. Fix
 	by Jasper Capel <jasper [at] newnewyork [dot] nl>
-	* Changed: version 0.4.12beta1 (won't release officially)
+	* Changed: version 0.4.12
 
 2011-03-24	Léon Keijser	<keijser@stone-it.com> 0.4.11
 	* Added: display expired certificate status
