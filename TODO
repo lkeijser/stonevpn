@@ -12,7 +12,6 @@ NICETOHAVES:
 - option to (PGP/GPG) encrypt e-mail
 - option to use a different configuration file (defaults to /etc/stonevpn.conf)
 - option to create encrypted zipfile (using 7zip?)
-- option to create: openvpn CA cert
 - a web interface would be cool .. in Django! python kicks butt
 - log all actions/output
 - port to Windows

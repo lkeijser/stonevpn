@@ -1,3 +1,7 @@
+2012-xx-xx	Léon Keijser	<keijser@stone-it.com> 0.4.13beta1
+	* Added: option to generate self-signed CA certificate
+	* Changed: version 0.4.13beta1 (won't release officially)
+
 2012-01-27	Léon Keijser	<keijser@stone-it.com> 0.4.12
 	* Fixed: empty index and serial file caused traceback. Fix
 	by Jasper Capel <jasper [at] newnewyork [dot] nl>
