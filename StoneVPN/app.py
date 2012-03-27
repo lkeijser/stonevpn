@@ -39,7 +39,7 @@ from OpenSSL import SSL, crypto
 from optparse import OptionParser, OptionGroup
 from configobj import ConfigObj
 from time import strftime
-from datetime import datetime, timedelta
+from datetime import date, datetime, timedelta
 from IPy import IP
 from string import atoi
 from datetime import datetime
@@ -48,6 +48,7 @@ from email.MIMEBase import MIMEBase
 from email.MIMEText import MIMEText
 from email.Utils import formatdate
 from email import Encoders
+from socket import gethostname
 from StoneVPN import STONEVPN_VERSION
 
 
@@ -108,6 +109,7 @@ def main():
     group_extra = OptionGroup(parser, "Extra options",
             "To be used in conjunction with the general options.")
     group_info = OptionGroup(parser, "Information/printing options")
+    group_ca = OptionGroup(parser, "CA certificate options")
     group_test = OptionGroup(parser, "Test/experimental options",
             "Caution: use these options with care.")
 
@@ -228,6 +230,10 @@ def main():
         action="store_true",
         dest="emptycrl",
         help="create an empty CRL file (or overwrite an existing one)")
+    group_ca.add_option("-A", "--newca",
+        action="store",
+        dest="newca",
+        help="create a new self-signed CA certificate that's valid for NEWCA years")
     group_test.add_option("-t", "--test",
         action="store_true",
         dest="test",
@@ -238,6 +244,7 @@ def main():
     parser.add_option_group(group_extra)
     parser.add_option_group(group_info)
     parser.add_option_group(group_crl)
+    parser.add_option_group(group_ca)
     parser.add_option_group(group_test)
 
     # parse cmd line options
@@ -269,6 +276,7 @@ def main():
     s.printindex    = options.printindex
     s.expiredate    = options.expiredate
     s.emptycrl      = options.emptycrl
+    s.newca         = options.newca
     s.test          = options.test
     # values we got from parsing the configuration file:
     s.cacertfile    = cacertfile
@@ -298,7 +306,7 @@ def main():
         parser.print_help()
 
     # check for valid args
-    if options.fname is None and options.serial is not None and options.listrevoked is not None and options.listall is not None and options.listallcsv is not None and options.showserial is not None and options.printcert is not None and options.printindex is not None and options.emptycrl is not None and options.test is not None:
+    if options.fname is None and options.serial is not None and options.listrevoked is not None and options.listall is not None and options.listallcsv is not None and options.showserial is not None and options.printcert is not None and options.printindex is not None and options.emptycrl is not None and options.test is not None and options.newca is not None:
         parser.error("Error: you have to specify a filename (FNAME)")
     else:
         # must..have..root..
@@ -338,6 +346,7 @@ class StoneVPN:
         self.printindex    = None
         self.expiredate    = None
         self.emptycrl      = None
+        self.newca         = None
         self.test          = None
         
     # Read certain vars from OpenSSL config file
@@ -346,7 +355,7 @@ class StoneVPN:
         sectionname = 'req_distinguished_name'
         section=config[sectionname]
         # make these variables also global
-        global countryName, stateOrProvinceName, localityName, organizationName, organizationalUnitName, defaultDays, prefixdir, indexdb, serialfile
+        global countryName, stateOrProvinceName, localityName, organizationName, organizationalUnitName, defaultDays, prefixdir, indexdb, serialfile, default_bits, default_md
         # Check if certain sections in OpenSSL configfile are present, report if they're not
         try:
             countryName = section['countryName_default']
@@ -394,6 +403,10 @@ class StoneVPN:
         prefixdir = section['dir']
         indexdb = section['database'].replace('$dir', prefixdir)
         serialfile = section['serial'].replace('$dir', prefixdir)
+        sectionname = 'req'
+        section=config[sectionname]
+        default_bits =  section['default_bits']
+        default_md = section['default_md']
 
     def run(self):
         """
@@ -717,6 +730,9 @@ class StoneVPN:
             f.write(newCRL)
             f.close()
 
+        if self.newca:
+            self.createSelfSignedCertificate(self.newca)
+
         if self.test:
             print "Testing 1, 2, 5 ... three Sir!"
             sys.exit()
@@ -899,13 +915,52 @@ class StoneVPN:
             print "Expired:\tno"
 
 
+    def createSelfSignedCertificate(self, years):
+        # check if a CA certificate already exists
+        if os.path.exists(self.cacertfile):
+            print "Error: the CA certificate already exists at %s" % self.cacertfile
+            sys.exit()
+        # check if a CA key already exists
+        if os.path.exists(self.cakeyfile):
+            # file already exists
+            print "Warning: the CA keyfile already exists at %s, so we'll use it" % self.cakeyfile
+            k = self.load_key(self.cakeyfile)
+        else:
+            # create a key pair
+            k = crypto.PKey()
+            k.generate_key(crypto.TYPE_RSA, int(default_bits))
+        valid_until = (date.today() + timedelta(int(years)*365)).isoformat()
+        print "Generating a self-signed CA certificate, valid until %s." % valid_until
+        # create a self-signed cert
+        cert = crypto.X509()
+        # get some values from the openssl.cnf file
+        cert.get_subject().C = countryName
+        cert.get_subject().ST = stateOrProvinceName
+        cert.get_subject().L = localityName
+        cert.get_subject().O = organizationName
+        cert.get_subject().OU = organizationalUnitName
+        cert.get_subject().CN = gethostname()
+        extensions = []
+        extensions.append(crypto.X509Extension('basicConstraints',0, 'CA:TRUE'))
+        cert.add_extensions(extensions)
+        cert.set_serial_number(0)
+        cert.gmtime_adj_notBefore(0)
+        cert.gmtime_adj_notAfter(int(years)*365*24*60*60)
+        cert.set_issuer(cert.get_subject())
+        cert.set_pubkey(k)
+        cert.sign(k, default_md)
+        # write key and cert file
+        self.save_key (self.cakeyfile, k)
+        self.save_cert (self.cacertfile, cert)
+
+
     # Generate keyfile and certificate
     def makeCert(self, fname, cname):
         # remove possible leftover files to prevent the zipfile from packing these
         for f in glob.glob(self.working + '/' + self.fprefix + fname + '.*'):
             if self.debug: print "DEBUG: removing old file %s" % f
             os.remove(f)
-        pkey = self.createKeyPair(self.TYPE_RSA, 1024)
+        pkey = self.createKeyPair(self.TYPE_RSA, int(default_bits))
         req = self.createCertRequest(pkey, CN=cname, C=countryName, ST=stateOrProvinceName, O=organizationName, OU=organizationalUnitName)
         try:
             cacert = self.load_cert( self.cacertfile )
