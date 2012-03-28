@@ -351,6 +351,7 @@ class StoneVPN:
         
     # Read certain vars from OpenSSL config file
     def readOpenSSLConf(self):
+        if self.debug: print "DEBUG: parsing OpenSSL configuration file %s" % self.opensslconf
         config = ConfigObj(self.opensslconf)
         sectionname = 'req_distinguished_name'
         section=config[sectionname]
@@ -930,7 +931,8 @@ class StoneVPN:
             k = crypto.PKey()
             k.generate_key(crypto.TYPE_RSA, int(default_bits))
         valid_until = (date.today() + timedelta(int(years)*365)).isoformat()
-        print "Generating a self-signed CA certificate, valid until %s." % valid_until
+        print "Generating a self-signed CA certificate."
+        print "The certificate is valid until %s." % valid_until
         # create a self-signed cert
         cert = crypto.X509()
         # get some values from the openssl.cnf file
@@ -943,14 +945,17 @@ class StoneVPN:
         extensions = []
         extensions.append(crypto.X509Extension('basicConstraints',0, 'CA:TRUE'))
         cert.add_extensions(extensions)
-        cert.set_serial_number(0)
+        serial = self.hex2dec( self.readSerial() )
+        cert.set_serial_number(serial)
         cert.gmtime_adj_notBefore(0)
         cert.gmtime_adj_notAfter(int(years)*365*24*60*60)
         cert.set_issuer(cert.get_subject())
         cert.set_pubkey(k)
         cert.sign(k, default_md)
         # write key and cert file
+        print "Writing CA private key to %s" % self.cakeyfile
         self.save_key (self.cakeyfile, k)
+        print "Writing CA certificate to %s" % self.cacertfile
         self.save_cert (self.cacertfile, cert)
 
 
