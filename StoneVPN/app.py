@@ -407,7 +407,11 @@ class StoneVPN:
         sectionname = 'req'
         section=config[sectionname]
         default_bits =  section['default_bits']
-        default_md = section['default_md']
+        try:
+            default_md = section['default_md']
+        except KeyError:
+            print "Warning: your OpenSSL configuration file misses key 'default_md'. Please add it. For now we'll assume SHA1'"
+            default_md = 'sha1'
 
     def run(self):
         """

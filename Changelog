@@ -1,6 +1,8 @@
-2012-xx-xx	Léon Keijser	<keijser@stone-it.com> 0.4.13beta1
+2012-xx-xx	Léon Keijser	<keijser@stone-it.com> 0.4.13beta2
 	* Added: option to generate self-signed CA certificate
-	* Changed: version 0.4.13beta1 (won't release officially)
+	* Fixed: assume SHA1 for default_md if key is missing in
+	OpenSSL config file
+	* Changed: version 0.4.13beta2 (won't release officially)
 
 2012-01-27	Léon Keijser	<keijser@stone-it.com> 0.4.12
 	* Fixed: empty index and serial file caused traceback. Fix
