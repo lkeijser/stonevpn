@@ -2,7 +2,7 @@
 
  StoneVPN - Easy OpenVPN certificate and configuration management
 
- (C) 2009,2010 by L.S. Keijser, <keijser@stone-it.com>
+ (C) 2009-2012 by L.S. Keijser, <keijser@stone-it.com>
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
