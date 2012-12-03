@@ -14,6 +14,10 @@ StoneVPN is included in EPEL5 and Fedora 11 and later. Just use yum to install:
 
 From the tarball:
 
+* install these packages:
+  python-configob
+  python-ipy
+
 * run 'python setup.py install' as root
 
 * run 'python setup.py install_docs' to install example config and
