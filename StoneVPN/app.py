@@ -512,7 +512,7 @@ class StoneVPN:
                 sys.exit()
             # parse config file in search for ifconfig-pool
             for line in fileinput.input(self.openvpnconf):
-                if line.split()[0] == 'ifconfig-pool':
+                if len(line.split()) > 0 and line.split()[0] == 'ifconfig-pool':
                     pool_from = line.split()[1]
                     pool_to = line.split()[2]
                     print "Pool runs from " + pool_from + " to " + pool_to
