@@ -1,6 +1,7 @@
 2014-01-08	Léon Keijser	<keijser@stone-it.com> 0.4.14
 	* Fixed: bug with empty lines in openvpn config file. Fix
 	by Julian Golderer <julian [at] webmeisterei [dot] com>
+	* Changed: version 0.4.14
 
 2012-11-09	Léon Keijser	<keijser@stone-it.com> 0.4.13
 	* Added: option to generate self-signed CA certificate
