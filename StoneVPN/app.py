@@ -8,7 +8,7 @@
  it under the terms of the GNU General Public License as published by
  the Free Software Foundation; either version 2 of the License, or
  (at your option) any later version.
- 
+
  This program is distributed in the hope that it will be useful,
  but WITHOUT ANY WARRANTY; without even the implied warranty of
  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -60,7 +60,7 @@ def main():
         config = ConfigObj(stonevpnconf)
         sectionname = 'stonevpn conf'
         section=config[sectionname]
-        
+
         crlfile = section['crlfile']
         prefix = section['prefix']
         pushrouter = section['pushrouter']
@@ -84,7 +84,7 @@ def main():
         print "File " + stonevpnconf + " does not exist!"
         sys.exit()
 
-    # retrieve default expiration date from openssl.cnf, needed for optionparse 
+    # retrieve default expiration date from openssl.cnf, needed for optionparse
     if os.path.exists(opensslconf):
         config = ConfigObj(opensslconf)
         sectionname = 'CA_default'
@@ -129,7 +129,7 @@ def main():
 
     # populate groups
     parser.add_option("-D", "--debug",
-        action="count", 
+        action="count",
         dest="debug",
         help="enable debugging output")
     group_general.add_option("-n", "--name",
@@ -161,7 +161,7 @@ def main():
         help="send all generated files to EMAILADDRESS")
     group_extra.add_option("-i", "--free-ip",
         action="store_true",
-        dest="freeip", 
+        dest="freeip",
         help="locate and assign free ip")
     group_extra.add_option("-E", "--extrafile",
         action="append",
@@ -193,7 +193,7 @@ def main():
     group_extra.add_option("-u", "--route",
         action="append",
         dest="route",
-        help="push extra route(s) to client. Specify multiple routes as: -u 192.168.1.1/32 -u 10.1.4.0/24") 
+        help="push extra route(s) to client. Specify multiple routes as: -u 192.168.1.1/32 -u 10.1.4.0/24")
     group_crl.add_option("-l", "--listrevoked",
         action="store_true",
         dest="listrevoked",
@@ -348,7 +348,7 @@ class StoneVPN:
         self.emptycrl      = None
         self.newca         = None
         self.test          = None
-        
+
     # Read certain vars from OpenSSL config file
     def readOpenSSLConf(self):
         if self.debug: print "DEBUG: parsing OpenSSL configuration file %s" % self.opensslconf
@@ -360,7 +360,7 @@ class StoneVPN:
         # Check if certain sections in OpenSSL configfile are present, report if they're not
         try:
             countryName = section['countryName_default']
-            if len(countryName) is 0: 
+            if len(countryName) is 0:
                 print "Error: countryName_default is empty. Please edit %s first." % self.opensslconf
                 sys.exit()
         except KeyError:
@@ -368,7 +368,7 @@ class StoneVPN:
             sys.exit()
         try:
             stateOrProvinceName = section['stateOrProvinceName_default']
-            if len(stateOrProvinceName) is 0: 
+            if len(stateOrProvinceName) is 0:
                 print "Error: stateOrProvinceName_default is empty. Please edit %s first." % self.opensslconf
                 sys.exit()
         except KeyError:
@@ -376,7 +376,7 @@ class StoneVPN:
             sys.exit()
         try:
             localityName = section['localityName_default']
-            if len(localityName) is 0: 
+            if len(localityName) is 0:
                 print "Error: localityName_default is empty. Please edit %s first." % self.opensslconf
                 sys.exit()
         except KeyError:
@@ -384,7 +384,7 @@ class StoneVPN:
             sys.exit()
         try:
             organizationName = section['0.organizationName_default']
-            if len(organizationName) is 0: 
+            if len(organizationName) is 0:
                 print "Error: 0.organizationName_default is empty. Please edit %s first." % self.opensslconf
                 sys.exit()
         except KeyError:
@@ -392,7 +392,7 @@ class StoneVPN:
             sys.exit()
         try:
             organizationalUnitName = section['organizationalUnitName_default']
-            if len(organizationalUnitName) is 0: 
+            if len(organizationalUnitName) is 0:
                 print "Error: organizationalUnitName_default is empty. Please edit %s first." % self.opensslconf
                 sys.exit()
         except KeyError:
@@ -438,13 +438,13 @@ class StoneVPN:
         if not self.fprefix == '':
             if not self.fprefix[-1] == '-':
                 self.fprefix = str(self.fprefix) + '-'
-        
+
         # check if working dir exists, create it if it doesn't
         if not os.path.exists(self.working):
             print "Working dir didn't exist, making ..."
             os.mkdir(self.working)
         # Make certificates
-        if self.cname: 
+        if self.cname:
             if self.fname is None:
                 print "Error: required option -f/--file is missing."
                 sys.exit()
@@ -519,7 +519,7 @@ class StoneVPN:
             # from here on we have to do some magic to get a list of
             # valid IP's in the specified pool
             # we first check if the first 3 octets in both 'from' and 'to'
-            # are the same. 
+            # are the same.
             r = re.compile('(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})')
             mFrom = r.match(pool_from)
             mTo = r.match(pool_to)
@@ -578,7 +578,7 @@ class StoneVPN:
                         clientip = line.split()[2]
                         # remove IP from range if it exists in the list
                         if clientip in ipList:
-                            ipList.remove(clientip) 
+                            ipList.remove(clientip)
                         # the server IP is the 1st argument
                         servip = line.split()[1]
                         # remove IP from range if it exists in the list
@@ -712,7 +712,7 @@ class StoneVPN:
                 f.close()
             if nowwhat != 1:
                 print "Wrote extra route(s) to " + self.ccddir + "/" + nospaces_cname
-    
+
         if self.emptycrl:
             try:
                 crl = crypto.CRL()
@@ -723,7 +723,7 @@ class StoneVPN:
                 print "you will have to revoke certificates manually.\n"
                 sys.exit()
             if os.path.exists(self.crlfile):
-                overwrite=raw_input("Existing crlfile was found. Do you want to overwrite (y/N): ") 
+                overwrite=raw_input("Existing crlfile was found. Do you want to overwrite (y/N): ")
                 if overwrite not in ('y', 'Y'):
                     print "Doing nothing.."
                     sys.exit()
@@ -796,13 +796,13 @@ class StoneVPN:
         # Create the X509 Extensions
         extensions.append(crypto.X509Extension('basicConstraints',1, 'CA:FALSE'))
         try:
-        	extensions.append(crypto.X509Extension('nsComment',0, 'Created with stonevpn ' + str(self.stonevpnver)))
+            extensions.append(crypto.X509Extension('nsComment',0, 'Created with stonevpn ' + str(self.stonevpnver)))
         except ValueError:
-        	print "\n=================================================================="
-        	print "Warning: your version of pyOpenSSL doesn't support X509Extensions."
-        	print "Please consult the README file that came with StoneVPN in order to"
-        	print "fix this. This is not trivial. The certificate will be generated."
-        	print "==================================================================\n"
+            print "\n=================================================================="
+            print "Warning: your version of pyOpenSSL doesn't support X509Extensions."
+            print "Please consult the README file that came with StoneVPN in order to"
+            print "fix this. This is not trivial. The certificate will be generated."
+            print "==================================================================\n"
         # We're creating a X509 certificate version 2
         cert = crypto.X509()
         cert.set_version ( 2 )
@@ -893,7 +893,7 @@ class StoneVPN:
         try:
             certfile = self.load_cert( cert )
         except:
-            print "Error opening certificate file" 
+            print "Error opening certificate file"
             sys.exit()
         # Some objects are 'X509Name objects' so we have to fiddle a bit to output to a human-readable format
         certIssuerArray = str(certfile.get_issuer()).replace('<X509Name object \'', '').replace('\'>','').split('/')
@@ -988,7 +988,7 @@ class StoneVPN:
         last = None
         for line in open(indexdb):
             last=line
-       	if last: 
+        if last:
             last_serial = last.split("\t")[3].strip()
         else:
             last_serial = 0
@@ -1022,7 +1022,7 @@ class StoneVPN:
         # We can't work with hex numbers. Convert them to dec first and increase its value by 1
         newSerial = self.hex2dec(curSerial) + 1
         newSerialDec = newSerial
-        # Now convert dec back to hex 
+        # Now convert dec back to hex
         newSerial = self.dec2hex(newSerial)
 
         # Check if a different expiration date for certificate
@@ -1039,7 +1039,7 @@ class StoneVPN:
             countRest = len(expList) - 1
             exp_time = ''.join(expList[0:countRest])
             if self.debug: print "DEBUG: exp_time is %s" % exp_time
-            if unit not in ('h', 'H', 'd', 'D', 'y', 'Y'): 
+            if unit not in ('h', 'H', 'd', 'D', 'y', 'Y'):
                 print "Invalid time unit provided. Use h(ours), d(ays) or y(ears)."
                 sys.exit()
             elif unit in ('h', 'H'):
@@ -1170,7 +1170,7 @@ class StoneVPN:
             print "Error: CRL file not found at: " + self.crlfile + " or insufficient rights."
             sys.exit()
         try:
-        	crl = crypto.CRL()
+            crl = crypto.CRL()
         except:
             print "\nError: CRL support is not available in your version of"
             print "pyOpenSSL. Please check the README file that came with"
@@ -1190,8 +1190,8 @@ class StoneVPN:
         for line in input:
             # first check if the line contains a revoked cert:
             if line.split()[0] == 'R':
-                # then check if the revoked cert has the same serial nr as the one we're trying to revoke
-                # if so, exit immediately since we can't revoke twice (duh)
+            # then check if the revoked cert has the same serial nr as the one we're trying to revoke
+            # if so, exit immediately since we can't revoke twice (duh)
                 if line.split()[3] == serial.upper():
                     print "Certificate with serial %s already revoked!" % serial.upper()
                     os.remove(self.working + '/index.tmp')
@@ -1253,8 +1253,8 @@ class StoneVPN:
         text = open(self.crlfile, 'r').read()
         print "Parsing CRL file %s" % self.crlfile
         try:
-        	crl = crypto.load_crl(crypto.FILETYPE_PEM, text)
-        	revs = crl.get_revoked()
+            crl = crypto.load_crl(crypto.FILETYPE_PEM, text)
+            revs = crl.get_revoked()
         except:
             print "\nError: CRL support is not available in your version of"
             print "pyOpenSSL. Please check the README file that came with"
@@ -1293,15 +1293,15 @@ class StoneVPN:
             expDate = str(revCerts[count].split()[1])
             print "Expiry date:\t\t20%s-%s-%s %s:%s:%s" % (expDate[:2],expDate[2:4],expDate[4:6],expDate[6:8],expDate[8:10],expDate[10:12])
             revDate = str(revCerts[count].split()[2])
-            print "Revocation date:\t20%s-%s-%s %s:%s:%s" % (revDate[:2],revDate[2:4],revDate[4:6],revDate[6:8],revDate[8:10],revDate[10:12]) 
+            print "Revocation date:\t20%s-%s-%s %s:%s:%s" % (revDate[:2],revDate[2:4],revDate[4:6],revDate[6:8],revDate[8:10],revDate[10:12])
             print "Serial:\t\t\t%s" % str(revCerts[count].split()[3])
             lineDN = line.split('unknown')[1].strip()
             newDN = ''.join(lineDN).replace('/',',')
             print "DN:\t\t\t%s" % newDN
             print "\n"
             count = count + 1
-    
-    
+
+
     def indent(self, rows, hasHeader=False, headerChar='-', delim=' | ', justify='left',
                separateRows=False, prefix='', postfix='', wrapfunc=lambda x:x):
         # closure for breaking logical rows to physical, using wrapfunc
@@ -1328,7 +1328,7 @@ class StoneVPN:
                     + postfix
             if separateRows or hasHeader: print >> output, rowSeparator; hasHeader=False
         return output.getvalue()
-    
+
     def listAllCerts(self):
         # list all certificates in indexdb, output as pretty table
         input = open(indexdb, 'r')
@@ -1363,7 +1363,7 @@ class StoneVPN:
 
 
     def listAllCertsCSV(self):
-        # same routine as listAllCerts() except print as 
+        # same routine as listAllCerts() except print as
         # comma seperated values and without the DN.
         input = open(indexdb, 'r')
         for line in input:
