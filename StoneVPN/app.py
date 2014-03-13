@@ -144,7 +144,7 @@ def main():
         action="store",
         dest="confs",
         default="unix",
-        help="create config files for [windows|unix|mac|all]")
+        help="create config files for [windows|unix|mac|android|all]")
     group_extra.add_option("-e", "--prefix",
         action="store",
         dest="fprefix",
@@ -1109,10 +1109,14 @@ class StoneVPN:
             sectionname = 'mac conf'
             print "Generating Mac configuration file"
             f=open(self.working + '/' + self.fprefix + fname + '.conf', 'w')
+        elif sname == 'android':
+            sectionname = 'android conf'
+            print "Generating Android configuration file"
+            f=open(self.working + '/' + self.fprefix + fname + '.ovpn', 'w')
         elif sname == 'all':
             print "Generating all configuration files"
         else:
-            print "Incorrect OS type specified. Valid options are 'unix', 'windows', 'mac' or 'all'."
+            print "Incorrect OS type specified. Valid options are 'unix', 'windows', 'mac', 'android' or 'all'."
             sys.exit()
         if sname != 'all':
             section=config[sectionname]
@@ -1133,9 +1137,19 @@ class StoneVPN:
                         f.write(section[var] + '\n')
                 else:
                     f.write(section[var] + '\n')
+	    if sname == 'android':
+		fp = open ( self.cacertfile, 'r' )
+		f.write('\n' + "<ca>" + '\n' + fp.read() + "</ca>" + '\n')
+		fp.close ()
+		fp = open ( self.working + '/' + self.fprefix + fname + '.crt', 'r' )
+		f.write('\n' + "<cert>" + '\n' + fp.read() + "</cert>" + '\n')
+		fp.close ()
+		fp = open ( self.working + '/' + self.fprefix + fname + '.key', 'r' )
+		f.write('\n' + "<key>" + '\n' + fp.read() + "</key>" + '\n')
+		fp.close ()
             f.close()
         else:
-            os_versions = ["windows", "linux", "mac"]
+            os_versions = ["windows", "linux", "mac", "android"]
             for os_type in os_versions:
                 # soort extensie ipv deze regel <<
                 if os_type == 'linux':
@@ -1150,6 +1164,10 @@ class StoneVPN:
                     sectionname = 'mac conf'
                     print "Generating Mac configuration file"
                     f=open(self.working + '/' + self.fprefix + fname + '.mac.conf', 'w')
+                elif os_type == 'android':
+                    sectionname = 'android conf'
+                    print "Generating Android configuration file"
+                    f=open(self.working + '/' + self.fprefix + fname + '.android.ovpn', 'w')
                 section=config[sectionname]
                 for var in section:
                     if var == 'ca':
@@ -1161,6 +1179,16 @@ class StoneVPN:
                         f.write(section[var].replace('clientkeyfile', self.fprefix + fname + '.key') + '\n')
                     else:
                         f.write(section[var] + '\n')
+		if os_type == 'android':
+		    fp = open ( self.cacertfile, 'r' )
+		    f.write('\n' + "<ca>" + '\n' + fp.read() + "</ca>" + '\n')
+		    fp.close ()
+		    fp = open ( self.working + '/' + self.fprefix + fname + '.crt', 'r' )
+		    f.write('\n' + "<cert>" + '\n' + fp.read() + "</cert>" + '\n')
+		    fp.close ()
+		    fp = open ( self.working + '/' + self.fprefix + fname + '.key', 'r' )
+		    f.write('\n' + "<key>" + '\n' + fp.read() + "</key>" + '\n')
+		    fp.close ()
                 f.close()
 
 
