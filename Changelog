@@ -1,3 +1,8 @@
+2014-03-13	Léon Keijser	<keijser@stone-it.com> 0.4.15
+	* Added: support for Android. Patch by Nerijus Baliunas <nerijus [at]
+	users [dot] sourceforge [dot] net>
+	* Changed: version 0.4.15
+
 2014-01-08	Léon Keijser	<keijser@stone-it.com> 0.4.14
 	* Fixed: bug with empty lines in openvpn config file. Fix
 	by Julian Golderer <julian [at] webmeisterei [dot] com>
