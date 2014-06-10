@@ -1137,16 +1137,16 @@ class StoneVPN:
                         f.write(section[var] + '\n')
                 else:
                     f.write(section[var] + '\n')
-	    if sname == 'android':
-		fp = open ( self.cacertfile, 'r' )
-		f.write('\n' + "<ca>" + '\n' + fp.read() + "</ca>" + '\n')
-		fp.close ()
-		fp = open ( self.working + '/' + self.fprefix + fname + '.crt', 'r' )
-		f.write('\n' + "<cert>" + '\n' + fp.read() + "</cert>" + '\n')
-		fp.close ()
-		fp = open ( self.working + '/' + self.fprefix + fname + '.key', 'r' )
-		f.write('\n' + "<key>" + '\n' + fp.read() + "</key>" + '\n')
-		fp.close ()
+            if sname == 'android':
+                fp = open ( self.cacertfile, 'r' )
+                f.write('\n' + "<ca>" + '\n' + fp.read() + "</ca>" + '\n')
+                fp.close ()
+                fp = open ( self.working + '/' + self.fprefix + fname + '.crt', 'r' )
+                f.write('\n' + "<cert>" + '\n' + fp.read() + "</cert>" + '\n')
+                fp.close ()
+                fp = open ( self.working + '/' + self.fprefix + fname + '.key', 'r' )
+                f.write('\n' + "<key>" + '\n' + fp.read() + "</key>" + '\n')
+                fp.close ()
             f.close()
         else:
             os_versions = ["windows", "linux", "mac", "android"]
@@ -1179,16 +1179,16 @@ class StoneVPN:
                         f.write(section[var].replace('clientkeyfile', self.fprefix + fname + '.key') + '\n')
                     else:
                         f.write(section[var] + '\n')
-		if os_type == 'android':
-		    fp = open ( self.cacertfile, 'r' )
-		    f.write('\n' + "<ca>" + '\n' + fp.read() + "</ca>" + '\n')
-		    fp.close ()
-		    fp = open ( self.working + '/' + self.fprefix + fname + '.crt', 'r' )
-		    f.write('\n' + "<cert>" + '\n' + fp.read() + "</cert>" + '\n')
-		    fp.close ()
-		    fp = open ( self.working + '/' + self.fprefix + fname + '.key', 'r' )
-		    f.write('\n' + "<key>" + '\n' + fp.read() + "</key>" + '\n')
-		    fp.close ()
+                if os_type == 'android':
+                    fp = open ( self.cacertfile, 'r' )
+                    f.write('\n' + "<ca>" + '\n' + fp.read() + "</ca>" + '\n')
+                    fp.close ()
+                    fp = open ( self.working + '/' + self.fprefix + fname + '.crt', 'r' )
+                    f.write('\n' + "<cert>" + '\n' + fp.read() + "</cert>" + '\n')
+                    fp.close ()
+                    fp = open ( self.working + '/' + self.fprefix + fname + '.key', 'r' )
+                    f.write('\n' + "<key>" + '\n' + fp.read() + "</key>" + '\n')
+                    fp.close ()
                 f.close()
 
 
