@@ -2,7 +2,7 @@
 
 from distutils.core import setup, Command
 import os, sys
-from StoneVPN import STONEVPN_VERSION
+from StoneVPN_App import STONEVPN_VERSION
 
 class SetupBuildCommand(Command):
     user_options = []
