@@ -49,7 +49,7 @@ from email.MIMEText import MIMEText
 from email.Utils import formatdate
 from email import Encoders
 from socket import gethostname
-from StoneVPN import STONEVPN_VERSION
+from StoneVPN_App import STONEVPN_VERSION
 
 
 def main():
