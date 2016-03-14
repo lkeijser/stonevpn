@@ -49,7 +49,7 @@ from email.MIMEText import MIMEText
 from email.Utils import formatdate
 from email import Encoders
 from socket import gethostname
-from StoneVPN_App import STONEVPN_VERSION
+from StoneVPN import STONEVPN_VERSION
 
 
 def main():
@@ -749,13 +749,13 @@ class StoneVPN:
         return pkey
 
     # Create request
-    def createCertRequest(self, pkey, digest="md5", **name):
+    def createCertRequest(self, pkey, digest='sha256', **name):
         req = crypto.X509Req()
         subj = req.get_subject()
         for (key,value) in name.items():
             setattr(subj, key, value)
         req.set_pubkey(pkey)
-        req.sign(pkey, 'md5')
+        req.sign(pkey, default_md)
         return req
 
     # decimal 2 hexidecimal and vice versa
@@ -791,7 +791,7 @@ class StoneVPN:
         f.close()
 
     # Create certificate
-    def createCertificate(self, req, (issuerCert, issuerKey), serial, (notBefore, notAfter), digest="md5"):
+    def createCertificate(self, req, (issuerCert, issuerKey), serial, (notBefore, notAfter), digest='sha256'):
         extensions = []
         # Create the X509 Extensions
         extensions.append(crypto.X509Extension('basicConstraints',1, 'CA:FALSE'))

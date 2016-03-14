@@ -14,6 +14,6 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 """
 
 import sys
-import StoneVPN_App.app as app
+import StoneVPN.app as app
 sys.exit(app.main() or 0)
 
